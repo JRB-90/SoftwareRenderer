@@ -1,0 +1,28 @@
+cmake_minimum_required (VERSION 3.8)
+
+project (Engine2D)
+
+find_library(math NAMES math)
+find_library(engine NAMES engine)
+
+add_library(engine2d STATIC
+	Engine2D.cpp
+	Engine2D.h
+	Point2D.cpp
+	Point2D.h
+	Line2D.cpp
+	Line2D.h
+	Scene2D.cpp
+	Scene2D.h
+)
+
+target_link_libraries(engine2d PUBLIC
+	SDL2
+	math
+	engine
+)
+
+target_include_directories(engine2d PUBLIC
+	${CMAKE_CURRENT_SOURCE_DIR}
+	C:\\SDL2\\include
+)
