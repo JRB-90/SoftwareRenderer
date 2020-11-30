@@ -6,8 +6,9 @@ Scene2D::Scene2D()
 {
 }
 
-void Scene2D::Clear()
+void Scene2D::ClearAll()
 {
 	points.clear();
 	lines.clear();
+	polygons.clear();
 }

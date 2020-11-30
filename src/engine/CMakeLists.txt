@@ -4,12 +4,20 @@ project (Engine)
 
 find_library(math NAMES math)
 
+link_directories(test
+	C:\\SDL2\\lib\\x64
+)
+
 add_library(engine STATIC
-    Input.cpp
-	Input.h
 	Color.cpp
 	Color.h
 	RenderingMode.h
+    RenderingWindow.h
+    RenderingWindow.cpp
+    Engine.h
+	Engine.cpp
+	IRenderingEngine.h
+	IScene.h
 )
 
 target_link_libraries(engine PUBLIC

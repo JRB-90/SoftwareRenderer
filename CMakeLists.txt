@@ -9,4 +9,6 @@ add_subdirectory("src/math")
 add_subdirectory("src/engine")
 add_subdirectory("src/engine2d")
 
-add_subdirectory("src/test")
+add_subdirectory("src/sdl_test")
+add_subdirectory("src/engine_test")
+add_subdirectory("src/starfield")
