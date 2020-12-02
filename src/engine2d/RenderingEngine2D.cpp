@@ -11,7 +11,7 @@ RenderingEngine2D::RenderingEngine2D(
 	std::shared_ptr<Scene2D> scene, 
 	size_t pixelsWidth, 
 	size_t pixelsHeight)
-	:
+  :
 	scene(std::move(scene)),
 	pixelsWidth(pixelsWidth),
 	pixelsHeight(pixelsHeight),

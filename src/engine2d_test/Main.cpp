@@ -47,7 +47,7 @@ int main(int argc, const char* argv[])
 	Engine engine(
 		renderingEngine,
 		RenderingMode::Software,
-		"Engine Test",
+		"Engine 2D Test",
 		WINDOW_WIDTH,
 		WINDOW_HEIGHT,
 		UPDATE_RATE,
