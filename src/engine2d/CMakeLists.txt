@@ -23,7 +23,7 @@ add_library(engine2d STATIC
 	Triangle2D.h
 	Triangle2D.cpp
     Utils2D.h 
-	Utils.cpp
+	Utils2D.cpp
 )
 
 target_link_libraries(engine2d PUBLIC

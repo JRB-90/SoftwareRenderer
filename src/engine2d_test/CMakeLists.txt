@@ -7,15 +7,15 @@ link_directories(test
 	C:\\SDL2\\lib\\x64
 )
 
-add_executable(engine_test
+add_executable(engine2d_test
 	Main.cpp
 )
 
-target_link_libraries(engine_test PUBLIC
+target_link_libraries(engine2d_test PUBLIC
 	engine
 	engine2d
 )
 
-target_include_directories(engine_test PUBLIC
+target_include_directories(engine2d_test PUBLIC
 	${CMAKE_CURRENT_SOURCE_DIR}
 )

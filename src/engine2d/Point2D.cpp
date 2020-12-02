@@ -12,6 +12,7 @@ Point2D::Point2D()
 Point2D::Point2D(const Point2D& point)
   :
 	position(point.position),
+	transform(point.transform),
 	color(point.color),
 	size(point.size)
 {

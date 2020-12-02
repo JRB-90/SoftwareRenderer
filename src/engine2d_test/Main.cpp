@@ -8,11 +8,13 @@
 #include "Point2D.h"
 #include "Line2D.h"
 #include "Polygon2D.h"
+#include "Frame2D.h"
 
 #include <iostream>
 #include <memory>
 #include <random>
 #include <ctime>
+#include <cmath>
 
 using namespace softengine;
 
@@ -41,13 +43,6 @@ int main(int argc, const char* argv[])
 			PIXELS_WIDTH,
 			PIXELS_HEIGHT
 		);
-
-	scene->Lines().push_back(
-		Line2D(
-			Vector2D(),
-			Vector2D()
-		)
-	);
 
 	Engine engine(
 		renderingEngine,
@@ -110,40 +105,51 @@ void SetupScene()
 	//}
 
 	std::vector<Vector2D> polyPoints;
-	polyPoints.push_back(Vector2D(100, 100));
-	polyPoints.push_back(Vector2D(120, 200));
-	polyPoints.push_back(Vector2D(200, 250));
-	scene->Polygons().push_back(
-		Polygon2D(
-			polyPoints,
-			Color::Cyan
+	polyPoints.push_back(Vector2D(-50, 50));
+	polyPoints.push_back(Vector2D(-50, -50));
+	polyPoints.push_back(Vector2D(40, -50));
+	Polygon2D triangle(
+		polyPoints,
+		Color::Cyan
+	);
+	triangle.Transform(
+		Frame2D(
+			Vector2D(300, 450)
 		)
 	);
+	scene->Polygons().push_back(triangle);
 
 	std::vector<Vector2D> polyPoints2;
-	polyPoints2.push_back(Vector2D(300, 300));
-	polyPoints2.push_back(Vector2D(300, 400));
-	polyPoints2.push_back(Vector2D(400, 400));
-	polyPoints2.push_back(Vector2D(400, 300));
-	scene->Polygons().push_back(
-		Polygon2D(
-			polyPoints2,
-			Color::Magenta
-		)
+	polyPoints2.push_back(Vector2D(-50, -50));
+	polyPoints2.push_back(Vector2D(-50, 50));
+	polyPoints2.push_back(Vector2D(50, 50));
+	polyPoints2.push_back(Vector2D(50, -50));
+	Polygon2D square(
+		polyPoints2,
+		Color::Magenta
 	);
+	scene->Polygons().push_back(square);
 
 	std::vector<Vector2D> polyPoints3;
-	polyPoints3.push_back(Vector2D(450, 50));
-	polyPoints3.push_back(Vector2D(402, 85));
-	polyPoints3.push_back(Vector2D(421, 140));
-	polyPoints3.push_back(Vector2D(479, 140));
-	polyPoints3.push_back(Vector2D(498, 85));
-	scene->Polygons().push_back(
-		Polygon2D(
-			polyPoints3,
-			Color::Yellow
+	polyPoints3.push_back(Vector2D(0, -40));
+	polyPoints3.push_back(Vector2D(-48, -5));
+	polyPoints3.push_back(Vector2D(-29, 50));
+	polyPoints3.push_back(Vector2D(29, 50));
+	polyPoints3.push_back(Vector2D(48, -5));
+	Polygon2D pentagon(
+		polyPoints3,
+		Color::Yellow
+	);
+	pentagon.Transform(
+		Frame2D(
+			Vector2D(
+				200,
+				200
+			),
+			0
 		)
 	);
+	scene->Polygons().push_back(pentagon);
 
 	//for (size_t i = 0; i < 1; i++)
 	//{
@@ -173,7 +179,27 @@ void SetupScene()
 	//}
 }
 
+double a = 0.0;
+
 void Update(double delta)
 {
 	// Update scene here
+
+	scene->Polygons()[0].Transform().Position(
+		Vector2D(
+			300 + (std::sin(SDL_GetPerformanceCounter() / 20000) * 30),
+			400 + (std::cos(SDL_GetPerformanceCounter() / 20000) * 30)
+		)
+	);
+	scene->Polygons()[0].Transform().Angle(-a * 2);
+
+	scene->Polygons()[1].Transform().Position(
+		Vector2D(
+			400 + (std::sin(SDL_GetPerformanceCounter() / 10000) * 20),
+			200 + (std::cos(SDL_GetPerformanceCounter() / 10000) * 20)
+		)
+	);
+
+	scene->Polygons()[2].Transform().Angle(a);
+	a += 1.0;
 }

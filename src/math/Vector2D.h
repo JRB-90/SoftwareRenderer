@@ -2,6 +2,8 @@
 
 namespace softengine
 {
+	class Frame2D;
+
 	class Vector2D
 	{
 	public:
@@ -25,6 +27,7 @@ namespace softengine
 		Vector2D operator+(const Vector2D& vec);
 		Vector2D operator-(const Vector2D& vec);
 		Vector2D operator*(const double scalar);
+		Vector2D operator*(const Frame2D& frame);
 		Vector2D operator/(const double scalar);
 
 	private:

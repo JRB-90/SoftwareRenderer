@@ -1,6 +1,9 @@
 #include "RenderingEngine2D.h"
 #include "Engine.h"
+#include "Frame2D.h"
 #include "Utils2D.h"
+
+#include <iostream>
 
 using namespace softengine;
 
@@ -193,19 +196,22 @@ void RenderingEngine2D::RenderScene2D()
 
 void RenderingEngine2D::RenderPoint(Point2D& point)
 {
+	Vector2D p = point.Position() * point.Transform();
 	SetPixelValue(
-		(size_t)point.Position().X(),
-		(size_t)point.Position().Y(),
+		(size_t)p.X(),
+		(size_t)p.Y(),
 		point.GetColor()
 	);
 }
 
 void RenderingEngine2D::RenderLine(Line2D& line)
 {
+	Vector2D p1 = line.P1() * line.Transform();
+	Vector2D p2 = line.P2() * line.Transform();
 	int yMax, yMin;
 	RenderLinePoints(
-		line.P1(),
-		line.P2(),
+		p1,
+		p2,
 		line.GetColor(),
 		yMax,
 		yMin
@@ -354,19 +360,22 @@ void RenderingEngine2D::RenderPolygon(Polygon2D& polygon)
 	}
 	else if (polygon.Points().size() == 1)
 	{
+		Vector2D p = Vector2D(polygon.Points()[0]) * polygon.Transform();
 		RenderPoint(
 			Point2D(
-				polygon.Points()[0],
+				p,
 				polygon.GetColor()
 			)
 		);
 	}
 	else if (polygon.Points().size() == 2)
 	{
+		Vector2D p1 = Vector2D(polygon.Points()[0]) * polygon.Transform();
+		Vector2D p2 = Vector2D(polygon.Points()[1]) * polygon.Transform();
 		RenderLine(
 			Line2D(
-				polygon.Points()[0],
-				polygon.Points()[1],
+				p1,
+				p2,
 				polygon.GetColor()
 			)
 		);
@@ -374,26 +383,34 @@ void RenderingEngine2D::RenderPolygon(Polygon2D& polygon)
 	else
 	{
 		RenderPolygonFilled(polygon);
-		RenderPolygonLines(polygon);
+		//RenderPolygonLines(polygon);
 	}
 }
 
 void RenderingEngine2D::RenderPolygonLines(Polygon2D& polygon)
 {
+	std::vector<Vector2D> transformedPoints;
+	for (size_t i = 0; i < polygon.Points().size(); i++)
+	{
+		transformedPoints.push_back(
+			Vector2D(polygon.Points()[i]) * polygon.Transform()
+		);
+	}
+
 	for (size_t i = 0; i < polygon.Points().size() - 1; i++)
 	{
 		RenderLine(
 			Line2D(
-				polygon.Points()[i],
-				polygon.Points()[i + 1],
+				transformedPoints[i],
+				transformedPoints[i + 1],
 				Color::White
 			)
 		);
 	}
 	RenderLine(
 		Line2D(
-			polygon.Points()[polygon.Points().size() - 1],
-			polygon.Points()[0],
+			transformedPoints[transformedPoints.size() - 1],
+			transformedPoints[0],
 			Color::White
 		)
 	);
@@ -401,13 +418,28 @@ void RenderingEngine2D::RenderPolygonLines(Polygon2D& polygon)
 
 void RenderingEngine2D::RenderPolygonFilled(Polygon2D& polygon)
 {
+	if (!polygon.IsValid())
+	{
+		std::cerr << "Attempted to render invlaid polygon" << std::endl;
+
+		return;
+	}
+
+	std::vector<Vector2D> transformedPoints;
+	for (size_t i = 0; i < polygon.Points().size(); i++)
+	{
+		transformedPoints.push_back(
+			Vector2D(polygon.Points()[i]) * polygon.Transform()
+		);
+	}
+
 	for (size_t i = 1; i < polygon.Points().size() - 1; i++)
 	{
 		RenderTriangle(
 			Triangle2D(
-				polygon.Points()[0],
-				polygon.Points()[i],
-				polygon.Points()[i + 1],
+				transformedPoints[0],
+				transformedPoints[i],
+				transformedPoints[i + 1],
 				polygon.GetColor()
 			)
 		);

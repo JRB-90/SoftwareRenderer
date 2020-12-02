@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Vector2D.h"
+#include "Frame2D.h"
 #include "Color.h"
 
 namespace softengine
@@ -27,6 +28,8 @@ namespace softengine
 
 		Vector2D& Position() { return position; }
 		void Position(Vector2D& position) { this->position = position; }
+		Frame2D& Transform() { return transform; }
+		void Transform(Frame2D& transform) { this->transform = transform; }
 		Color& GetColor() { return color; }
 		void SetColor(Color& color) { this->color = color; }
 		uint16_t Size() { return size; }
@@ -34,6 +37,7 @@ namespace softengine
 
 	private:
 		Vector2D position;
+		Frame2D transform;
 		Color color;
 		uint16_t size;
 	};
