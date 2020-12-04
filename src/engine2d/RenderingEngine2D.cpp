@@ -2,6 +2,7 @@
 #include "Engine.h"
 #include "Frame2D.h"
 #include "Utils2D.h"
+#include "MathUtils.h"
 
 #include <iostream>
 
@@ -119,8 +120,14 @@ void RenderingEngine2D::Render()
 	SDL_RenderPresent(renderer);
 }
 
-Color RenderingEngine2D::GetPixelValue(size_t pixel) const
+Color RenderingEngine2D::GetPixelValue(int pixel) const
 {
+	if (pixel < 0 ||
+		pixel >= pixelCount)
+	{
+		return Color(0.0, 0.0, 0.0, 0.0);
+	}
+
 	const size_t offset = 4 * pixel;
 
 	return
@@ -133,9 +140,15 @@ Color RenderingEngine2D::GetPixelValue(size_t pixel) const
 }
 
 Color RenderingEngine2D::GetPixelValue(
-	size_t pixelX,
-	size_t pixelY) const
+	int pixelX,
+	int pixelY) const
 {
+	if (pixelX < 0 || pixelX >= pixelsWidth ||
+		pixelY < 0 || pixelY >= pixelsHeight)
+	{
+		return Color(0.0, 0.0, 0.0, 0.0);
+	}
+
 	const size_t offset = (pixelsWidth * pixelY * 4) + pixelX * 4;
 
 	return
@@ -148,9 +161,15 @@ Color RenderingEngine2D::GetPixelValue(
 }
 
 void RenderingEngine2D::SetPixelValue(
-	size_t pixel,
+	int pixel,
 	Color& color)
 {
+	if (pixel < 0 ||
+		pixel >= pixelCount)
+	{
+		return;
+	}
+
 	const size_t offset = 4 * pixel;
 	pixels[offset + 0] = color.GetAs4B().b;
 	pixels[offset + 1] = color.GetAs4B().g;
@@ -159,28 +178,29 @@ void RenderingEngine2D::SetPixelValue(
 }
 
 void RenderingEngine2D::SetPixelValue(
-	size_t pixelX,
-	size_t pixelY,
+	int pixelX,
+	int pixelY,
 	Color& color)
 {
-	if (pixelX > 0 &&
-		pixelX < pixelsWidth &&
-		pixelY > 0 &&
-		pixelY < pixelsHeight)
+
+	if (pixelX < 0 || pixelX >= pixelsWidth ||
+		pixelY < 0 || pixelY >= pixelsHeight)
 	{
-		const size_t offset = (pixelsWidth * pixelY * 4) + pixelX * 4;
-		pixels[offset + 0] = color.GetAs4B().b;
-		pixels[offset + 1] = color.GetAs4B().g;
-		pixels[offset + 2] = color.GetAs4B().r;
-		pixels[offset + 3] = color.GetAs4B().a;
+		return;
 	}
+
+	const size_t offset = (pixelsWidth * pixelY * 4) + pixelX * 4;
+	pixels[offset + 0] = color.GetAs4B().b;
+	pixels[offset + 1] = color.GetAs4B().g;
+	pixels[offset + 2] = color.GetAs4B().r;
+	pixels[offset + 3] = color.GetAs4B().a;
 }
 
 void RenderingEngine2D::RenderScene2D()
 {
-	for (Point2D& point : scene->Points())
+	for (Polygon2D& polygon : scene->Polygons())
 	{
-		RenderPoint(point);
+		RenderPolygon(polygon);
 	}
 
 	for (Line2D& line : scene->Lines())
@@ -188,15 +208,18 @@ void RenderingEngine2D::RenderScene2D()
 		RenderLine(line);
 	}
 
-	for (Polygon2D& polygon : scene->Polygons())
+	for (Point2D& point : scene->Points())
 	{
-		RenderPolygon(polygon);
+		RenderPoint(point);
 	}
 }
 
 void RenderingEngine2D::RenderPoint(Point2D& point)
 {
-	Vector2D p = point.Position() * point.Transform();
+	Vector2D p = MathUtils::TransformPointFor2D(
+		point.Position(),
+		point.Transform()
+	);
 	SetPixelValue(
 		(size_t)p.X(),
 		(size_t)p.Y(),
@@ -206,8 +229,16 @@ void RenderingEngine2D::RenderPoint(Point2D& point)
 
 void RenderingEngine2D::RenderLine(Line2D& line)
 {
-	Vector2D p1 = line.P1() * line.Transform();
-	Vector2D p2 = line.P2() * line.Transform();
+	Vector2D p1 = MathUtils::TransformPointFor2D(
+		line.P1(),
+		line.Transform()
+	);
+
+	Vector2D p2 = MathUtils::TransformPointFor2D(
+		line.P2(),
+		line.Transform()
+	);
+
 	int yMax, yMin;
 	RenderLinePoints(
 		p1,
@@ -249,8 +280,8 @@ void RenderingEngine2D::RenderLinePoints(
 		x += xInc;
 		y += yInc;
 		SetPixelValue(
-			(size_t)x,
-			(size_t)y,
+			x,
+			y,
 			color
 		);
 
@@ -290,7 +321,7 @@ void RenderingEngine2D::RenderTriangle(Triangle2D& triangle)
 		p1 = temp;
 	}
 
-	std::vector<size_t> x01 =
+	std::vector<int> x01 =
 		Utils2D::InterpolateXPixelValues(
 			p0.X(),
 			p0.Y(), 
@@ -298,7 +329,7 @@ void RenderingEngine2D::RenderTriangle(Triangle2D& triangle)
 			p1.Y() 
 		);
 
-	std::vector<size_t> x12 =
+	std::vector<int> x12 =
 		Utils2D::InterpolateXPixelValues(
 			p1.X(),
 			p1.Y(),
@@ -306,7 +337,7 @@ void RenderingEngine2D::RenderTriangle(Triangle2D& triangle)
 			p2.Y()
 		);
 
-	std::vector<size_t> x02 =
+	std::vector<int> x02 =
 		Utils2D::InterpolateXPixelValues(
 			p0.X(),
 			p0.Y(),
@@ -315,7 +346,7 @@ void RenderingEngine2D::RenderTriangle(Triangle2D& triangle)
 		);
 
 	x01.pop_back();
-	std::vector<size_t> x012;
+	std::vector<int> x012;
 	for (auto x : x01)
 	{
 		x012.push_back(x);
@@ -325,9 +356,9 @@ void RenderingEngine2D::RenderTriangle(Triangle2D& triangle)
 		x012.push_back(x);
 	}
 
-	std::vector<size_t> xLeft;
-	std::vector<size_t> xRight;
-	size_t m = x02.size() / 2;
+	std::vector<int> xLeft;
+	std::vector<int> xRight;
+	int m = x02.size() / 2;
 	if (x02[m] < x012[m])
 	{
 		xLeft = x02;
@@ -339,13 +370,13 @@ void RenderingEngine2D::RenderTriangle(Triangle2D& triangle)
 		xRight = x02;
 	}
 
-	for (size_t y = p0.Y(); y < p2.Y(); y++)
+	for (int y = p0.Y(); y < p2.Y(); y++)
 	{
-		for (size_t x = xLeft[y - p0.Y()]; x < xRight[y - p0.Y()]; x++)
+		for (int x = xLeft[y - p0.Y()]; x < xRight[y - p0.Y()]; x++)
 		{
 			SetPixelValue(
-				(size_t)x,
-				(size_t)y,
+				x,
+				y,
 				triangle.GetColor()
 			);
 		}
@@ -360,7 +391,10 @@ void RenderingEngine2D::RenderPolygon(Polygon2D& polygon)
 	}
 	else if (polygon.Points().size() == 1)
 	{
-		Vector2D p = Vector2D(polygon.Points()[0]) * polygon.Transform();
+		Vector2D p = MathUtils::TransformPointFor2D(
+			Vector2D(polygon.Points()[0]),
+			polygon.Transform()
+		);
 		RenderPoint(
 			Point2D(
 				p,
@@ -370,8 +404,15 @@ void RenderingEngine2D::RenderPolygon(Polygon2D& polygon)
 	}
 	else if (polygon.Points().size() == 2)
 	{
-		Vector2D p1 = Vector2D(polygon.Points()[0]) * polygon.Transform();
-		Vector2D p2 = Vector2D(polygon.Points()[1]) * polygon.Transform();
+		Vector2D p1 = MathUtils::TransformPointFor2D(
+			Vector2D(polygon.Points()[0]),
+			polygon.Transform()
+		);
+		Vector2D p2 = MathUtils::TransformPointFor2D(
+			Vector2D(polygon.Points()[1]),
+			polygon.Transform()
+		);
+
 		RenderLine(
 			Line2D(
 				p1,
@@ -393,7 +434,10 @@ void RenderingEngine2D::RenderPolygonLines(Polygon2D& polygon)
 	for (size_t i = 0; i < polygon.Points().size(); i++)
 	{
 		transformedPoints.push_back(
-			Vector2D(polygon.Points()[i]) * polygon.Transform()
+			MathUtils::TransformPointFor2D(
+				Vector2D(polygon.Points()[i]),
+				polygon.Transform()
+			)
 		);
 	}
 
@@ -429,7 +473,10 @@ void RenderingEngine2D::RenderPolygonFilled(Polygon2D& polygon)
 	for (size_t i = 0; i < polygon.Points().size(); i++)
 	{
 		transformedPoints.push_back(
-			Vector2D(polygon.Points()[i]) * polygon.Transform()
+			MathUtils::TransformPointFor2D(
+				Vector2D(polygon.Points()[i]),
+				polygon.Transform()
+			)
 		);
 	}
 

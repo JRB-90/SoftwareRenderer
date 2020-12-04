@@ -64,6 +64,39 @@ int main(int argc, const char* argv[])
 
 void SetupScene()
 {
+	//scene->Points().push_back(
+	//	Point2D(
+	//		Vector2D(
+	//			200,
+	//			200
+	//		),
+	//		Color::Blue
+	//	)
+	//);
+	//scene->Points().push_back(
+	//	Point2D(
+	//		Vector2D(
+	//			20,
+	//			20
+	//		),
+	//		Color::Red
+	//	)
+	//);
+
+	scene->Lines().push_back(
+		Line2D(
+			Vector2D(
+				0,
+				0
+			),
+			Vector2D(
+				50,
+				50
+			),
+			Color::Magenta
+		)
+	);
+
 	//for (size_t i = 0; i < 100; i++)
 	//{
 	//	scene->Points().push_back(
@@ -104,31 +137,31 @@ void SetupScene()
 	//	);
 	//}
 
-	std::vector<Vector2D> polyPoints;
-	polyPoints.push_back(Vector2D(-50, 50));
-	polyPoints.push_back(Vector2D(-50, -50));
-	polyPoints.push_back(Vector2D(40, -50));
-	Polygon2D triangle(
-		polyPoints,
-		Color::Cyan
-	);
-	triangle.Transform(
-		Frame2D(
-			Vector2D(300, 450)
-		)
-	);
-	scene->Polygons().push_back(triangle);
+	//std::vector<Vector2D> polyPoints;
+	//polyPoints.push_back(Vector2D(-50, 50));
+	//polyPoints.push_back(Vector2D(-50, -50));
+	//polyPoints.push_back(Vector2D(40, -50));
+	//Polygon2D triangle(
+	//	polyPoints,
+	//	Color::Cyan
+	//);
+	//triangle.Transform(
+	//	Frame2D(
+	//		Vector2D(300, 450)
+	//	)
+	//);
+	//scene->Polygons().push_back(triangle);
 
-	std::vector<Vector2D> polyPoints2;
-	polyPoints2.push_back(Vector2D(-50, -50));
-	polyPoints2.push_back(Vector2D(-50, 50));
-	polyPoints2.push_back(Vector2D(50, 50));
-	polyPoints2.push_back(Vector2D(50, -50));
-	Polygon2D square(
-		polyPoints2,
-		Color::Magenta
-	);
-	scene->Polygons().push_back(square);
+	//std::vector<Vector2D> polyPoints2;
+	//polyPoints2.push_back(Vector2D(-50, -50));
+	//polyPoints2.push_back(Vector2D(-50, 50));
+	//polyPoints2.push_back(Vector2D(50, 50));
+	//polyPoints2.push_back(Vector2D(50, -50));
+	//Polygon2D square(
+	//	polyPoints2,
+	//	Color::Magenta
+	//);
+	//scene->Polygons().push_back(square);
 
 	std::vector<Vector2D> polyPoints3;
 	polyPoints3.push_back(Vector2D(0, -40));
@@ -185,21 +218,38 @@ void Update(double delta)
 {
 	// Update scene here
 
-	scene->Polygons()[0].Transform().Position(
+	//scene->Polygons()[0].Transform().Position(
+	//	Vector2D(
+	//		300 + (std::sin(SDL_GetPerformanceCounter() / 20000) * 30),
+	//		400 + (std::cos(SDL_GetPerformanceCounter() / 20000) * 30)
+	//	)
+	//);
+	//scene->Polygons()[0].Transform().Angle(-a * 2);
+
+	//scene->Polygons()[1].Transform().Position(
+	//	Vector2D(
+	//		400 + (std::sin(SDL_GetPerformanceCounter() / 10000) * 20),
+	//		200 + (std::cos(SDL_GetPerformanceCounter() / 10000) * 20)
+	//	)
+	//);
+
+	//scene->Polygons()[2].Transform().Angle(a);
+	a += 2.0;
+
+	double s = 1.0 + (std::sin(SDL_GetPerformanceCounter() / 20000) * 0.5);
+	Frame2D f(
 		Vector2D(
-			300 + (std::sin(SDL_GetPerformanceCounter() / 20000) * 30),
-			400 + (std::cos(SDL_GetPerformanceCounter() / 20000) * 30)
+			200,
+			200
+		),
+		a,
+		Vector2D(
+			s,
+			s
 		)
 	);
-	scene->Polygons()[0].Transform().Angle(-a * 2);
 
-	scene->Polygons()[1].Transform().Position(
-		Vector2D(
-			400 + (std::sin(SDL_GetPerformanceCounter() / 10000) * 20),
-			200 + (std::cos(SDL_GetPerformanceCounter() / 10000) * 20)
-		)
-	);
-
-	scene->Polygons()[2].Transform().Angle(a);
-	a += 1.0;
+	scene->Polygons()[0].Transform(f);
+	//scene->Points()[1].Transform(f);
+	scene->Lines()[0].Transform(f);
 }

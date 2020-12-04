@@ -49,17 +49,17 @@ namespace softengine
 		Color refreshColor;
 		bool isInitialised;
 
-		Color GetPixelValue(size_t pixel) const;
+		Color GetPixelValue(int pixel) const;
 		Color GetPixelValue(
-			size_t pixelX,
-			size_t pixelY) const;
+			int pixelX,
+			int pixelY) const;
 		void SetPixelValue(
-			size_t pixel,
+			int pixel,
 			Color& color
 		);
 		void SetPixelValue(
-			size_t pixelX,
-			size_t pixelY,
+			int pixelX,
+			int pixelY,
 			Color& color
 		);
 

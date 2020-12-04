@@ -14,3 +14,30 @@ double MathUtils::ToDeg(double rad)
 {
 	return (rad * 180.0) / M_PI;
 }
+
+Vector2D MathUtils::TransformPointFor2D(
+	Vector2D& position, 
+	Frame2D& transform)
+{
+	double angleRad = MathUtils::ToRad(transform.Angle());
+
+	Frame2D s(
+		transform.Scale().X(), 0, 0,
+		0, transform.Scale().Y(), 0,
+		0, 0, 1.0
+	);
+
+	Frame2D r(
+		std::cos(angleRad), -std::sin(angleRad), 0.0,
+		std::sin(angleRad), std::cos(angleRad), 0.0,
+		0, 0, 1.0
+	);
+
+	Frame2D t(
+		1.0, 0.0, transform.Position().X(),
+		0.0, 1.0, transform.Position().Y(),
+		0.0, 0.0, 1.0
+	);
+
+	return ((position * s) * r) * t;
+}

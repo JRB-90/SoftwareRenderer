@@ -6,7 +6,8 @@ using namespace softengine;
 
 Frame2D::Frame2D()
   :
-	angle(0)
+	angle(0.0),
+	scale(Vector2D(1.0, 1.0))
 {
 	CalculateMatrix();
 }
@@ -14,14 +15,16 @@ Frame2D::Frame2D()
 Frame2D::Frame2D(Vector2D position)
   :
 	position(position),
-	angle(0)
+	angle(0.0),
+	scale(Vector2D(1.0, 1.0))
 {
 	CalculateMatrix();
 }
 
 Frame2D::Frame2D(double angle)
   :
-	angle(angle)
+	angle(angle),
+	scale(Vector2D(1.0, 1.0))
 {
 	CalculateMatrix();
 }
@@ -31,7 +34,31 @@ Frame2D::Frame2D(
 	double angle)
   :
 	position(position),
-	angle(angle)
+	angle(angle),
+	scale(Vector2D(1.0, 1.0))
+{
+	CalculateMatrix();
+}
+
+Frame2D::Frame2D(
+	Vector2D position, 
+	Vector2D scale)
+  :
+	position(position),
+	angle(0.0),
+	scale(scale)
+{
+	CalculateMatrix();
+}
+
+Frame2D::Frame2D(
+	Vector2D position, 
+	double angle, 
+	Vector2D scale)
+  :
+	position(position),
+	angle(angle),
+	scale(scale)
 {
 	CalculateMatrix();
 }
@@ -56,23 +83,51 @@ Frame2D::Frame2D(
 		m[1][2]
 	);
 	angle = MathUtils::ToDeg(std::atan2(m[1][0], m[0][0]));
+
+	double sx = std::sqrt((m[0][0] * m[0][0]) + (m[0][1] * m[0][1]));
+	if (m[0][0] < 0)
+	{
+		sx *= -1.0;
+	}
+	double sy = std::sqrt((m[1][0] * m[1][0]) + (m[1][1] * m[1][1]));
+	if (m[1][1] < 0)
+	{
+		sy *= -1.0;
+	}
+	scale = Vector2D(sx, sy);
 }
 
 void Frame2D::CalculateMatrix()
 {
 	double angleRad = MathUtils::ToRad(angle);
 
-	m[0][0] = std::cos(angleRad);
-	m[0][1] = -std::sin(angleRad);
-	m[0][2] = position.X();
+	Frame2D s(
+		scale.X(),				0,						0,
+		0,						scale.Y(),				0,
+		0,						0,						1.0
+	);
 
-	m[1][0] = std::sin(angleRad);
-	m[1][1] = std::cos(angleRad);
-	m[1][2] = position.Y();
+	Frame2D r(
+		std::cos(angleRad), -std::sin(angleRad), 0.0,
+		std::sin(angleRad), std::cos(angleRad), 0.0,
+		0, 0, 1.0
+	);
 
-	m[2][0] = 0.0;
-	m[2][1] = 0.0;
-	m[2][2] = 1.0;
+	Frame2D t(
+		1.0,					0.0,					position.X(),
+		0.0,					1.0,					position.Y(),
+		0.0,					0.0,					1.0
+	);
+
+	Frame2D res = (s * r) * t;
+
+	for (size_t i = 0; i < 3; i++)
+	{
+		for (size_t j = 0; j < 3; j++)
+		{
+			m[i][j] = res.At(i, j);
+		}
+	}
 }
 
 double Frame2D::At(
