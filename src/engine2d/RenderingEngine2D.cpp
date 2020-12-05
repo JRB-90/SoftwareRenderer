@@ -198,6 +198,11 @@ void RenderingEngine2D::SetPixelValue(
 
 void RenderingEngine2D::RenderScene2D()
 {
+	for (Sprite2D& sprite : scene->Sprites())
+	{
+		RenderSprite(sprite);
+	}
+
 	for (Polygon2D& polygon : scene->Polygons())
 	{
 		RenderPolygon(polygon);
@@ -490,5 +495,44 @@ void RenderingEngine2D::RenderPolygonFilled(Polygon2D& polygon)
 				polygon.GetColor()
 			)
 		);
+	}
+}
+
+void RenderingEngine2D::RenderSprite(Sprite2D& sprite)
+{
+	for (size_t i = 0; i < sprite.Width(); i++)
+	{
+		for (size_t j = 0; j < sprite.Height(); j++)
+		{
+			Color pc = sprite.GetPixel(
+				i,
+				j
+			);
+			if (IsValidSpritePixel(pc))
+			{
+				Vector2D pos = sprite.Transform().Position();
+				SetPixelValue(
+					i + (int)pos.X(),
+					j + (int)pos.Y(),
+					pc
+				);
+			}
+		}
+	}
+}
+
+bool RenderingEngine2D::IsValidSpritePixel(Color& color)
+{
+	Color4B c = color.GetAs4B();
+	if (c.r == 140 &&
+		c.g == 43 &&
+		c.b == 150 &&
+		c.a == 255)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
 	}
 }

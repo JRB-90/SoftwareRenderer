@@ -7,6 +7,7 @@ find_library(engine NAMES engine)
 
 link_directories(test
 	C:\\SDL2\\lib\\x64
+	C:\\SDL2_image\\lib\\x64
 )
 
 add_library(engine2d STATIC
@@ -24,10 +25,13 @@ add_library(engine2d STATIC
 	Triangle2D.cpp
     Utils2D.h 
 	Utils2D.cpp
+    Sprite2D.h
+	Sprite2D.cpp
 )
 
 target_link_libraries(engine2d PUBLIC
 	SDL2
+	SDL2_image
 	math
 	engine
 )
@@ -35,4 +39,5 @@ target_link_libraries(engine2d PUBLIC
 target_include_directories(engine2d PUBLIC
 	${CMAKE_CURRENT_SOURCE_DIR}
 	C:\\SDL2\\include
+	C:\\SDL2_image\\include
 )

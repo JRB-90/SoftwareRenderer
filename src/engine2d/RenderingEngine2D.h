@@ -9,6 +9,7 @@
 #include "Line2D.h"
 #include "Triangle2D.h"
 #include "Polygon2D.h"
+#include "Sprite2D.h"
 #include "SDL.h"
 #include <memory>
 
@@ -77,5 +78,8 @@ namespace softengine
 		void RenderPolygon(Polygon2D& polygon);
 		void RenderPolygonLines(Polygon2D& polygon);
 		void RenderPolygonFilled(Polygon2D& polygon);
+		void RenderSprite(Sprite2D& sprite);
+
+		static bool IsValidSpritePixel(Color& color);
 	};
 }

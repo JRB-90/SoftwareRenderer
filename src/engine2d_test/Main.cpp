@@ -9,6 +9,8 @@
 #include "Line2D.h"
 #include "Polygon2D.h"
 #include "Frame2D.h"
+#include "ImageLoader.h"
+#include "Sprite2D.h"
 
 #include <iostream>
 #include <memory>
@@ -24,6 +26,7 @@ const size_t PIXELS_WIDTH = 640;
 const size_t PIXELS_HEIGHT = 480;
 const int UPDATE_RATE = 20;
 
+std::unique_ptr<Engine> engine;
 std::shared_ptr<Scene2D> scene;
 
 void SetupScene();
@@ -44,7 +47,11 @@ int main(int argc, const char* argv[])
 			PIXELS_HEIGHT
 		);
 
-	Engine engine(
+	renderingEngine->RefreshColor(
+		Color(Color::White)
+	);
+
+	engine = std::make_unique<Engine>(
 		renderingEngine,
 		RenderingMode::Software,
 		"Engine 2D Test",
@@ -54,8 +61,8 @@ int main(int argc, const char* argv[])
 		true
 	);
 
-	engine.RegisterUpdateCallback(Update);
-	engine.Run();
+	engine->RegisterUpdateCallback(Update);
+	engine->Run();
 
 	std::cout << "Finished" << std::endl;
 
@@ -64,192 +71,21 @@ int main(int argc, const char* argv[])
 
 void SetupScene()
 {
-	//scene->Points().push_back(
-	//	Point2D(
-	//		Vector2D(
-	//			200,
-	//			200
-	//		),
-	//		Color::Blue
-	//	)
-	//);
-	//scene->Points().push_back(
-	//	Point2D(
-	//		Vector2D(
-	//			20,
-	//			20
-	//		),
-	//		Color::Red
-	//	)
-	//);
-
-	scene->Lines().push_back(
-		Line2D(
-			Vector2D(
-				0,
-				0
-			),
-			Vector2D(
-				50,
-				50
-			),
-			Color::Magenta
-		)
-	);
-
-	//for (size_t i = 0; i < 100; i++)
-	//{
-	//	scene->Points().push_back(
-	//		Point2D(
-	//			Vector2D(
-	//				((double)std::rand() / RAND_MAX) * (double)PIXELS_WIDTH,
-	//				((double)std::rand() / RAND_MAX) * (double)PIXELS_HEIGHT
-	//			),
-	//			Color(
-	//				(double)std::rand() / RAND_MAX,
-	//				(double)std::rand() / RAND_MAX,
-	//				(double)std::rand() / RAND_MAX,
-	//				1.0
-	//			)
-	//		)
-	//	);
-	//}
-
-	//for (size_t j = 0; j < 20; j++)
-	//{
-	//	scene->Lines().push_back(
-	//		Line2D(
-	//			Vector2D(
-	//				((double)std::rand() / RAND_MAX) * (double)PIXELS_WIDTH,
-	//				((double)std::rand() / RAND_MAX) * (double)PIXELS_HEIGHT
-	//			),
-	//			Vector2D(
-	//				((double)std::rand() / RAND_MAX) * (double)PIXELS_WIDTH,
-	//				((double)std::rand() / RAND_MAX) * (double)PIXELS_HEIGHT
-	//			),
-	//			Color(
-	//				(double)std::rand() / RAND_MAX,
-	//				(double)std::rand() / RAND_MAX,
-	//				(double)std::rand() / RAND_MAX,
-	//				1.0
-	//			)
-	//		)
-	//	);
-	//}
-
-	//std::vector<Vector2D> polyPoints;
-	//polyPoints.push_back(Vector2D(-50, 50));
-	//polyPoints.push_back(Vector2D(-50, -50));
-	//polyPoints.push_back(Vector2D(40, -50));
-	//Polygon2D triangle(
-	//	polyPoints,
-	//	Color::Cyan
-	//);
-	//triangle.Transform(
-	//	Frame2D(
-	//		Vector2D(300, 450)
-	//	)
-	//);
-	//scene->Polygons().push_back(triangle);
-
-	//std::vector<Vector2D> polyPoints2;
-	//polyPoints2.push_back(Vector2D(-50, -50));
-	//polyPoints2.push_back(Vector2D(-50, 50));
-	//polyPoints2.push_back(Vector2D(50, 50));
-	//polyPoints2.push_back(Vector2D(50, -50));
-	//Polygon2D square(
-	//	polyPoints2,
-	//	Color::Magenta
-	//);
-	//scene->Polygons().push_back(square);
-
-	std::vector<Vector2D> polyPoints3;
-	polyPoints3.push_back(Vector2D(0, -40));
-	polyPoints3.push_back(Vector2D(-48, -5));
-	polyPoints3.push_back(Vector2D(-29, 50));
-	polyPoints3.push_back(Vector2D(29, 50));
-	polyPoints3.push_back(Vector2D(48, -5));
-	Polygon2D pentagon(
-		polyPoints3,
-		Color::Yellow
-	);
-	pentagon.Transform(
-		Frame2D(
-			Vector2D(
-				200,
-				200
-			),
-			0
-		)
-	);
-	scene->Polygons().push_back(pentagon);
-
-	//for (size_t i = 0; i < 1; i++)
-	//{
-	//	//size_t randSize = 6;
-	//	size_t randSize = (size_t)((((double)std::rand() / RAND_MAX) * 8.0) + 2);
-	//	std::vector<Vector2D> pPoints;
-	//	for (size_t k = 0; k < randSize; k++)
-	//	{
-	//		pPoints.push_back(
-	//			Vector2D(
-	//				((double)std::rand() / RAND_MAX) * (double)PIXELS_WIDTH,
-	//				((double)std::rand() / RAND_MAX) * (double)PIXELS_HEIGHT
-	//			)
-	//		);
-	//	}
-	//	scene->Polygons().push_back(
-	//		Polygon2D(
-	//			pPoints,
-	//			Color(
-	//				(double)std::rand() / RAND_MAX,
-	//				(double)std::rand() / RAND_MAX,
-	//				(double)std::rand() / RAND_MAX,
-	//				1.0
-	//			)
-	//		)
-	//	);
-	//}
+	Texture texture;
+	if (engine->GetResourceManager().LoadImageResource(
+		"cat.png",
+		texture
+	))
+	{
+		Sprite2D cat(texture);
+		cat.Transform().Position(
+			Vector2D(200, 200)
+		);
+		scene->Sprites().push_back(cat);
+	}
 }
-
-double a = 0.0;
 
 void Update(double delta)
 {
-	// Update scene here
-
-	//scene->Polygons()[0].Transform().Position(
-	//	Vector2D(
-	//		300 + (std::sin(SDL_GetPerformanceCounter() / 20000) * 30),
-	//		400 + (std::cos(SDL_GetPerformanceCounter() / 20000) * 30)
-	//	)
-	//);
-	//scene->Polygons()[0].Transform().Angle(-a * 2);
-
-	//scene->Polygons()[1].Transform().Position(
-	//	Vector2D(
-	//		400 + (std::sin(SDL_GetPerformanceCounter() / 10000) * 20),
-	//		200 + (std::cos(SDL_GetPerformanceCounter() / 10000) * 20)
-	//	)
-	//);
-
-	//scene->Polygons()[2].Transform().Angle(a);
-	a += 2.0;
-
-	double s = 1.0 + (std::sin(SDL_GetPerformanceCounter() / 20000) * 0.5);
-	Frame2D f(
-		Vector2D(
-			200,
-			200
-		),
-		a,
-		Vector2D(
-			s,
-			s
-		)
-	);
-
-	scene->Polygons()[0].Transform(f);
-	//scene->Points()[1].Transform(f);
-	scene->Lines()[0].Transform(f);
+	
 }

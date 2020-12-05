@@ -3,6 +3,7 @@
 #include "IScene.h"
 #include "RenderingWindow.h"
 #include "RenderingMode.h"
+#include "Color.h"
 #include <memory>
 
 namespace softengine
@@ -19,5 +20,8 @@ namespace softengine
 			size_t windowWidth,
 			size_t windowHeight
 		) = 0;
+
+		virtual Color RefreshColor() const = 0;
+		virtual void RefreshColor(Color& refreshColor) = 0;
 	};
 }

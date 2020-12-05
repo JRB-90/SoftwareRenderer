@@ -2,6 +2,7 @@
 
 #include "RenderingWindow.h"
 #include "IRenderingEngine.h"
+#include "ResourceManager.h"
 #include "RenderingMode.h"
 #include "SDL.h"
 #undef main
@@ -27,11 +28,14 @@ namespace softengine
 		void Run();
 		void RegisterUpdateCallback(void (*updateCallback)(double));
 
+		ResourceManager& GetResourceManager() { return resourceManager; }
+
 		static SDL_RendererFlags ToSDLRenderingFlag(RenderingMode renderingMode);
 
 	private:
 		RenderingWindow renderingWindow;
 		std::shared_ptr<IRenderingEngine> renderingEngine;
+		ResourceManager resourceManager;
 		RenderingMode renderingMode;
 		int updateFrequency;
 		bool debugModeEnabled;

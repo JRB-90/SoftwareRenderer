@@ -3,8 +3,13 @@ cmake_minimum_required (VERSION 3.8)
 find_library(engine NAMES engine)
 find_library(engine2d NAMES engine2d)
 
-link_directories(engine2d_test
+link_directories(test
 	C:\\SDL2\\lib\\x64
+	C:\\SDL2_image\\lib\\x64
+)
+
+set(RESOURCE_FILES
+  cat.png
 )
 
 add_executable(engine2d_test

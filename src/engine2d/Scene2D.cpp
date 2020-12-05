@@ -11,4 +11,5 @@ void Scene2D::ClearAll()
 	points.clear();
 	lines.clear();
 	polygons.clear();
+	sprites.clear();
 }
