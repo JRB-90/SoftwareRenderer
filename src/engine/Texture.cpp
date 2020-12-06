@@ -4,74 +4,62 @@
 using namespace softengine;
 
 Texture::Texture()
+  :
+	pixels(NULL),
+	width(0),
+	height(0)
 {
 }
 
 Texture::~Texture()
 {
+	if (pixels != NULL)
+	{
+		delete[] pixels;
+		pixels = NULL;
+	}
 }
 
 Texture::Texture(const Texture& texture)
-{
-	this->surface = std::move(texture.surface);
-}
-
-Texture::Texture(std::shared_ptr<SDL_Surface> surface)
   :
-	surface(std::move(surface))
+	width(texture.width),
+	height(texture.height)
 {
+	size_t size = width * height * 4;
+	pixels = new Uint8[size];
+	std::memcpy(this->pixels, texture.pixels, size);
 }
 
-void Texture::CleanupResource()
+Texture::Texture(
+	size_t width,
+	size_t height,
+	Uint8* pixels)
+  :
+	width(width),
+	height(height)
 {
-
+	size_t size = width * height * 4;
+	this->pixels = new Uint8[size];
+	std::memcpy(this->pixels, pixels, size);
 }
 
-size_t softengine::Texture::Width()
-{
-	if (surface.get() != nullptr)
-	{
-		return surface->w;
-	}
-	else
-	{
-		return 0;
-	}
-}
-
-size_t softengine::Texture::Height()
-{
-	if (surface.get() != nullptr)
-	{
-		return surface->h;
-	}
-	else
-	{
-		return 0;
-	}
-}
-
-Color softengine::Texture::GetPixel(
+Color Texture::GetPixel(
 	size_t x, 
 	size_t y)
 {
-	if (surface.get() != nullptr)
+	if (x >= 0 &&
+		x < width &&
+		y >= 0 &&
+		y < height)
 	{
-		Uint8 bpp = surface->format->BytesPerPixel;
-		Uint8* p = (Uint8*)surface->pixels;
-		size_t off = (y * surface->w) + x;
-		uint8_t r, g, b, a;
+		size_t off = (y * 4 * width) + (x * 4);
 
-		SDL_GetRGBA(
-			p[off],
-			surface->format,
-			&r,
-			&g,
-			&b,
-			&a
+		return Color(
+			pixels[off + 0],
+			pixels[off + 1],
+			pixels[off + 2],
+			pixels[off + 3]
 		);
-
-		return Color(r, g, b, a);
 	}
 	else
 	{

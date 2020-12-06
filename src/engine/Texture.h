@@ -7,24 +7,28 @@
 
 namespace softengine
 {
-	class Texture : public IResource
+	class Texture
 	{
 	public:
 		Texture();
 		~Texture();
 		Texture(const Texture& texture);
-		Texture(std::shared_ptr<SDL_Surface> surface);
+		Texture(
+			size_t width,
+			size_t height,
+			Uint8* pixels
+		);
 
-		virtual void CleanupResource() override;
-
-		size_t Width();
-		size_t Height();
+		size_t Width() { return width; }
+		size_t Height() { return height; }
 		Color GetPixel(
 			size_t x,
 			size_t y
 		);
 
 	private:
-		std::shared_ptr<SDL_Surface> surface;
+		Uint8* pixels;
+		size_t width;
+		size_t height;
 	};
 }

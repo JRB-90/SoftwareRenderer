@@ -13,9 +13,6 @@ namespace softengine
 	public:
 		ImageLoader();
 
-		bool ImageLoader::LoadImageResource(
-			const std::string& name,
-			Texture& texture
-		);
+		Texture ImageLoader::LoadImageResource(const std::string& name);
 	};
 }

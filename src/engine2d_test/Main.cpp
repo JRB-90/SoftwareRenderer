@@ -12,6 +12,7 @@
 #include "ImageLoader.h"
 #include "Sprite2D.h"
 #include "InputState.h"
+#include "ImageLoader.h"
 
 #include <iostream>
 #include <memory>
@@ -75,17 +76,19 @@ int main(int argc, const char* argv[])
 
 void SetupScene()
 {
-	Texture texture;
-	if (engine->GetResourceManager().LoadImageResource(
-		"cat.png",
-		texture
-	))
+	try
 	{
+		ImageLoader imageLoader;
+		Texture texture = imageLoader.LoadImageResource("cat.png");
 		Sprite2D cat(texture);
 		cat.Transform().Position(
 			Vector2D(200, 200)
 		);
 		scene->Sprites().push_back(cat);
+	}
+	catch (std::exception e)
+	{
+		std::cerr << e.what() << std::endl;
 	}
 }
 

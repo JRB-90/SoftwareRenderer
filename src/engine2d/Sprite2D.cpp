@@ -6,7 +6,7 @@ Sprite2D::Sprite2D()
 {
 }
 
-Sprite2D::Sprite2D(Texture& texture)
+Sprite2D::Sprite2D(Texture texture)
   :
 	texture(texture)
 {

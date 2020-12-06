@@ -2,7 +2,6 @@
 
 #include "RenderingWindow.h"
 #include "IRenderingEngine.h"
-#include "ResourceManager.h"
 #include "RenderingMode.h"
 #include "InputHandler.h"
 #include "InputState.h"
@@ -30,14 +29,11 @@ namespace softengine
 		void Run();
 		void RegisterUpdateCallback(void (*updateCallback)(InputState, double));
 
-		ResourceManager& GetResourceManager() { return resourceManager; }
-
 		static SDL_RendererFlags ToSDLRenderingFlag(RenderingMode renderingMode);
 
 	private:
 		RenderingWindow renderingWindow;
 		std::shared_ptr<IRenderingEngine> renderingEngine;
-		ResourceManager resourceManager;
 		InputHandler inputHandler;
 		RenderingMode renderingMode;
 		int updateFrequency;

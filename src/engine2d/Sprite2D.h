@@ -10,7 +10,7 @@ namespace softengine
 	{
 	public:
 		Sprite2D();
-		Sprite2D(Texture& texture);
+		Sprite2D(Texture texture);
 
 		Frame2D& Transform() { return transform; }
 		void Transform(Frame2D& transform) { this->transform = transform; }

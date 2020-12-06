@@ -23,8 +23,8 @@ add_library(engine STATIC
     ImageLoader.h
 	Texture.cpp
 	Texture.h
-    ResourceManager.cpp
-	ResourceManager.h
+    
+	
     IResource.h
     InputHandler.h
 	InputHandler.cpp
