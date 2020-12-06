@@ -26,6 +26,9 @@ add_library(engine STATIC
     ResourceManager.cpp
 	ResourceManager.h
     IResource.h
+    InputHandler.h
+	InputHandler.cpp
+	InputState.h
 )
 
 target_link_libraries(engine PUBLIC

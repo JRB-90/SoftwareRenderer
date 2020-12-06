@@ -17,7 +17,10 @@ const int UPDATE_RATE = 30;
 std::shared_ptr<Scene3D> scene;
 
 void SetupScene();
-void Update(double delta);
+void Update(
+	InputState inputstate,
+	double delta
+);
 
 int main(int argc, const char* argv[])
 {
@@ -57,7 +60,9 @@ void SetupScene()
 
 }
 
-void Update(double delta)
+void Update(
+	InputState inputstate,
+	double delta)
 {
 
 }

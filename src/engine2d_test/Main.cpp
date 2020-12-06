@@ -11,6 +11,7 @@
 #include "Frame2D.h"
 #include "ImageLoader.h"
 #include "Sprite2D.h"
+#include "InputState.h"
 
 #include <iostream>
 #include <memory>
@@ -30,7 +31,10 @@ std::unique_ptr<Engine> engine;
 std::shared_ptr<Scene2D> scene;
 
 void SetupScene();
-void Update(double delta);
+void Update(
+	InputState inputState,
+	double delta
+);
 
 int main(int argc, const char* argv[])
 {
@@ -85,7 +89,34 @@ void SetupScene()
 	}
 }
 
-void Update(double delta)
+void Update(
+	InputState inputState, 
+	double delta)
 {
-	
+	double speed = 10.0 * delta;
+
+	if (inputState.up)
+	{
+		scene->Sprites()[0].Transform().Position().Y(
+			scene->Sprites()[0].Transform().Position().Y() - speed
+		);
+	}
+	if (inputState.down)
+	{
+		scene->Sprites()[0].Transform().Position().Y(
+			scene->Sprites()[0].Transform().Position().Y() + speed
+		);
+	}
+	if (inputState.left)
+	{
+		scene->Sprites()[0].Transform().Position().X(
+			scene->Sprites()[0].Transform().Position().X() - speed
+		);
+	}
+	if (inputState.right)
+	{
+		scene->Sprites()[0].Transform().Position().X(
+			scene->Sprites()[0].Transform().Position().X() + speed
+		);
+	}
 }

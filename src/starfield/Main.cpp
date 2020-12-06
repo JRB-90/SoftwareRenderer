@@ -8,6 +8,7 @@
 #include "Point2D.h"
 #include "Line2D.h"
 #include "Star.h"
+#include "InputState.h"
 
 #include <iostream>
 #include <memory>
@@ -29,7 +30,10 @@ std::shared_ptr<Scene2D> scene;
 std::vector<Star> stars;
 
 void SetupScene();
-void Update(double delta);
+void Update(
+	InputState inputstate,
+	double delta
+);
 
 int main(int argc, const char* argv[])
 {
@@ -87,7 +91,9 @@ void SetupScene()
 	}
 }
 
-void Update(double delta)
+void Update(
+	InputState inputstate,
+	double delta)
 {
 	for (Star& s : stars)
 	{

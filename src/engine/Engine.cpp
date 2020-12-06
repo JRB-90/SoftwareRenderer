@@ -54,8 +54,9 @@ void Engine::Run()
 		{
 			double timeTaken = (double)delta / (double)SDL_GetPerformanceFrequency();
 			previous = current;
-			PollInput();
-			Update(timeTaken / targetTime);
+
+			InputState inputState = PollInput();
+			Update(inputState, timeTaken / targetTime);
 			Render();
 
 			if (debugModeEnabled)
@@ -72,7 +73,7 @@ void Engine::Run()
 	renderingWindow.Close();
 }
 
-void Engine::RegisterUpdateCallback(void(*updateCallback)(double))
+void Engine::RegisterUpdateCallback(void(*updateCallback)(InputState, double))
 {
 	this->updateCallback = updateCallback;
 }
@@ -90,37 +91,34 @@ SDL_RendererFlags Engine::ToSDLRenderingFlag(RenderingMode renderingMode)
 	}
 }
 
-void Engine::PollInput()
+InputState Engine::PollInput()
 {
-	SDL_Event windowEvent;
-	while (SDL_PollEvent(&windowEvent))
-	{
-		switch (windowEvent.type)
-		{
-		case SDL_QUIT:
-			isRunning = false;
-			return;
-		default:
-			break;
-		}
+	inputHandler.Update();
+	InputState inputState = inputHandler.GetCurrentState();
 
-		switch (windowEvent.window.event)
-		{
-		case SDL_WINDOWEVENT_RESIZED:
-			renderingEngine->WindowResized(
-				windowEvent.window.data1,
-				windowEvent.window.data2
-			);
-			break;
-		default:
-			break;
-		}
+	if (inputState.isQuitRequested)
+	{
+		isRunning = false;
+
+		return inputState;
 	}
+	
+	if (inputState.windowResizeRequested)
+	{
+		renderingEngine->WindowResized(
+			inputState.windowSizeWidth,
+			inputState.windowSizeHeight
+		);
+	}
+
+	return inputState;
 }
 
-void Engine::Update(double delta)
+void Engine::Update(
+	InputState inputState, 
+	double delta)
 {
-	updateCallback(delta);
+	updateCallback(inputState, delta);
 }
 
 void Engine::Render()

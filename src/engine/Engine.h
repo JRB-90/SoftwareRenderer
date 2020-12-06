@@ -4,6 +4,8 @@
 #include "IRenderingEngine.h"
 #include "ResourceManager.h"
 #include "RenderingMode.h"
+#include "InputHandler.h"
+#include "InputState.h"
 #include "SDL.h"
 #undef main
 #include <thread>
@@ -26,7 +28,7 @@ namespace softengine
 		~Engine();
 
 		void Run();
-		void RegisterUpdateCallback(void (*updateCallback)(double));
+		void RegisterUpdateCallback(void (*updateCallback)(InputState, double));
 
 		ResourceManager& GetResourceManager() { return resourceManager; }
 
@@ -36,15 +38,19 @@ namespace softengine
 		RenderingWindow renderingWindow;
 		std::shared_ptr<IRenderingEngine> renderingEngine;
 		ResourceManager resourceManager;
+		InputHandler inputHandler;
 		RenderingMode renderingMode;
 		int updateFrequency;
 		bool debugModeEnabled;
 		bool isRunning;
 		std::thread runThread;
-		void (*updateCallback)(double);
+		void (*updateCallback)(InputState, double);
 
-		void PollInput();
-		void Update(double delta);
+		InputState PollInput();
+		void Update(
+			InputState inputstate,
+			double delta
+		);
 		void Render();
 	};
 }
