@@ -3,6 +3,7 @@
 #include "IScene.h"
 #include "RenderingWindow.h"
 #include "RenderingMode.h"
+#include "TextOverlay.h"
 #include "Color.h"
 #include <memory>
 
@@ -21,7 +22,8 @@ namespace softengine
 			size_t windowHeight
 		) = 0;
 
-		virtual Color RefreshColor() const = 0;
+		virtual TextOverlay& GetTextOverLay() = 0;
+		virtual Color& RefreshColor() = 0;
 		virtual void RefreshColor(Color& refreshColor) = 0;
 	};
 }

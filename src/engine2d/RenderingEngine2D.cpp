@@ -15,7 +15,6 @@ RenderingEngine2D::RenderingEngine2D(
 	pixelsHeight(pixelsHeight),
 	pixelCount(pixelsWidth * pixelsHeight),
 	screenBufSize(pixelCount * 4),
-	
 	refreshColor(
 		Color(
 			0.0,
@@ -68,8 +67,8 @@ void RenderingEngine2D::Render()
 	}
 
 	surface->FillWithColor(refreshColor);
-	surface->Render();
 	RenderScene2D();
+	textOverlay.RenderToSurface(*surface);
 	surface->Render();
 }
 

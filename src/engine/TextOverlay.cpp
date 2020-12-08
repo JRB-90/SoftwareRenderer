@@ -12,4 +12,6 @@ void TextOverlay::Update()
 
 }
 
-
+void TextOverlay::RenderToSurface(RenderSurface& surface)
+{
+}

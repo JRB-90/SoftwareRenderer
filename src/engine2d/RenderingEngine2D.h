@@ -6,6 +6,7 @@
 #include "Scene2D.h"
 #include "Color.h"
 #include "RenderSurface.h"
+#include "TextOverlay.h"
 #include "SDL.h"
 #include <memory>
 
@@ -21,7 +22,8 @@ namespace softengine
 		);
 		~RenderingEngine2D();
 
-		Color RefreshColor() const { return refreshColor; }
+		TextOverlay& GetTextOverLay() { return textOverlay; }
+		Color& RefreshColor() { return refreshColor; }
 		void RefreshColor(Color& refreshColor) { this->refreshColor = refreshColor; }
 
 		void InitialiseToWindow(
@@ -41,6 +43,7 @@ namespace softengine
 		size_t screenBufSize;
 		std::shared_ptr<Scene2D> scene;
 		std::unique_ptr<RenderSurface> surface;
+		TextOverlay textOverlay;
 		Color refreshColor;
 		bool isInitialised;
 

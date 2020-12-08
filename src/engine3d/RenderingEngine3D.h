@@ -3,8 +3,10 @@
 #include "IRenderingEngine.h"
 #include "RenderingWindow.h"
 #include "RenderingMode.h"
-#include "Color.h"
 #include "Scene3D.h"
+#include "Color.h"
+#include "RenderSurface.h"
+#include "TextOverlay.h"
 #include "SDL.h"
 #include <memory>
 
@@ -20,7 +22,8 @@ namespace softengine
 		);
 		~RenderingEngine3D();
 
-		Color RefreshColor() const { return refreshColor; }
+		TextOverlay& GetTextOverLay() { return textOverlay; }
+		Color& RefreshColor() { return refreshColor; }
 		void RefreshColor(Color& refreshColor) { this->refreshColor = refreshColor; }
 
 		void InitialiseToWindow(
@@ -34,32 +37,16 @@ namespace softengine
 		void Render() override;
 
 	private:
-		const size_t pixelsWidth;
-		const size_t pixelsHeight;
-		const size_t pixelCount;
-		const size_t screenBufSize;
+		size_t pixelsWidth;
+		size_t pixelsHeight;
+		size_t pixelCount;
+		size_t screenBufSize;
 		std::shared_ptr<Scene3D> scene;
-		SDL_Renderer* renderer;
-		SDL_Texture* texture;
-		Uint8* pixels;
+		std::unique_ptr<RenderSurface> surface;
+		TextOverlay textOverlay;
 		Color refreshColor;
 		bool isInitialised;
 
-		Color GetPixelValue(size_t pixel) const;
-		Color GetPixelValue(
-			size_t pixelX,
-			size_t pixelY) const;
-		void SetPixelValue(
-			size_t pixel,
-			Color& color
-		);
-		void SetPixelValue(
-			size_t pixelX,
-			size_t pixelY,
-			Color& color
-		);
-
 		void RenderScene3D();
-		//void RenderPoint(Point3D& point);
 	};
 }

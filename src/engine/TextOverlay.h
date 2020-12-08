@@ -1,5 +1,6 @@
 #pragma once
 
+#include "RenderSurface.h"
 #include <vector>
 #include <string>
 
@@ -11,7 +12,7 @@ namespace softengine
 		TextOverlay();
 
 		void Update();
-		//void RenderToSurface();
+		void RenderToSurface(RenderSurface& surface);
 
 		std::vector<std::string>& Lines() { return lines; }
 
