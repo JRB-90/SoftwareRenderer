@@ -23,12 +23,14 @@ add_library(engine STATIC
     ImageLoader.h
 	Texture.cpp
 	Texture.h
-    
-	
     IResource.h
     InputHandler.h
 	InputHandler.cpp
 	InputState.h
+    TextOverlay.h
+	TextOverlay.cpp
+	RenderSurface.h
+	RenderSurface.cpp
 )
 
 target_link_libraries(engine PUBLIC

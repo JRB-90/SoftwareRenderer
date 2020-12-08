@@ -5,11 +5,7 @@
 #include "RenderingMode.h"
 #include "Scene2D.h"
 #include "Color.h"
-#include "Point2D.h"
-#include "Line2D.h"
-#include "Triangle2D.h"
-#include "Polygon2D.h"
-#include "Sprite2D.h"
+#include "RenderSurface.h"
 #include "SDL.h"
 #include <memory>
 
@@ -39,47 +35,15 @@ namespace softengine
 		void Render() override;
 
 	private:
-		const size_t pixelsWidth;
-		const size_t pixelsHeight;
-		const size_t pixelCount;
-		const size_t screenBufSize;;
+		size_t pixelsWidth;
+		size_t pixelsHeight;
+		size_t pixelCount;
+		size_t screenBufSize;
 		std::shared_ptr<Scene2D> scene;
-		SDL_Renderer* renderer;
-		SDL_Texture* texture;
-		Uint8* pixels;
+		std::unique_ptr<RenderSurface> surface;
 		Color refreshColor;
 		bool isInitialised;
 
-		Color GetPixelValue(int pixel) const;
-		Color GetPixelValue(
-			int pixelX,
-			int pixelY) const;
-		void SetPixelValue(
-			int pixel,
-			Color& color
-		);
-		void SetPixelValue(
-			int pixelX,
-			int pixelY,
-			Color& color
-		);
-
 		void RenderScene2D();
-		void RenderPoint(Point2D& point);
-		void RenderLine(Line2D& line);
-		void RenderLinePoints(
-			Vector2D p1,
-			Vector2D p2,
-			Color color,
-			int& yMax,
-			int& yMin
-		);
-		void RenderTriangle(Triangle2D& triangle);
-		void RenderPolygon(Polygon2D& polygon);
-		void RenderPolygonLines(Polygon2D& polygon);
-		void RenderPolygonFilled(Polygon2D& polygon);
-		void RenderSprite(Sprite2D& sprite);
-
-		static bool IsValidSpritePixel(Color& color);
 	};
 }

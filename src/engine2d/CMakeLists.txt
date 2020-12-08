@@ -27,6 +27,8 @@ add_library(engine2d STATIC
 	Utils2D.cpp
     Sprite2D.h
 	Sprite2D.cpp
+	Primitive2DRenderer.h
+	Primitive2DRenderer.cpp
 )
 
 target_link_libraries(engine2d PUBLIC
