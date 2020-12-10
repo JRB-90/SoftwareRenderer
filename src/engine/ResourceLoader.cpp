@@ -1,14 +1,25 @@
-#include "ImageLoader.h"
+#include "ResourceLoader.h"
+#include "SDL_image.h"
+
 #include <stdexcept>
+
+#include <filesystem>
 
 using namespace softengine;
 
-ImageLoader::ImageLoader()
+ResourceLoader::ResourceLoader()
 {
 	IMG_Init(IMG_INIT_PNG);
+	TTF_Init();
 }
 
-Texture ImageLoader::LoadImageResource(const std::string& name)
+ResourceLoader::~ResourceLoader()
+{
+	IMG_Quit();
+	TTF_Quit();
+}
+
+Texture ResourceLoader::LoadImageResource(const std::string& name)
 {
 	std::string path = "..\\..\\res\\" + name;
 	SDL_Surface* image = IMG_Load(path.c_str());
@@ -51,5 +62,22 @@ Texture ImageLoader::LoadImageResource(const std::string& name)
 		SDL_FreeSurface(image);
 
 		return texture;
+	}
+}
+
+TTF_Font* ResourceLoader::LoadFontResource(
+	const std::string& name,
+	int fontSize)
+{
+	std::string path = "..\\..\\res\\fonts\\" + name;
+	TTF_Font* font = TTF_OpenFont(path.c_str(), fontSize);
+	auto error = TTF_GetError();
+	if (!font)
+	{
+		throw std::runtime_error("Failed to load font");
+	}
+	else
+	{
+		return font;
 	}
 }

@@ -6,6 +6,7 @@ find_library(engine2d NAMES engine2d)
 link_directories(test
 	C:\\SDL2\\lib\\x64
 	C:\\SDL2_image\\lib\\x64
+	C:\\SDL2_ttf\\lib\\x64
 )
 
 add_executable(starfield

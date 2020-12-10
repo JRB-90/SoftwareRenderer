@@ -1,6 +1,7 @@
 #include "Engine.h"
 #include <iostream>
 #include <chrono>
+#include <sstream>
 
 using namespace softengine;
 
@@ -65,6 +66,11 @@ void Engine::Run()
 				std::cout << "Time taken: " << timeTaken << "s" << std::endl;
 				std::cout << "FPS: " << 1.0 / timeTaken << std::endl;
 				std::cout << "Delta percentage: " << timeTaken / targetTime << std::endl;
+			
+				renderingEngine->GetTextOverLay().Lines().clear();
+				std::stringstream ss;
+				ss << "FPS: " << 1.0 / timeTaken;
+				renderingEngine->GetTextOverLay().Lines().push_back(ss.str());
 			}
 		}
 		std::this_thread::sleep_for(std::chrono::nanoseconds(0));

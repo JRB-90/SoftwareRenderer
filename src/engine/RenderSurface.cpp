@@ -133,6 +133,41 @@ void RenderSurface::SetPixelValue(
 	pixels[offset + 3] = color.GetAs4B().a;
 }
 
+SDL_Texture* RenderSurface::CreateSDLTexture(SDL_Surface* surface)
+{
+	return
+		SDL_CreateTextureFromSurface(
+			renderer,
+			surface
+		);
+}
+
+void RenderSurface::RenderTexture(
+	SDL_Rect& position, 
+	SDL_Texture* texture)
+{
+	SDL_RenderCopy(
+		renderer,
+		texture,
+		NULL,
+		&position
+	);
+	SDL_RenderPresent(renderer);
+}
+
+void RenderSurface::Clear(Color color)
+{
+	Color4B c = color.GetAs4B();
+	SDL_SetRenderDrawColor(
+		renderer,
+		c.r,
+		c.g,
+		c.b,
+		c.a
+	);
+	SDL_RenderClear(renderer);
+}
+
 void RenderSurface::FillWithColor(Color color)
 {
 	for (size_t i = 0; i < screenBufSize; i += 4)
@@ -145,7 +180,7 @@ void RenderSurface::FillWithColor(Color color)
 	}
 }
 
-void RenderSurface::Render()
+void RenderSurface::RenderPixels()
 {
 	Uint8* lockedPixels = nullptr;
 	int pitch = 0;

@@ -23,6 +23,10 @@ RenderingEngine2D::RenderingEngine2D(
 			1.0
 		)
 	),
+	textOverlay(
+		16,
+		Color::Black
+	),
 	isInitialised(false)
 {
 }
@@ -68,8 +72,8 @@ void RenderingEngine2D::Render()
 
 	surface->FillWithColor(refreshColor);
 	RenderScene2D();
+	surface->RenderPixels();
 	textOverlay.RenderToSurface(*surface);
-	surface->Render();
 }
 
 void RenderingEngine2D::RenderScene2D()

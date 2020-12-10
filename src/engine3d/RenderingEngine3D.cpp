@@ -67,7 +67,7 @@ void RenderingEngine3D::Render()
 	surface->FillWithColor(refreshColor);
 	RenderScene3D();
 	textOverlay.RenderToSurface(*surface);
-	surface->Render();
+	surface->RenderPixels();
 }
 
 void RenderingEngine3D::RenderScene3D()

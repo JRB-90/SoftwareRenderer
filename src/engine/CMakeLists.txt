@@ -7,6 +7,7 @@ find_library(math NAMES math)
 link_directories(test
 	C:\\SDL2\\lib\\x64
 	C:\\SDL2_image\\lib\\x64
+	C:\\SDL2_ttf\\lib\\x64
 )
 
 add_library(engine STATIC
@@ -19,8 +20,8 @@ add_library(engine STATIC
     Engine.h
 	IRenderingEngine.h
 	IScene.h
-	ImageLoader.cpp
-    ImageLoader.h
+	ResourceLoader.cpp
+    ResourceLoader.h
 	Texture.cpp
 	Texture.h
     IResource.h
@@ -36,6 +37,7 @@ add_library(engine STATIC
 target_link_libraries(engine PUBLIC
 	SDL2
 	SDL2_image
+	SDL2_ttf
 	math
 )
 
@@ -43,4 +45,5 @@ target_include_directories(engine PUBLIC
 	${CMAKE_CURRENT_SOURCE_DIR}
 	C:\\SDL2\\include
 	C:\\SDL2_image\\include
+	C:\\SDL2_ttf\\include
 )

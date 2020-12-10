@@ -5,6 +5,8 @@
 #include "Color.h"
 #include "SDL.h"
 
+#include <memory>
+
 namespace softengine
 {
 	class RenderSurface
@@ -35,8 +37,14 @@ namespace softengine
 			int pixelY,
 			Color& color
 		);
+		SDL_Texture* CreateSDLTexture(SDL_Surface* surface);
+		void RenderTexture(
+			SDL_Rect& position,
+			SDL_Texture* texture
+		);
+		void Clear(Color color);
 		void FillWithColor(Color color);
-		void Render();
+		void RenderPixels();
 
 		size_t Width() const { return pixelsWidth; }
 		size_t Height() const { return pixelsHeight; }

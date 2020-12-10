@@ -9,10 +9,9 @@
 #include "Line2D.h"
 #include "Polygon2D.h"
 #include "Frame2D.h"
-#include "ImageLoader.h"
+#include "ResourceLoader.h"
 #include "Sprite2D.h"
 #include "InputState.h"
-#include "ImageLoader.h"
 
 #include <iostream>
 #include <memory>
@@ -53,7 +52,12 @@ int main(int argc, const char* argv[])
 		);
 
 	renderingEngine->RefreshColor(
-		Color(Color::White)
+		Color(
+			0.2,
+			0.1,
+			0.1,
+			1.0
+		)
 	);
 
 	engine = std::make_unique<Engine>(
@@ -78,8 +82,8 @@ void SetupScene()
 {
 	try
 	{
-		ImageLoader imageLoader;
-		Texture texture = imageLoader.LoadImageResource("cat.png");
+		ResourceLoader imageLoader;
+		Texture texture = imageLoader.LoadImageResource("sprites\\cat.png");
 		Sprite2D cat(texture);
 		cat.Transform().Position(
 			Vector2D(200, 200)
