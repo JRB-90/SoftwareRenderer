@@ -32,6 +32,8 @@ add_library(engine STATIC
 	TextOverlay.cpp
 	RenderSurface.h
 	RenderSurface.cpp
+	Utils.h
+	Utils.cpp
 )
 
 target_link_libraries(engine PUBLIC

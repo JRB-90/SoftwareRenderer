@@ -16,9 +16,8 @@ namespace softengine
 			Color fontColor
 		);
 
+		void SetText(const std::string& text);
 		void RenderToSurface(RenderSurface& surface);
-
-		std::vector<std::string>& Lines() { return lines; }
 
 	private:
 		ResourceLoader resourceLoader;

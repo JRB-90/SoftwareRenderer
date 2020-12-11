@@ -1,4 +1,5 @@
 #include "TextOverlay.h"
+#include "Utils.h"
 #include "SDL.h"
 #include "SDL_ttf.h"
 
@@ -11,6 +12,11 @@ TextOverlay::TextOverlay(
 	fontSize(fontSize),
 	fontColor(fontColor.GetAs4B())
 {
+}
+
+void TextOverlay::SetText(const std::string& text)
+{
+	lines = Utils::SplitString(text, '\n');
 }
 
 void TextOverlay::RenderToSurface(RenderSurface& surface)

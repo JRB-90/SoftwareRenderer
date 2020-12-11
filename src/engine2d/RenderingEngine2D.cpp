@@ -15,17 +15,10 @@ RenderingEngine2D::RenderingEngine2D(
 	pixelsHeight(pixelsHeight),
 	pixelCount(pixelsWidth * pixelsHeight),
 	screenBufSize(pixelCount * 4),
-	refreshColor(
-		Color(
-			0.0,
-			0.0,
-			0.0,
-			1.0
-		)
-	),
+	refreshColor(Color::Black),
 	textOverlay(
 		16,
-		Color::Black
+		Color::White
 	),
 	isInitialised(false)
 {

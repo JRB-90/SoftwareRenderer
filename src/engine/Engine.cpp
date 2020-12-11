@@ -23,7 +23,8 @@ Engine::Engine(
 		windowTitle,
 		windowWidth,
 		windowHeight
-	)
+	),
+	updateCallback(NULL)
 {
 	SDL_Init(SDL_INIT_EVERYTHING);
 }
@@ -62,15 +63,13 @@ void Engine::Run()
 
 			if (debugModeEnabled)
 			{
-				std::cout << "\033[2J" << "" << "\033[H";
-				std::cout << "Time taken: " << timeTaken << "s" << std::endl;
-				std::cout << "FPS: " << 1.0 / timeTaken << std::endl;
-				std::cout << "Delta percentage: " << timeTaken / targetTime << std::endl;
-			
-				renderingEngine->GetTextOverLay().Lines().clear();
 				std::stringstream ss;
-				ss << "FPS: " << 1.0 / timeTaken;
-				renderingEngine->GetTextOverLay().Lines().push_back(ss.str());
+				ss << "Time taken: " << timeTaken << "s" << std::endl;
+				ss << "FPS: " << 1.0 / timeTaken << std::endl;
+				ss << "Delta percentage: " << timeTaken / targetTime;
+				std::cout << "\033[2J" << "" << "\033[H";
+				std::cout << ss.str();
+				renderingEngine->GetTextOverLay().SetText(ss.str());
 			}
 		}
 		std::this_thread::sleep_for(std::chrono::nanoseconds(0));
@@ -124,7 +123,10 @@ void Engine::Update(
 	InputState inputState, 
 	double delta)
 {
-	updateCallback(inputState, delta);
+	if (updateCallback != NULL)
+	{
+		updateCallback(inputState, delta);
+	}
 }
 
 void Engine::Render()
