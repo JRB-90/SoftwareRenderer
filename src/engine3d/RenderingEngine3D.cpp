@@ -21,6 +21,10 @@ RenderingEngine3D::RenderingEngine3D(
 			1.0
 		)
 	),
+	textOverlay(
+		14,
+		Color::White
+	),
 	isInitialised(false)
 {
 }

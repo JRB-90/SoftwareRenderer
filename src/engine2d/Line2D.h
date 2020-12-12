@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Vector2D.h"
+#include "Vertex2D.h"
 #include "Frame2D.h"
 #include "Color.h"
 
@@ -11,34 +11,32 @@ namespace softengine
 	public:
 		Line2D(const Line2D& line);
 		Line2D(
-			Vector2D p1,
-			Vector2D p2
+			Vertex2D v1,
+			Vertex2D v2
 		);
 		Line2D(
-			Vector2D p1,
-			Vector2D p2,
-			Color color
+			Vertex2D v1,
+			Vertex2D v2,
+			Frame2D transform
 		);
 		Line2D(
-			Vector2D p1,
-			Vector2D p2,
+			Vertex2D v1,
+			Vertex2D v2,
 			uint16_t width
 		);
 		Line2D(
-			Vector2D p1,
-			Vector2D p2,
-			Color color,
+			Vertex2D v1,
+			Vertex2D v2,
+			Frame2D transform,
 			uint16_t width
 		);
 		
-		Vector2D& P1() { return p1; }
-		void P1(Vector2D& p1) { this->p1 = p1; }
-		Vector2D& P2() { return p2; }
-		void P2(Vector2D& p1) { this->p2 = p2; }
+		Vertex2D& V1() { return v1; }
+		void V1(Vertex2D& v1) { this->v1 = v1; }
+		Vertex2D& V2() { return v2; }
+		void V2(Vertex2D& v2) { this->v2 = v2; }
 		Frame2D& Transform() { return transform; }
 		void Transform(Frame2D& transform) { this->transform = transform; }
-		Color& GetColor() { return color; }
-		void SetColor(Color& color) { this->color = color; }
 		uint16_t Width() { return width; }
 		void Width(uint16_t width) { this->width = width; }
 
@@ -48,10 +46,9 @@ namespace softengine
 		);
 
 	private:
-		Vector2D p1;
-		Vector2D p2;
+		Vertex2D v1;
+		Vertex2D v2;
 		Frame2D transform;
-		Color color;
 		uint16_t width;
 	};
 }

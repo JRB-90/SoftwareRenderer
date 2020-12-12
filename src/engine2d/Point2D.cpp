@@ -4,55 +4,51 @@ using namespace softengine;
 
 Point2D::Point2D()
   :
-	color(Color::White),
 	size(1)
 {
 }
 
 Point2D::Point2D(const Point2D& point)
   :
-	position(point.position),
+	vertex(point.vertex),
 	transform(point.transform),
-	color(point.color),
 	size(point.size)
 {
 }
 
-Point2D::Point2D(Vector2D position)
+Point2D::Point2D(Vertex2D vertex)
   :
-	position(position),
-	color(Color::White),
+	vertex(vertex),
 	size(1)
 {
 }
 
 Point2D::Point2D(
-	Vector2D position,
-	Color color)
+	Vertex2D position, 
+	Frame2D transform)
   :
-	position(position),
-	color(color),
+	vertex(vertex),
+	transform(transform),
 	size(1)
 {
 }
 
 Point2D::Point2D(
-	Vector2D position, 
+	Vertex2D position, 
 	uint16_t size)
   :
-	position(position),
-	color(Color::White),
+	vertex(vertex),
 	size(size)
 {
 }
 
 Point2D::Point2D(
-	Vector2D position, 
-	Color color, 
+	Vertex2D position, 
+	Frame2D transform,
 	uint16_t size)
   :
-	position(position),
-	color(color),
+	vertex(vertex),
+	transform(transform),
 	size(size)
 {
 }

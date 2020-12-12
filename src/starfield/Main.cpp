@@ -6,7 +6,7 @@
 #include "IScene.h"
 #include "Scene2D.h"
 #include "Point2D.h"
-#include "Line2D.h"
+#include "Color.h"
 #include "Star.h"
 #include "InputState.h"
 
@@ -76,9 +76,14 @@ void SetupScene()
 	for (size_t i = 0; i < NUM_STARS; i++)
 	{
 		Star s(
-			Vector2D(
-				PIXELS_WIDTH / 2,
-				PIXELS_HEIGHT / 2
+			Point2D(
+				Vertex2D(
+					Vector2D(
+						PIXELS_WIDTH / 2,
+						PIXELS_HEIGHT / 2
+					),
+					Color::White
+				)
 			),
 			Vector2D(
 				((double)std::rand() / (RAND_MAX / 2) - 1.0),
@@ -98,27 +103,27 @@ void Update(
 	for (Star& s : stars)
 	{
 		s.Move();
-		if (s.Position().Position().X() > (PIXELS_WIDTH) ||
-			s.Position().Position().X() < 0.0 ||
-			s.Position().Position().Y() > (PIXELS_HEIGHT) ||
-			s.Position().Position().Y() < 0.0)
+		if (s.Position().Vertex().Position.X() > (PIXELS_WIDTH) ||
+			s.Position().Vertex().Position.X() < 0.0 ||
+			s.Position().Vertex().Position.Y() > (PIXELS_HEIGHT) ||
+			s.Position().Vertex().Position.Y() < 0.0)
 		{
-			s.Position().Position().X(PIXELS_WIDTH / 2.0);
-			s.Position().Position().Y(PIXELS_HEIGHT / 2.0);
+			s.Position().Vertex().Position.X(PIXELS_WIDTH / 2.0);
+			s.Position().Vertex().Position.Y(PIXELS_HEIGHT / 2.0);
 			s.Direction().X(((double)std::rand() / (RAND_MAX / 2) - 1.0));
 			s.Direction().Y(((double)std::rand() / (RAND_MAX / 2) - 1.0));
 			s.Speed(0.01);
 		}
 
 		Vector2D displacement = 
-			s.Position().Position() -
+			s.Position().Vertex().Position -
 			Vector2D(PIXELS_WIDTH / 2, PIXELS_HEIGHT / 2);
 		s.Speed(s.Speed() + displacement.Length() * 0.01 * delta);
 	}
 
 	for (size_t i = 0; i < scene->Points().size(); i++)
 	{
-		scene->Points()[i].Position().X(stars[i].Position().Position().X());
-		scene->Points()[i].Position().Y(stars[i].Position().Position().Y());
+		scene->Points()[i].Vertex().Position.X(stars[i].Position().Vertex().Position.X());
+		scene->Points()[i].Vertex().Position.Y(stars[i].Position().Vertex().Position.Y());
 	}
 }

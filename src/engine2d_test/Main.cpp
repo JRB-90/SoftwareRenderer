@@ -12,6 +12,7 @@
 #include "ResourceLoader.h"
 #include "Sprite2D.h"
 #include "InputState.h"
+#include "Vertex2D.h"
 
 #include <iostream>
 #include <memory>
@@ -25,7 +26,7 @@ const size_t WINDOW_WIDTH = 640;
 const size_t WINDOW_HEIGHT = 480;
 const size_t PIXELS_WIDTH = 640;
 const size_t PIXELS_HEIGHT = 480;
-const int UPDATE_RATE = 20;
+const int UPDATE_RATE = 30;
 
 std::unique_ptr<Engine> engine;
 std::shared_ptr<Scene2D> scene;
@@ -53,9 +54,9 @@ int main(int argc, const char* argv[])
 
 	renderingEngine->RefreshColor(
 		Color(
-			0.2,
-			0.1,
-			0.1,
+			0.0,
+			0.0,
+			0.0,
 			1.0
 		)
 	);
@@ -94,6 +95,17 @@ void SetupScene()
 	{
 		std::cerr << e.what() << std::endl;
 	}
+
+	std::vector<size_t> indices = { 0, 1, 2};
+	std::vector<Vertex2D> vertices = 
+	{
+		Vertex2D(Vector2D(30.0, 0.0), Color::Red),
+		Vertex2D(Vector2D(0.0, 100.0), Color::Red),
+		Vertex2D(Vector2D(50.0, 50.0), Color::Red)
+	};
+	Polygon2D triPoly(indices, vertices);
+	triPoly.Transform(Frame2D(Vector2D(300, 200)));
+	scene->Polygons().push_back(triPoly);
 }
 
 void Update(

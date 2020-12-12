@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Vector2D.h"
+#include "VBO2D.h"
 #include "Frame2D.h"
 #include "Color.h"
 #include <vector>
@@ -12,28 +12,23 @@ namespace softengine
 	public:
 		Polygon2D();
 		Polygon2D(const Polygon2D& polygon);
-		Polygon2D(Color color);
-		Polygon2D(std::vector<Vector2D> points);
 		Polygon2D(
-			std::vector<Vector2D> points,
-			Color color);
+			std::vector<size_t> indices,
+			std::vector<Vertex2D> vertices
+		);
+		Polygon2D(
+			std::vector<size_t> indices,
+			std::vector<Vertex2D> vertices,
+			Frame2D transform
+		);
 
-		void ClearPoints();
-		void AddPoint(Vector2D& point);
-
-		const std::vector<Vector2D> Points() const { return points; }
+		VBO2D& VBO() { return vbo; }
+		void VBO(VBO2D& vbo) { this->vbo = vbo; }
 		Frame2D& Transform() { return transform; }
 		void Transform(Frame2D& transform) { this->transform = transform; }
-		Color GetColor() const { return color; }
-		void SetColor(Color color) { this->color = color; }
-		bool IsValid() const { return isValid; }
 
 	private:
-		std::vector<Vector2D> points;
+		VBO2D vbo;
 		Frame2D transform;
-		Color color;
-		bool isValid;
-
-		void CheckIsValid();
 	};
 }

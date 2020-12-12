@@ -23,5 +23,5 @@ Star::Star(
 void Star::Move()
 {
 	Vector2D moveVec = direction * speed;
-	position.Position() = position.Position() + moveVec;
+	position.Vertex().Position = position.Vertex().Position + moveVec;
 }

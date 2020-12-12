@@ -17,7 +17,7 @@ RenderingEngine2D::RenderingEngine2D(
 	screenBufSize(pixelCount * 4),
 	refreshColor(Color::Black),
 	textOverlay(
-		16,
+		14,
 		Color::White
 	),
 	isInitialised(false)
@@ -83,7 +83,8 @@ void RenderingEngine2D::RenderScene2D()
 	{
 		Primitive2DRenderer::RenderPolygon(
 			*surface,
-			polygon
+			polygon,
+			true // TODO - Have this configurable
 		);
 	}
 

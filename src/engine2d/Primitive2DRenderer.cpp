@@ -11,13 +11,13 @@ void Primitive2DRenderer::RenderPoint(
 	Point2D& point)
 {
 	Vector2D p = MathUtils::TransformPointFor2D(
-		point.Position(),
+		point.Vertex().Position,
 		point.Transform()
 	);
 	surface.SetPixelValue(
-		(size_t)p.X(),
-		(size_t)p.Y(),
-		point.GetColor()
+		(int)p.X(),
+		(int)p.Y(),
+		point.Vertex().VertColor
 	);
 }
 
@@ -26,21 +26,28 @@ void Primitive2DRenderer::RenderLine(
 	Line2D& line)
 {
 	Vector2D p1 = MathUtils::TransformPointFor2D(
-		line.P1(),
+		line.V1().Position,
 		line.Transform()
 	);
 
 	Vector2D p2 = MathUtils::TransformPointFor2D(
-		line.P2(),
+		line.V2().Position,
 		line.Transform()
 	);
 
 	int yMax, yMin;
 	RenderLinePoints(
 		surface,
-		p1,
-		p2,
-		line.GetColor(),
+		Vertex2D(
+			p1,
+			line.V1().UVCoord,
+			line.V1().VertColor
+		),
+		Vertex2D(
+			p2,
+			line.V2().UVCoord,
+			line.V2().VertColor
+		),
 		yMax,
 		yMin
 	);
@@ -48,17 +55,16 @@ void Primitive2DRenderer::RenderLine(
 
 void Primitive2DRenderer::RenderLinePoints(
 	RenderSurface& surface,
-	Vector2D p1, 
-	Vector2D p2, 
-	Color color, 
+	Vertex2D v1, 
+	Vertex2D v2,
 	int& yMax, 
 	int& yMin)
 {
-	double x = p1.X();
-	double y = p1.Y();
+	double x = v1.Position.X();
+	double y = v1.Position.Y();
 	yMax = yMin = y;
-	double dx = p2.X() - p1.X();
-	double dy = p2.Y() - p1.Y();
+	double dx = v2.Position.X() - v1.Position.X();
+	double dy = v2.Position.Y() - v1.Position.Y();
 	int steps;
 
 	if (std::abs(dx) > std::abs(dy))
@@ -80,7 +86,7 @@ void Primitive2DRenderer::RenderLinePoints(
 		surface.SetPixelValue(
 			x,
 			y,
-			color
+			v1.VertColor  // TODO - Interpolate between colors
 		);
 
 		if (y > yMax)
@@ -98,6 +104,8 @@ void Primitive2DRenderer::RenderTriangle(
 	RenderSurface& surface, 
 	Triangle2D& triangle)
 {
+	// TODO - Make this use vertices
+
 	Vector2D p0 = triangle.P1();
 	Vector2D p1 = triangle.P2();
 	Vector2D p2 = triangle.P3();
@@ -185,56 +193,24 @@ void Primitive2DRenderer::RenderTriangle(
 
 void Primitive2DRenderer::RenderPolygon(
 	RenderSurface& surface, 
-	Polygon2D& polygon)
+	Polygon2D& polygon,
+	bool isWireFrame)
 {
-	if (polygon.Points().size() == 0)
-	{
-		return;
-	}
-	else if (polygon.Points().size() == 1)
-	{
-		Vector2D p = MathUtils::TransformPointFor2D(
-			Vector2D(polygon.Points()[0]),
-			polygon.Transform()
-		);
-		RenderPoint(
-			surface,
-			Point2D(
-				p,
-				polygon.GetColor()
-			)
-		);
-	}
-	else if (polygon.Points().size() == 2)
-	{
-		Vector2D p1 = MathUtils::TransformPointFor2D(
-			Vector2D(polygon.Points()[0]),
-			polygon.Transform()
-		);
-		Vector2D p2 = MathUtils::TransformPointFor2D(
-			Vector2D(polygon.Points()[1]),
-			polygon.Transform()
-		);
+	// TODO - Make all renderingmethods in this class work with Vertex2D rather than Point2D/Line2D
 
-		RenderLine(
+	if (isWireFrame)
+	{
+		RenderPolygonLines(
 			surface,
-			Line2D(
-				p1,
-				p2,
-				polygon.GetColor()
-			)
+			polygon
 		);
 	}
 	else
 	{
 		RenderPolygonFilled(
-			surface, 
+			surface,
 			polygon
 		);
-		//RenderPolygonLines(
-		//	surface,
-		//	polygon
-		//);
 	}
 }
 
@@ -242,74 +218,68 @@ void Primitive2DRenderer::RenderPolygonLines(
 	RenderSurface& surface, 
 	Polygon2D& polygon)
 {
-	std::vector<Vector2D> transformedPoints;
-	for (size_t i = 0; i < polygon.Points().size(); i++)
+	for (size_t i = 0; i < polygon.VBO().IndicesSize(); i += 3)
 	{
-		transformedPoints.push_back(
-			MathUtils::TransformPointFor2D(
-				Vector2D(polygon.Points()[i]),
-				polygon.Transform()
-			)
+		Line2D l1(
+			polygon.VBO().Vertices(i),
+			polygon.VBO().Vertices(i + 1),
+			polygon.Transform()
 		);
-	}
 
-	for (size_t i = 0; i < polygon.Points().size() - 1; i++)
-	{
-		RenderLine(
-			surface,
-
-			Line2D(
-				transformedPoints[i],
-				transformedPoints[i + 1],
-				Color::White
-			)
+		Line2D l2(
+			polygon.VBO().Vertices(i + 1),
+			polygon.VBO().Vertices(i + 2),
+			polygon.Transform()
 		);
-	}
-	RenderLine(
-		surface,
 
-		Line2D(
-			transformedPoints[transformedPoints.size() - 1],
-			transformedPoints[0],
-			Color::White
-		)
-	);
+		Line2D l3(
+			polygon.VBO().Vertices(i + 2),
+			polygon.VBO().Vertices(i),
+			polygon.Transform()
+		);
+
+		RenderLine(surface, l1);
+		RenderLine(surface, l2);
+		RenderLine(surface, l3);
+	}
 }
 
 void Primitive2DRenderer::RenderPolygonFilled(
 	RenderSurface& surface,
 	Polygon2D& polygon)
 {
-	if (!polygon.IsValid())
-	{
-		std::cerr << "Attempted to render invlaid polygon" << std::endl;
+	// TODO
 
-		return;
-	}
+	//if (!polygon.IsValid())
+	//{
+	//	std::cerr << "Attempted to render invlaid polygon" << std::endl;
 
-	std::vector<Vector2D> transformedPoints;
-	for (size_t i = 0; i < polygon.Points().size(); i++)
-	{
-		transformedPoints.push_back(
-			MathUtils::TransformPointFor2D(
-				Vector2D(polygon.Points()[i]),
-				polygon.Transform()
-			)
-		);
-	}
+	//	return;
+	//}
 
-	for (size_t i = 1; i < polygon.Points().size() - 1; i++)
-	{
-		RenderTriangle(
-			surface,
-			Triangle2D(
-				transformedPoints[0],
-				transformedPoints[i],
-				transformedPoints[i + 1],
-				polygon.GetColor()
-			)
-		);
-	}
+	//std::vector<Vector2D> transformedPoints;
+	//for (size_t i = 0; i < polygon.Points().size(); i++)
+	//{
+	//	transformedPoints.push_back(
+	//		MathUtils::TransformPointFor2D(
+	//			Vector2D(polygon.Points()[i]),
+	//			polygon.Transform()
+	//		)
+	//	);
+	//}
+
+	//for (size_t i = 1; i < polygon.Points().size() - 1; i++)
+	//{
+	//	RenderTriangle(
+	//		surface,
+	//		Triangle2D(
+	//			transformedPoints[0],
+	//			transformedPoints[i],
+	//			transformedPoints[i + 1],
+	//			polygon.GetColor()
+	//		)
+	//	);
+	//}
 }
 
 void Primitive2DRenderer::RenderSprite(
