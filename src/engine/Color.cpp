@@ -86,7 +86,7 @@ Color4D Color::GetAs4D() const
 
 uint8_t Color::ToColorByte(double val) const
 {
-	return (uint8_t)(255.0 / val);
+	return (uint8_t)(255.0 * val);
 }
 
 double Color::ToColorDouble(uint8_t val) const

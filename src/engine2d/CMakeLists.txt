@@ -21,8 +21,8 @@ add_library(engine2d STATIC
 	Scene2D.h
     Polygon2D.h
 	Polygon2D.cpp
-	Triangle2D.h
-	Triangle2D.cpp
+	
+	
     Utils2D.h 
 	Utils2D.cpp
     Sprite2D.h

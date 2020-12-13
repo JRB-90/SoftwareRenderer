@@ -6,18 +6,27 @@
 
 using namespace softengine;
 
+void Primitive2DRenderer::RenderVertex(
+	RenderSurface& surface,
+	Vertex2D& vertex)
+{
+	surface.SetPixelValue(
+		vertex.Position.X(),
+		vertex.Position.Y(),
+		vertex.VertColor
+	);
+}
+
 void Primitive2DRenderer::RenderPoint(
 	RenderSurface& surface,
 	Point2D& point)
 {
-	Vector2D p = MathUtils::TransformPointFor2D(
-		point.Vertex().Position,
-		point.Transform()
-	);
-	surface.SetPixelValue(
-		(int)p.X(),
-		(int)p.Y(),
-		point.Vertex().VertColor
+	RenderVertex(
+		surface,
+		Utils2D::TransformVertexFor2D(
+			point.Vertex(),
+			point.Transform()
+		)
 	);
 }
 
@@ -25,28 +34,16 @@ void Primitive2DRenderer::RenderLine(
 	RenderSurface& surface, 
 	Line2D& line)
 {
-	Vector2D p1 = MathUtils::TransformPointFor2D(
-		line.V1().Position,
-		line.Transform()
-	);
-
-	Vector2D p2 = MathUtils::TransformPointFor2D(
-		line.V2().Position,
-		line.Transform()
-	);
-
 	int yMax, yMin;
 	RenderLinePoints(
 		surface,
-		Vertex2D(
-			p1,
-			line.V1().UVCoord,
-			line.V1().VertColor
+		Utils2D::TransformVertexFor2D(
+			line.V1(),
+			line.Transform()
 		),
-		Vertex2D(
-			p2,
-			line.V2().UVCoord,
-			line.V2().VertColor
+		Utils2D::TransformVertexFor2D(
+			line.V2(),
+			line.Transform()
 		),
 		yMax,
 		yMin
@@ -55,8 +52,8 @@ void Primitive2DRenderer::RenderLine(
 
 void Primitive2DRenderer::RenderLinePoints(
 	RenderSurface& surface,
-	Vertex2D v1, 
-	Vertex2D v2,
+	Vertex2D& v1, 
+	Vertex2D& v2,
 	int& yMax, 
 	int& yMin)
 {
@@ -83,10 +80,16 @@ void Primitive2DRenderer::RenderLinePoints(
 	{
 		x += xInc;
 		y += yInc;
+		double factor = (double)i / (double)steps;
+		
 		surface.SetPixelValue(
 			x,
 			y,
-			v1.VertColor  // TODO - Interpolate between colors
+			InterpolateColor(
+				v1.VertColor,
+				v2.VertColor,
+				factor
+			)
 		);
 
 		if (y > yMax)
@@ -102,13 +105,15 @@ void Primitive2DRenderer::RenderLinePoints(
 
 void Primitive2DRenderer::RenderTriangle(
 	RenderSurface& surface, 
-	Triangle2D& triangle)
+	Vertex2D& v1,
+	Vertex2D& v2,
+	Vertex2D& v3)
 {
 	// TODO - Make this use vertices
 
-	Vector2D p0 = triangle.P1();
-	Vector2D p1 = triangle.P2();
-	Vector2D p2 = triangle.P3();
+	Vector2D p0 = v1.Position;
+	Vector2D p1 = v2.Position;
+	Vector2D p2 = v3.Position;
 
 	if (p1.Y() < p0.Y())
 	{
@@ -185,10 +190,20 @@ void Primitive2DRenderer::RenderTriangle(
 			surface.SetPixelValue(
 				x,
 				y,
-				triangle.GetColor()
+				v1.VertColor // TODO - Interpolate colors
 			);
 		}
 	}
+}
+
+void RenderTriangleWithTexture(
+	RenderSurface& surface,
+	Vertex2D& v1,
+	Vertex2D& v2,
+	Vertex2D& v3,
+	Texture& texture)
+{
+	// TODO
 }
 
 void Primitive2DRenderer::RenderPolygon(
@@ -250,36 +265,29 @@ void Primitive2DRenderer::RenderPolygonFilled(
 {
 	// TODO
 
-	//if (!polygon.IsValid())
-	//{
-	//	std::cerr << "Attempted to render invlaid polygon" << std::endl;
+	if (polygon.VBO().IndicesSize() < 3)
+	{
+		throw std::runtime_error("Polygon needs at least 3 vertices");
+	}
 
-	//	return;
-	//}
-
-	//std::vector<Vector2D> transformedPoints;
-	//for (size_t i = 0; i < polygon.Points().size(); i++)
-	//{
-	//	transformedPoints.push_back(
-	//		MathUtils::TransformPointFor2D(
-	//			Vector2D(polygon.Points()[i]),
-	//			polygon.Transform()
-	//		)
-	//	);
-	//}
-
-	//for (size_t i = 1; i < polygon.Points().size() - 1; i++)
-	//{
-	//	RenderTriangle(
-	//		surface,
-	//		Triangle2D(
-	//			transformedPoints[0],
-	//			transformedPoints[i],
-	//			transformedPoints[i + 1],
-	//			polygon.GetColor()
-	//		)
-	//	);
-	//}
+	for (size_t i = 0; i < polygon.VBO().IndicesSize(); i += 3)
+	{
+		RenderTriangle(
+			surface,
+			Utils2D::TransformVertexFor2D(
+				polygon.VBO().Vertices(i),
+				polygon.Transform()
+			),
+			Utils2D::TransformVertexFor2D(
+				polygon.VBO().Vertices(i + 1),
+				polygon.Transform()
+			),
+			Utils2D::TransformVertexFor2D(
+				polygon.VBO().Vertices(i + 2),
+				polygon.Transform()
+			)
+		);
+	}
 }
 
 void Primitive2DRenderer::RenderSprite(
@@ -307,12 +315,29 @@ void Primitive2DRenderer::RenderSprite(
 	}
 }
 
+Color Primitive2DRenderer::InterpolateColor(
+	Color c1, 
+	Color c2, 
+	double factor)
+{
+	Color4D c1d = c1.GetAs4D();
+	Color4D c2d = c2.GetAs4D();
+
+	return 
+		Color(
+			MathUtils::Interpolate(c1d.r, c2d.r, factor),
+			MathUtils::Interpolate(c1d.g, c2d.g, factor),
+			MathUtils::Interpolate(c1d.b, c2d.b, factor),
+			MathUtils::Interpolate(c1d.a, c2d.a, factor)
+		);	
+}
+
 bool Primitive2DRenderer::IsValidSpritePixel(Color& color)
 {
 	Color4B c = color.GetAs4B();
-	if (c.r == 140 &&
-		c.g == 43 &&
-		c.b == 150 &&
+	if (c.r == 164 &&
+		c.g == 117 &&
+		c.b == 160 &&
 		c.a == 255)
 	{
 		return false;

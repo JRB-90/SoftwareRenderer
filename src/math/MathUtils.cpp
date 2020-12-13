@@ -41,3 +41,23 @@ Vector2D MathUtils::TransformPointFor2D(
 
 	return ((position * s) * r) * t;
 }
+
+int MathUtils::Interpolate(
+	int val1, 
+	int val2, 
+	double factor)
+{
+	int delta = val2 - val1;
+
+	return val1 + (int)((double)delta * factor);
+}
+
+double MathUtils::Interpolate(
+	double val1,
+	double val2, 
+	double factor)
+{
+	double delta = val2 - val1;
+
+	return val1 + (delta * factor);
+}

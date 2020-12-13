@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Vertex2D.h"
+#include "Frame2D.h"
 #include <vector>
 
 namespace softengine
@@ -21,6 +23,11 @@ namespace softengine
 			int y0,
 			int x1,
 			int y1
+		);
+
+		static Vertex2D TransformVertexFor2D(
+			Vertex2D& vertex,
+			Frame2D& transform
 		);
 	};
 }

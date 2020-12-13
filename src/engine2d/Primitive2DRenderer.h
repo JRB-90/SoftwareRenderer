@@ -6,7 +6,6 @@
 #include "Vector2D.h"
 #include "Point2D.h"
 #include "Line2D.h"
-#include "Triangle2D.h"
 #include "Polygon2D.h"
 #include "Sprite2D.h"
 #include "Texture.h"
@@ -19,6 +18,10 @@ namespace softengine
 	public:
 		Primitive2DRenderer() = delete;
 
+		static void RenderVertex(
+			RenderSurface& surface,
+			Vertex2D& vertex
+		);
 		static void RenderPoint(
 			RenderSurface& surface,
 			Point2D& point
@@ -29,18 +32,22 @@ namespace softengine
 		);
 		static void RenderLinePoints(
 			RenderSurface& surface,
-			Vertex2D p1,
-			Vertex2D p2,
+			Vertex2D& v1,
+			Vertex2D& v2,
 			int& yMax,
 			int& yMin
 		);
 		static void RenderTriangle(
 			RenderSurface& surface, 
-			Triangle2D& triangle
+			Vertex2D& v1,
+			Vertex2D& v2,
+			Vertex2D& v3
 		);
 		static void RenderTriangleWithTexture(
 			RenderSurface& surface,
-			Triangle2D& triangle,
+			Vertex2D& v1,
+			Vertex2D& v2,
+			Vertex2D& v3,
 			Texture& texture
 		);
 		static void RenderPolygon(
@@ -59,6 +66,11 @@ namespace softengine
 		static void RenderSprite(
 			RenderSurface& surface, 
 			Sprite2D& sprite
+		);
+		static Color InterpolateColor(
+			Color c1,
+			Color c2,
+			double factor
 		);
 		static bool IsValidSpritePixel(Color& color);
 	};

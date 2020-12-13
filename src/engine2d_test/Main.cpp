@@ -106,6 +106,14 @@ void SetupScene()
 	Polygon2D triPoly(indices, vertices);
 	triPoly.Transform(Frame2D(Vector2D(300, 200)));
 	scene->Polygons().push_back(triPoly);
+
+	scene->Lines().push_back(
+		Line2D(
+			Vertex2D(Vector2D(0, 0), Color::Red),
+			Vertex2D(Vector2D(100, 0), Color::Green),
+			Frame2D(Vector2D(100, 100))
+		)
+	);
 }
 
 void Update(
