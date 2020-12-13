@@ -3,6 +3,7 @@
 #include "VBO2D.h"
 #include "Frame2D.h"
 #include "Color.h"
+#include "DrawType.h"
 #include <vector>
 
 namespace softengine
@@ -19,6 +20,17 @@ namespace softengine
 		Polygon2D(
 			std::vector<size_t> indices,
 			std::vector<Vertex2D> vertices,
+			DrawType drawType
+		);
+		Polygon2D(
+			std::vector<size_t> indices,
+			std::vector<Vertex2D> vertices,
+			Frame2D transform
+		);
+		Polygon2D(
+			std::vector<size_t> indices,
+			std::vector<Vertex2D> vertices,
+			DrawType drawType,
 			Frame2D transform
 		);
 
@@ -26,9 +38,12 @@ namespace softengine
 		void VBO(VBO2D& vbo) { this->vbo = vbo; }
 		Frame2D& Transform() { return transform; }
 		void Transform(Frame2D& transform) { this->transform = transform; }
+		DrawType GetDrawType() { return drawType; }
+		void SetDrawType(DrawType drawType) { this->drawType = drawType; }
 
 	private:
 		VBO2D vbo;
 		Frame2D transform;
+		DrawType drawType;
 	};
 }

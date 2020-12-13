@@ -34,6 +34,7 @@ add_library(engine STATIC
 	RenderSurface.cpp
 	Utils.h
 	Utils.cpp
+	DrawType.h
 )
 
 target_link_libraries(engine PUBLIC

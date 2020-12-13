@@ -95,9 +95,6 @@ size_t VBO2D::Indices(size_t index)
 		throw std::exception("Indices index out of range");
 	}
 
-	auto var1 = indices[index];
-	auto var2 = *(indices + index);
-
 	return indices[index];
 }
 

@@ -100,10 +100,10 @@ void SetupScene()
 	std::vector<Vertex2D> vertices = 
 	{
 		Vertex2D(Vector2D(30.0, 0.0), Color::Red),
-		Vertex2D(Vector2D(0.0, 100.0), Color::Red),
-		Vertex2D(Vector2D(50.0, 50.0), Color::Red)
+		Vertex2D(Vector2D(0.0, 100.0), Color::Green),
+		Vertex2D(Vector2D(50.0, 50.0), Color::Blue)
 	};
-	Polygon2D triPoly(indices, vertices);
+	Polygon2D triPoly(indices, vertices, DrawType::Triangles);
 	triPoly.Transform(Frame2D(Vector2D(300, 200)));
 	scene->Polygons().push_back(triPoly);
 
@@ -115,6 +115,8 @@ void SetupScene()
 		)
 	);
 }
+
+double scale = 1.0;
 
 void Update(
 	InputState inputState, 
@@ -145,5 +147,15 @@ void Update(
 		scene->Sprites()[0].Transform().Position().X(
 			scene->Sprites()[0].Transform().Position().X() + speed
 		);
+	}
+	if (inputState.in)
+	{
+		scale += 0.1 * delta;
+		scene->Polygons()[0].Transform().Scale(scale);
+	}
+	if (inputState.out)
+	{
+		scale -= 0.1 * delta;
+		scene->Polygons()[0].Transform().Scale(scale);
 	}
 }

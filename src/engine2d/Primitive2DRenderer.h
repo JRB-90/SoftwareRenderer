@@ -55,7 +55,7 @@ namespace softengine
 			Polygon2D& polygon,
 			bool isWireFrame = false
 		);
-		static void RenderPolygonLines(
+		static void RenderPolygonWireFrame(
 			RenderSurface& surface, 
 			Polygon2D& polygon
 		);
@@ -71,6 +71,14 @@ namespace softengine
 			Color c1,
 			Color c2,
 			double factor
+		);
+		static Color InterpolateColor(
+			Color c1,
+			Color c2,
+			Color c3,
+			double factor1,
+			double factor2,
+			double factor3
 		);
 		static bool IsValidSpritePixel(Color& color);
 	};

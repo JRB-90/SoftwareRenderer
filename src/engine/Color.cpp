@@ -1,5 +1,7 @@
 #include "Color.h"
 
+#include <algorithm>
+
 using namespace softengine;
 
 const Color Color::Black	= Color(0.0, 0.0, 0.0, 1.0);
@@ -82,6 +84,50 @@ Color4B Color::GetAs4B() const
 Color4D Color::GetAs4D() const
 {
 	return color;
+}
+
+Color Color::operator+(const Color& vec)
+{
+	return
+		Color(
+			std::max(std::min(color.r + color.r, 1.0), 0.0),
+			std::max(std::min(color.g + color.g, 1.0), 0.0),
+			std::max(std::min(color.b + color.b, 1.0), 0.0),
+			std::max(std::min(color.a + color.a, 1.0), 0.0)
+		);
+}
+
+Color Color::operator-(const Color& vec)
+{
+	return
+		Color(
+			std::max(std::min((color.r - color.r) * 2.0, 1.0), 0.0),
+			std::max(std::min((color.g - color.g) * 2.0, 1.0), 0.0),
+			std::max(std::min((color.b - color.b) * 2.0, 1.0), 0.0),
+			std::max(std::min((color.a - color.a) * 2.0, 1.0), 0.0)
+		);
+}
+
+Color Color::operator*(const double scalar)
+{
+	return
+		Color(
+			std::max(std::min(color.r * scalar, 1.0), 0.0),
+			std::max(std::min(color.g * scalar, 1.0), 0.0),
+			std::max(std::min(color.b * scalar, 1.0), 0.0),
+			std::max(std::min(color.a * scalar, 1.0), 0.0)
+		);
+}
+
+Color Color::operator/(const double scalar)
+{
+	return
+		Color(
+			std::max(std::min(color.r / scalar, 1.0), 0.0),
+			std::max(std::min(color.g / scalar, 1.0), 0.0),
+			std::max(std::min(color.b / scalar, 1.0), 0.0),
+			std::max(std::min(color.a / scalar, 1.0), 0.0)
+		);
 }
 
 uint8_t Color::ToColorByte(double val) const

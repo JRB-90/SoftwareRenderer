@@ -13,5 +13,7 @@ namespace softengine
 		bool down = false;
 		bool right = false;
 		bool left = false;
+		bool in = false;
+		bool out = false;
 	};
 }

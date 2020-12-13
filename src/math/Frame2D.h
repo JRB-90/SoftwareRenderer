@@ -28,6 +28,11 @@ namespace softengine
 			Vector2D scale
 		);
 		Frame2D(
+			Vector2D position,
+			double angle,
+			double scale
+		);
+		Frame2D(
 			double m00, double m01, double m02,
 			double m10, double m11, double m12,
 			double m20, double m21, double m22
@@ -39,6 +44,7 @@ namespace softengine
 		void Angle(double angle) { this->angle = angle; CalculateMatrix(); }
 		Vector2D& Scale() { return scale; }
 		void Scale(Vector2D& scale) { this->scale = scale; CalculateMatrix(); }
+		void Scale(double scale) { this->scale = Vector2D(scale, scale); CalculateMatrix(); }
 
 		double At(size_t row, size_t col) const;
 		Frame2D Inverse();

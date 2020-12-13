@@ -11,6 +11,8 @@ add_library(math STATIC
 	Frame2D.cpp
 	MathUtils.h
 	MathUtils.cpp
+    Vector4D.h
+	Vector4D.cpp
 )
 
 target_include_directories(math PUBLIC

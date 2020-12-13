@@ -67,6 +67,11 @@ namespace softengine
 		Color4B GetAs4B() const;
 		Color4D GetAs4D() const;
 
+		Color operator+(const Color& vec);
+		Color operator-(const Color& vec);
+		Color operator*(const double scalar);
+		Color operator/(const double scalar);
+
 		static const Color Black;
 		static const Color White;
 		static const Color Red;

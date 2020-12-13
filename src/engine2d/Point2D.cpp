@@ -24,7 +24,7 @@ Point2D::Point2D(Vertex2D vertex)
 }
 
 Point2D::Point2D(
-	Vertex2D position, 
+	Vertex2D vertex, 
 	Frame2D transform)
   :
 	vertex(vertex),
@@ -43,7 +43,7 @@ Point2D::Point2D(
 }
 
 Point2D::Point2D(
-	Vertex2D position, 
+	Vertex2D vertex, 
 	Frame2D transform,
 	uint16_t size)
   :

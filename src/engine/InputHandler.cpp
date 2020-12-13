@@ -38,41 +38,29 @@ void InputHandler::Update()
 			break;
 		}
 
-		if (windowEvent.key.state == SDL_PRESSED)
+		if (windowEvent.key.state == SDL_PRESSED ||
+			windowEvent.key.state == SDL_RELEASED)
 		{
+			bool state = windowEvent.key.state == SDL_PRESSED;
 			switch (windowEvent.key.keysym.scancode)
 			{
 			case SDL_Scancode::SDL_SCANCODE_W:
-				currentState.up = true;
+				currentState.up = state;
 				break;
 			case SDL_Scancode::SDL_SCANCODE_S:
-				currentState.down = true;
+				currentState.down = state;
 				break;
 			case SDL_Scancode::SDL_SCANCODE_D:
-				currentState.right = true;
+				currentState.right = state;
 				break;
 			case SDL_Scancode::SDL_SCANCODE_A:
-				currentState.left = true;
+				currentState.left = state;
 				break;
-			default:
+			case SDL_Scancode::SDL_SCANCODE_Z:
+				currentState.in = state;
 				break;
-			}
-		}
-		else if (windowEvent.key.state == SDL_RELEASED)
-		{
-			switch (windowEvent.key.keysym.scancode)
-			{
-			case SDL_Scancode::SDL_SCANCODE_W:
-				currentState.up = false;
-				break;
-			case SDL_Scancode::SDL_SCANCODE_S:
-				currentState.down = false;
-				break;
-			case SDL_Scancode::SDL_SCANCODE_D:
-				currentState.right = false;
-				break;
-			case SDL_Scancode::SDL_SCANCODE_A:
-				currentState.left = false;
+			case SDL_Scancode::SDL_SCANCODE_X:
+				currentState.out = state;
 				break;
 			default:
 				break;

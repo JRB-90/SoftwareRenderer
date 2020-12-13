@@ -64,6 +64,23 @@ Frame2D::Frame2D(
 }
 
 Frame2D::Frame2D(
+	Vector2D position, 
+	double angle, 
+	double scale)
+  :
+	position(position),
+	angle(angle),
+	scale(
+		Vector2D(
+			scale, 
+			scale
+		)
+	)
+{
+	CalculateMatrix();
+}
+
+Frame2D::Frame2D(
 	double m00, double m01, double m02, 
 	double m10, double m11, double m12, 
 	double m20, double m21, double m22)

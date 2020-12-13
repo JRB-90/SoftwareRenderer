@@ -84,7 +84,7 @@ void RenderingEngine2D::RenderScene2D()
 		Primitive2DRenderer::RenderPolygon(
 			*surface,
 			polygon,
-			true // TODO - Have this configurable
+			false // TODO - Have this configurable
 		);
 	}
 

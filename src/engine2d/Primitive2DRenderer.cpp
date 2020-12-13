@@ -2,6 +2,7 @@
 
 #include "MathUtils.h"
 #include "Utils2D.h"
+#include "Vector4D.h"
 #include <iostream>
 
 using namespace softengine;
@@ -109,8 +110,6 @@ void Primitive2DRenderer::RenderTriangle(
 	Vertex2D& v2,
 	Vertex2D& v3)
 {
-	// TODO - Make this use vertices
-
 	Vector2D p0 = v1.Position;
 	Vector2D p1 = v2.Position;
 	Vector2D p2 = v3.Position;
@@ -187,10 +186,24 @@ void Primitive2DRenderer::RenderTriangle(
 	{
 		for (int x = xLeft[y - p0.Y()]; x < xRight[y - p0.Y()]; x++)
 		{
+			Vector2D cur(x, y);
+			double factor1 = 1 / (p0 - cur).Length();
+			double factor2 = 1 / (p1 - cur).Length();
+			double factor3 = 1 / (p2 - cur).Length();
+
+			Color c = InterpolateColor(
+				v1.VertColor,
+				v2.VertColor,
+				v3.VertColor,
+				factor1,
+				factor2,
+				factor3
+			);
+
 			surface.SetPixelValue(
 				x,
 				y,
-				v1.VertColor // TODO - Interpolate colors
+				c
 			);
 		}
 	}
@@ -211,11 +224,9 @@ void Primitive2DRenderer::RenderPolygon(
 	Polygon2D& polygon,
 	bool isWireFrame)
 {
-	// TODO - Make all renderingmethods in this class work with Vertex2D rather than Point2D/Line2D
-
 	if (isWireFrame)
 	{
-		RenderPolygonLines(
+		RenderPolygonWireFrame(
 			surface,
 			polygon
 		);
@@ -229,33 +240,76 @@ void Primitive2DRenderer::RenderPolygon(
 	}
 }
 
-void Primitive2DRenderer::RenderPolygonLines(
+void Primitive2DRenderer::RenderPolygonWireFrame(
 	RenderSurface& surface, 
 	Polygon2D& polygon)
 {
-	for (size_t i = 0; i < polygon.VBO().IndicesSize(); i += 3)
+	switch (polygon.GetDrawType())
 	{
-		Line2D l1(
-			polygon.VBO().Vertices(i),
-			polygon.VBO().Vertices(i + 1),
-			polygon.Transform()
-		);
+	case DrawType::Points:
+		for (size_t i = 0; i < polygon.VBO().IndicesSize(); i++)
+		{
+			size_t vertexIndex = polygon.VBO().Indices(i);
+			Vertex2D vertex = polygon.VBO().Vertices(vertexIndex);
 
-		Line2D l2(
-			polygon.VBO().Vertices(i + 1),
-			polygon.VBO().Vertices(i + 2),
-			polygon.Transform()
-		);
+			RenderPoint(
+				surface,
+				Point2D(
+					polygon.VBO().Vertices(vertexIndex),
+					polygon.Transform()
+				)
+			);
+		}
+		break;
+	case DrawType::Lines:
+		for (size_t i = 0; i < polygon.VBO().IndicesSize() - 1; i += 2)
+		{
+			size_t vertexIndex1 = polygon.VBO().Indices(i);
+			size_t vertexIndex2 = polygon.VBO().Indices(i + 1);
+			Line2D line(
+				polygon.VBO().Vertices(vertexIndex1),
+				polygon.VBO().Vertices(vertexIndex2),
+				polygon.Transform()
+			);
 
-		Line2D l3(
-			polygon.VBO().Vertices(i + 2),
-			polygon.VBO().Vertices(i),
-			polygon.Transform()
-		);
+			RenderLine(surface, line);
+		}
+		break;
+	case DrawType::Triangles:
+		for (size_t i = 0; i < polygon.VBO().IndicesSize() - 2; i += 3)
+		{
+			size_t vertexIndex1 = polygon.VBO().Indices(i);
+			size_t vertexIndex2 = polygon.VBO().Indices(i + 1);
+			size_t vertexIndex3 = polygon.VBO().Indices(i + 2);
 
-		RenderLine(surface, l1);
-		RenderLine(surface, l2);
-		RenderLine(surface, l3);
+			Line2D l1(
+				polygon.VBO().Vertices(vertexIndex1),
+				polygon.VBO().Vertices(vertexIndex2),
+				polygon.Transform()
+			);
+
+			Line2D l2(
+				polygon.VBO().Vertices(vertexIndex2),
+				polygon.VBO().Vertices(vertexIndex3),
+				polygon.Transform()
+			);
+
+			Line2D l3(
+				polygon.VBO().Vertices(vertexIndex3),
+				polygon.VBO().Vertices(vertexIndex1),
+				polygon.Transform()
+			);
+
+			RenderLine(surface, l1);
+			RenderLine(surface, l2);
+			RenderLine(surface, l3);
+		}
+		break;
+	case DrawType::Quads:
+		// TODO
+		break;
+	default:
+		break;
 	}
 }
 
@@ -263,27 +317,24 @@ void Primitive2DRenderer::RenderPolygonFilled(
 	RenderSurface& surface,
 	Polygon2D& polygon)
 {
-	// TODO
-
-	if (polygon.VBO().IndicesSize() < 3)
+	for (size_t i = 0; i < polygon.VBO().IndicesSize() - 2; i += 3)
 	{
-		throw std::runtime_error("Polygon needs at least 3 vertices");
-	}
+		size_t vertexIndex1 = polygon.VBO().Indices(i);
+		size_t vertexIndex2 = polygon.VBO().Indices(i + 1);
+		size_t vertexIndex3 = polygon.VBO().Indices(i + 2);
 
-	for (size_t i = 0; i < polygon.VBO().IndicesSize(); i += 3)
-	{
 		RenderTriangle(
 			surface,
 			Utils2D::TransformVertexFor2D(
-				polygon.VBO().Vertices(i),
+				polygon.VBO().Vertices(vertexIndex1),
 				polygon.Transform()
 			),
 			Utils2D::TransformVertexFor2D(
-				polygon.VBO().Vertices(i + 1),
+				polygon.VBO().Vertices(vertexIndex2),
 				polygon.Transform()
 			),
 			Utils2D::TransformVertexFor2D(
-				polygon.VBO().Vertices(i + 2),
+				polygon.VBO().Vertices(vertexIndex3),
 				polygon.Transform()
 			)
 		);
@@ -330,6 +381,34 @@ Color Primitive2DRenderer::InterpolateColor(
 			MathUtils::Interpolate(c1d.b, c2d.b, factor),
 			MathUtils::Interpolate(c1d.a, c2d.a, factor)
 		);	
+}
+
+Color Primitive2DRenderer::InterpolateColor(
+	Color c1,
+	Color c2, 
+	Color c3, 
+	double factor1, 
+	double factor2,
+	double factor3)
+{
+	Color4D c1d = c1.GetAs4D();
+	Vector4D v1(c1d.r, c1d.g, c1d.b, c1d.a);
+	Color4D c2d = c2.GetAs4D();
+	Vector4D v2(c2d.r, c2d.g, c2d.b, c2d.a);
+	Color4D c3d = c3.GetAs4D();
+	Vector4D v3(c3d.r, c3d.g, c3d.b, c3d.a);
+
+	Vector4D v =
+		((v1 * factor1) + (v2 * factor2) + (v3 * factor3)) /
+		(factor1 + factor2 + factor3);
+
+	return
+		Color(
+			v.X(),
+			v.Y(),
+			v.Z(), 
+			v.W()
+		);
 }
 
 bool Primitive2DRenderer::IsValidSpritePixel(Color& color)
