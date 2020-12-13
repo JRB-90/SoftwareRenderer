@@ -63,22 +63,32 @@ namespace softengine
 			RenderSurface& surface, 
 			Polygon2D& polygon
 		);
+		static void RenderPolygonWithTexture(
+			RenderSurface& surface,
+			Polygon2D& polygon,
+			Texture& texture
+		);
 		static void RenderSprite(
 			RenderSurface& surface, 
 			Sprite2D& sprite
 		);
 		static Color InterpolateColor(
-			Color c1,
-			Color c2,
+			Color& c1,
+			Color& c2,
 			double factor
 		);
 		static Color InterpolateColor(
-			Color c1,
-			Color c2,
-			Color c3,
-			double factor1,
-			double factor2,
-			double factor3
+			Vertex2D& v1,
+			Vertex2D& v2,
+			Vertex2D& v3,
+			Vector2D& pos
+		);
+		static Color InterpolateTexture(
+			Vertex2D& v1,
+			Vertex2D& v2,
+			Vertex2D& v3,
+			Vector2D& pos,
+			Texture& texture
 		);
 		static bool IsValidSpritePixel(Color& color);
 	};

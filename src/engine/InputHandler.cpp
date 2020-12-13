@@ -62,6 +62,12 @@ void InputHandler::Update()
 			case SDL_Scancode::SDL_SCANCODE_X:
 				currentState.out = state;
 				break;
+			case SDL_Scancode::SDL_SCANCODE_Q:
+				currentState.rotL = state;
+				break;
+			case SDL_Scancode::SDL_SCANCODE_E:
+				currentState.rotR = state;
+				break;
 			default:
 				break;
 			}

@@ -15,5 +15,7 @@ namespace softengine
 		bool left = false;
 		bool in = false;
 		bool out = false;
+		bool rotL = false;
+		bool rotR = false;
 	};
 }

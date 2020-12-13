@@ -105,18 +105,20 @@ void SetupScene()
 	};
 	Polygon2D triPoly(indices, vertices, DrawType::Triangles);
 	triPoly.Transform(Frame2D(Vector2D(300, 200)));
+	triPoly.Transform().Scale(2.0);
 	scene->Polygons().push_back(triPoly);
 
 	scene->Lines().push_back(
 		Line2D(
 			Vertex2D(Vector2D(0, 0), Color::Red),
-			Vertex2D(Vector2D(100, 0), Color::Green),
+			Vertex2D(Vector2D(300, 0), Color::Green),
 			Frame2D(Vector2D(100, 100))
 		)
 	);
 }
 
 double scale = 1.0;
+double angle = 0.0;
 
 void Update(
 	InputState inputState, 
@@ -151,11 +153,21 @@ void Update(
 	if (inputState.in)
 	{
 		scale += 0.1 * delta;
-		scene->Polygons()[0].Transform().Scale(scale);
+		scene->Sprites()[0].Transform().Scale(scale);
 	}
 	if (inputState.out)
 	{
 		scale -= 0.1 * delta;
-		scene->Polygons()[0].Transform().Scale(scale);
+		scene->Sprites()[0].Transform().Scale(scale);
+	}
+	if (inputState.rotR)
+	{
+		angle += 2.0 * delta;
+		scene->Sprites()[0].Transform().Angle(angle);
+	}
+	if (inputState.rotL)
+	{
+		angle -= 2.0 * delta;
+		scene->Sprites()[0].Transform().Angle(angle);
 	}
 }

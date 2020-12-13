@@ -2,6 +2,7 @@
 
 #include "Texture.h"
 #include "Frame2D.h"
+#include "Polygon2D.h"
 #include "Color.h"
 
 namespace softengine
@@ -11,9 +12,15 @@ namespace softengine
 	public:
 		Sprite2D();
 		Sprite2D(Texture texture);
+		Sprite2D(
+			Texture texture,
+			Frame2D transform
+		);
 
-		Frame2D& Transform() { return transform; }
-		void Transform(Frame2D& transform) { this->transform = transform; }
+		Texture& GetTexture() { return texture; }
+		const Polygon2D& Vertices() { return vertices; }
+		Frame2D& Transform() { return vertices.Transform(); }
+		void Transform(Frame2D& transform) { this->vertices.Transform(transform); }
 
 		size_t Width() { return texture.Width(); }
 		size_t Height() { return texture.Height(); }
@@ -24,6 +31,6 @@ namespace softengine
 
 	private:
 		Texture texture;
-		Frame2D transform;
+		Polygon2D vertices;
 	};
 }
