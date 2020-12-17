@@ -433,7 +433,30 @@ void Primitive2DRenderer::RenderPolygonWithTexture(
 	Polygon2D& polygon, 
 	Texture& texture)
 {
-	// TODO
+	// TODO - Test
+	for (size_t i = 0; i < polygon.VBO().IndicesSize() - 2; i += 3)
+	{
+		size_t vertexIndex1 = polygon.VBO().Indices(i);
+		size_t vertexIndex2 = polygon.VBO().Indices(i + 1);
+		size_t vertexIndex3 = polygon.VBO().Indices(i + 2);
+
+		RenderTriangleWithTexture(
+			surface,
+			Utils2D::TransformVertexFor2D(
+				polygon.VBO().Vertices(vertexIndex1),
+				polygon.Transform()
+			),
+			Utils2D::TransformVertexFor2D(
+				polygon.VBO().Vertices(vertexIndex2),
+				polygon.Transform()
+			),
+			Utils2D::TransformVertexFor2D(
+				polygon.VBO().Vertices(vertexIndex3),
+				polygon.Transform()
+			),
+			texture
+		);
+	}
 }
 
 void Primitive2DRenderer::RenderSprite(

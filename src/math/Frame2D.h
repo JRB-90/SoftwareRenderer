@@ -9,26 +9,26 @@ namespace softengine
 	public:
 		Frame2D();
 		Frame2D(
-			Vector2D position
+			Vector2D translation
 		);
 		Frame2D(
 			double angle
 		);
 		Frame2D(
-			Vector2D position,
+			Vector2D translation,
 			double angle
 		);
 		Frame2D(
-			Vector2D position,
+			Vector2D translation,
 			Vector2D scale
 		);
 		Frame2D(
-			Vector2D position,
+			Vector2D translation,
 			double angle,
 			Vector2D scale
 		);
 		Frame2D(
-			Vector2D position,
+			Vector2D translation,
 			double angle,
 			double scale
 		);
@@ -38,8 +38,8 @@ namespace softengine
 			double m20, double m21, double m22
 		);
 
-		Vector2D& Position() { return position; }
-		void Position(Vector2D& position) { this->position = position; CalculateMatrix(); }
+		Vector2D& Translation() { return translation; }
+		void Translation(Vector2D& translation) { this->translation = translation; CalculateMatrix(); }
 		double Angle() { return angle; }
 		void Angle(double angle) { this->angle = angle; CalculateMatrix(); }
 		Vector2D& Scale() { return scale; }
@@ -57,7 +57,7 @@ namespace softengine
 		Frame2D operator*(const Frame2D& rhs);
 
 	private:
-		Vector2D position;
+		Vector2D translation;
 		double angle;
 		Vector2D scale;
 		double m[3][3] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };

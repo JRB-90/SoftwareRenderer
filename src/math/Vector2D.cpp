@@ -1,5 +1,6 @@
 #include "Vector2D.h"
 #include "Frame2D.h"
+#include "MathUtils.h"
 #include <cmath>
 
 using namespace softengine;
@@ -48,6 +49,25 @@ Vector2D Vector2D::Normalised()
 	v.Normalise();
 
 	return v;
+}
+
+double Vector2D::Dot(Vector2D& vec)
+{
+	return x * vec.X() + y * vec.Y();
+}
+
+double Vector2D::AngleWith(Vector2D& vec)
+{
+	Vector2D v1 = this->Normalised();
+	Vector2D v2 = vec.Normalised();
+	double angle = std::acos(v1.Dot(v2)) / v1.Length() * v2.Length();
+
+	return MathUtils::ToDeg(angle);
+}
+
+double Vector2D::AngleBetween(Vector2D& v1, Vector2D& v2)
+{
+	return v1.AngleWith(v2);
 }
 
 Vector2D Vector2D::operator+(const Vector2D& vec)

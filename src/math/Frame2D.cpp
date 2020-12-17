@@ -12,9 +12,9 @@ Frame2D::Frame2D()
 	CalculateMatrix();
 }
 
-Frame2D::Frame2D(Vector2D position)
+Frame2D::Frame2D(Vector2D translation)
   :
-	position(position),
+	translation(translation),
 	angle(0.0),
 	scale(Vector2D(1.0, 1.0))
 {
@@ -30,10 +30,10 @@ Frame2D::Frame2D(double angle)
 }
 
 Frame2D::Frame2D(
-	Vector2D position, 
+	Vector2D translation,
 	double angle)
   :
-	position(position),
+	translation(translation),
 	angle(angle),
 	scale(Vector2D(1.0, 1.0))
 {
@@ -41,10 +41,10 @@ Frame2D::Frame2D(
 }
 
 Frame2D::Frame2D(
-	Vector2D position, 
+	Vector2D translation,
 	Vector2D scale)
   :
-	position(position),
+	translation(translation),
 	angle(0.0),
 	scale(scale)
 {
@@ -52,11 +52,11 @@ Frame2D::Frame2D(
 }
 
 Frame2D::Frame2D(
-	Vector2D position, 
+	Vector2D translation,
 	double angle, 
 	Vector2D scale)
   :
-	position(position),
+	translation(translation),
 	angle(angle),
 	scale(scale)
 {
@@ -64,11 +64,11 @@ Frame2D::Frame2D(
 }
 
 Frame2D::Frame2D(
-	Vector2D position, 
+	Vector2D translation,
 	double angle, 
 	double scale)
   :
-	position(position),
+	translation(translation),
 	angle(angle),
 	scale(
 		Vector2D(
@@ -95,7 +95,7 @@ Frame2D::Frame2D(
 	m[2][1] = m21;
 	m[2][2] = m22;
 
-	position = Vector2D(
+	translation = Vector2D(
 		m[0][2],
 		m[1][2]
 	);
@@ -112,39 +112,6 @@ Frame2D::Frame2D(
 		sy *= -1.0;
 	}
 	scale = Vector2D(sx, sy);
-}
-
-void Frame2D::CalculateMatrix()
-{
-	double angleRad = MathUtils::ToRad(angle);
-
-	Frame2D s(
-		scale.X(),				0,						0,
-		0,						scale.Y(),				0,
-		0,						0,						1.0
-	);
-
-	Frame2D r(
-		std::cos(angleRad), -std::sin(angleRad), 0.0,
-		std::sin(angleRad), std::cos(angleRad), 0.0,
-		0, 0, 1.0
-	);
-
-	Frame2D t(
-		1.0,					0.0,					position.X(),
-		0.0,					1.0,					position.Y(),
-		0.0,					0.0,					1.0
-	);
-
-	Frame2D res = (s * r) * t;
-
-	for (size_t i = 0; i < 3; i++)
-	{
-		for (size_t j = 0; j < 3; j++)
-		{
-			m[i][j] = res.At(i, j);
-		}
-	}
 }
 
 double Frame2D::At(
@@ -202,4 +169,37 @@ Frame2D Frame2D::operator*(const Frame2D& rhs)
 		res[1][0], res[1][1], res[1][2],
 		res[2][0], res[2][1], res[2][2]
 	);
+}
+
+void Frame2D::CalculateMatrix()
+{
+	double angleRad = MathUtils::ToRad(angle);
+
+	Frame2D s(
+		scale.X(), 0, 0,
+		0, scale.Y(), 0,
+		0, 0, 1.0
+	);
+
+	Frame2D r(
+		std::cos(angleRad), -std::sin(angleRad), 0.0,
+		std::sin(angleRad), std::cos(angleRad), 0.0,
+		0, 0, 1.0
+	);
+
+	Frame2D t(
+		1.0, 0.0, translation.X(),
+		0.0, 1.0, translation.Y(),
+		0.0, 0.0, 1.0
+	);
+
+	Frame2D res = (s * r) * t;
+
+	for (size_t i = 0; i < 3; i++)
+	{
+		for (size_t j = 0; j < 3; j++)
+		{
+			m[i][j] = res.At(i, j);
+		}
+	}
 }

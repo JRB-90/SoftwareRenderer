@@ -13,6 +13,12 @@ add_library(math STATIC
 	MathUtils.cpp
     Vector4D.h
 	Vector4D.cpp
+    Frame3D.h
+	Frame3D.cpp
+    Rotation3D.h
+	Rotation3D.cpp
+    Quaternion.h
+	Quaternion.cpp
 )
 
 target_include_directories(math PUBLIC

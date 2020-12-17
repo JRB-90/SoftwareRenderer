@@ -5,6 +5,8 @@ find_library(engine3d NAMES engine3d)
 
 link_directories(engine3d_test
 	C:\\SDL2\\lib\\x64
+	C:\\SDL2_image\\lib\\x64
+	C:\\SDL2_ttf\\lib\\x64
 )
 
 add_executable(engine3d_test

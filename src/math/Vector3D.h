@@ -2,6 +2,8 @@
 
 namespace softengine
 {
+	class Frame3D;
+
 	class Vector3D
 	{
 	public:
@@ -24,10 +26,19 @@ namespace softengine
 		double Length();
 		void Normalise();
 		Vector3D Normalised();
+		double Dot(Vector3D& vec);
+		double AngleWith(Vector3D& vec);
+		Vector3D Cross(Vector3D& vec);
+
+		static double AngleBetween(
+			Vector3D& v1,
+			Vector3D& v2
+		);
 
 		Vector3D operator+(const Vector3D& vec);
 		Vector3D operator-(const Vector3D& vec);
 		Vector3D operator*(const double scalar);
+		Vector3D operator*(const Frame3D& frame);
 		Vector3D operator/(const double scalar);
 
 	private:

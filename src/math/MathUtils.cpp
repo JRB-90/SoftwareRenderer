@@ -34,8 +34,8 @@ Vector2D MathUtils::TransformPointFor2D(
 	);
 
 	Frame2D t(
-		1.0, 0.0, transform.Position().X(),
-		0.0, 1.0, transform.Position().Y(),
+		1.0, 0.0, transform.Translation().X(),
+		0.0, 1.0, transform.Translation().Y(),
 		0.0, 0.0, 1.0
 	);
 

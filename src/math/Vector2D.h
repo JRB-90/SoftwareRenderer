@@ -23,6 +23,13 @@ namespace softengine
 		double Length();
 		void Normalise();
 		Vector2D Normalised();
+		double Dot(Vector2D& vec);
+		double AngleWith(Vector2D& vec);
+
+		static double AngleBetween(
+			Vector2D& v1,
+			Vector2D& v2
+		);
 
 		Vector2D operator+(const Vector2D& vec);
 		Vector2D operator-(const Vector2D& vec);

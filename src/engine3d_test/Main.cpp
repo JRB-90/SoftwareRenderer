@@ -2,6 +2,11 @@
 #include "RenderingEngine3D.h"
 #include "Scene3D.h"
 
+#include "Vector3D.h"
+#include "Frame3D.h"
+#include "Rotation3D.h"
+#include "Quaternion.h"
+
 #include <iostream>
 #include <random>
 #include <ctime>
