@@ -52,15 +52,22 @@ Rotation3D::Rotation3D(Quaternion quaternion)
 	double zz = q.Z() * q.Z();
 	double zw = q.Z() * q.W();
 
-	m[0][0] = 1 - 2 * (yy + zz);
-	m[0][1] = 2 * (xy - zw);
-	m[0][2] = 2 * (xz + yw);
-	m[1][0] = 2 * (xy + zw);
-	m[1][1] = 1 - 2 * (xx + zz);
-	m[1][2] = 2 * (yz - xw);
-	m[2][0] = 2 * (xz - yw);
-	m[2][1] = 2 * (yz + xw);
-	m[2][2] = 1 - 2 * (xx + yy);
+	m.At(0, 0, 1 - 2 * (yy + zz));
+	m.At(0, 1, 2 * (xy - zw));
+	m.At(0, 2, 2 * (xz + yw));
+	m.At(1, 0, 2 * (xy + zw));
+	m.At(1, 1, 1 - 2 * (xx + zz));
+	m.At(1, 2, 2 * (yz - xw));
+	m.At(2, 0, 2 * (xz - yw));
+	m.At(2, 1, 2 * (yz + xw));
+	m.At(2, 2, 1 - 2 * (xx + yy));
+}
+
+Rotation3D::Rotation3D(Matrix3 mat)
+  :
+	m(mat)
+{
+	CalculateFromMatrix();
 }
 
 Rotation3D::Rotation3D(
@@ -68,24 +75,13 @@ Rotation3D::Rotation3D(
 	double m10, double m11, double m12, 
 	double m20, double m21, double m22)
 {
-	m[0][0] = m00;
-	m[0][1] = m01;
-	m[0][2] = m02;
-	m[1][0] = m10;
-	m[1][1] = m11;
-	m[1][2] = m12;
-	m[2][0] = m20;
-	m[2][1] = m21;
-	m[2][2] = m22;
+	m = Matrix3(
+		m00, m01, m02,
+		m10, m11, m12,
+		m20, m21, m22
+	);
 
 	CalculateFromMatrix();
-}
-
-double Rotation3D::At(
-	size_t row, 
-	size_t col) const
-{
-	return m[row][col];
 }
 
 Quaternion Rotation3D::AsQuaternion()
@@ -95,17 +91,19 @@ Quaternion Rotation3D::AsQuaternion()
 
 Rotation3D Rotation3D::Inverse()
 {
+	// TODO - Does this need to be MAtrix3.Inverse?
+
 	double res[3][3] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-	res[0][0] = m[0][0];
-	res[0][1] = m[1][0];
-	res[0][2] = m[2][0];
-	res[1][0] = m[0][1];
-	res[1][1] = m[1][1];
-	res[1][2] = m[2][1];
-	res[2][0] = m[0][2];
-	res[2][1] = m[1][2];
-	res[2][2] = m[2][2];
+	res[0][0] = m.At(0, 0);
+	res[0][1] = m.At(1, 0);
+	res[0][2] = m.At(2, 0);
+	res[1][0] = m.At(0, 1);
+	res[1][1] = m.At(1, 1);
+	res[1][2] = m.At(2, 1);
+	res[2][0] = m.At(0, 2);
+	res[2][1] = m.At(1, 2);
+	res[2][2] = m.At(2, 2);
 
 	return Rotation3D(
 		res[0][0], res[0][1], res[0][2],
@@ -116,24 +114,7 @@ Rotation3D Rotation3D::Inverse()
 
 Rotation3D Rotation3D::operator*(const Rotation3D& rhs)
 {
-	double res[3][3] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-
-	for (size_t i = 0; i < 3; i++)
-	{
-		for (size_t j = 0; j < 3; j++)
-		{
-			for (size_t k = 0; k < 3; k++)
-			{
-				res[i][j] += m[i][k] * rhs.At(k, j);
-			}
-		}
-	}
-
-	return Rotation3D(
-		res[0][0], res[0][1], res[0][2],
-		res[1][0], res[1][1], res[1][2],
-		res[2][0], res[2][1], res[2][2]
-	);
+	return Rotation3D(m * rhs.m);
 }
 
 void Rotation3D::CalculateMatrix()
@@ -145,38 +126,38 @@ void Rotation3D::CalculateMatrix()
 	double cy = std::cos(MathUtils::ToRad(ry));
 	double cz = std::cos(MathUtils::ToRad(rz));
 
-	m[0][0] = cy * cz;
-	m[0][1] = cz * sx * sy - cx * sz;
-	m[0][2] = cx * cz * sy + sx * sz;
-	m[1][0] = cy * sz;
-	m[1][1] = cx * cz + sx * sy * sz;
-	m[1][2] = -cz * sx + cx * sy * sz;
-	m[2][0] = -sy;
-	m[2][1] = cy * sx;
-	m[2][2] = cx * cy;
+	m.At(0, 0, cy * cz);
+	m.At(0, 1, cz * sx * sy - cx * sz);
+	m.At(0, 2, cx * cz * sy + sx * sz);
+	m.At(1, 0, cy * sz);
+	m.At(1, 1, cx * cz + sx * sy * sz);
+	m.At(1, 2, -cz * sx + cx * sy * sz);
+	m.At(2, 0, -sy);
+	m.At(2, 1, cy * sx);
+	m.At(2, 2, cx * cy);
 }
 
 void Rotation3D::CalculateFromMatrix()
 {
-	if (m[2][0] < 1)
+	if (m.At(2, 0) < 1)
 	{
-		if (m[2][0] > -1)
+		if (m.At(2, 0)> -1)
 		{
-			ry = MathUtils::ToDeg(std::asin(-m[2][0]));
-			rz = MathUtils::ToDeg(std::atan2(m[1][0] / std::cos(ry), m[0][0] / std::cos(ry)));
-			rx = MathUtils::ToDeg(std::atan2(m[2][1] / std::cos(ry), m[2][2] / std::cos(ry)));
+			ry = MathUtils::ToDeg(std::asin(-m.At(2, 0)));
+			rz = MathUtils::ToDeg(std::atan2(m.At(1, 0) / std::cos(ry), m.At(0, 0) / std::cos(ry)));
+			rx = MathUtils::ToDeg(std::atan2(m.At(2, 1) / std::cos(ry), m.At(2, 2) / std::cos(ry)));
 		}
 		else
 		{
 			ry = MathUtils::ToDeg(M_PI / 2);
 			rz = 0.0;
-			rx = MathUtils::ToDeg(std::atan2(m[0][1], m[0][2]));
+			rx = MathUtils::ToDeg(std::atan2(m.At(0, 1), m.At(0, 2)));
 		}
 	}
 	else
 	{
 		ry = MathUtils::ToDeg(-M_PI / 2);
 		rz = 0.0;
-		rx = MathUtils::ToDeg(std::atan2(-m[0][1], -m[0][2]));
+		rx = MathUtils::ToDeg(std::atan2(-m.At(0, 1), -m.At(0, 2)));
 	}
 }

@@ -122,10 +122,10 @@ Vector3D Vector3D::operator*(const Frame3D& frame)
 	for (size_t i = 0; i < 3; i++)
 	{
 		res[i] =
-			x * frame.At(i, 0) +
-			y * frame.At(i, 1) +
-			z * frame.At(i, 2) +
-			1 * frame.At(i, 3);
+			x * frame.Matrix().At(i, 0) +
+			y * frame.Matrix().At(i, 1) +
+			z * frame.Matrix().At(i, 2) +
+			1 * frame.Matrix().At(i, 3);
 	}
 
 	return 

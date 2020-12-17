@@ -14,6 +14,8 @@ add_library(engine3d STATIC
 	RenderingEngine3D.h
     Scene3D.h
 	Scene3D.cpp
+	Camera.h
+	Camera.cpp
 )
 
 target_link_libraries(engine3d PUBLIC

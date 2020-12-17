@@ -2,6 +2,7 @@
 
 #include "Vector3D.h"
 #include "Rotation3D.h"
+#include "Matrix4.h"
 
 namespace softengine
 {
@@ -9,6 +10,7 @@ namespace softengine
 	{
 	public:
 		Frame3D();
+		Frame3D(Matrix4 matrix);
 		Frame3D(
 			Vector3D translation
 		);
@@ -30,8 +32,8 @@ namespace softengine
 		void Tranlation(Vector3D& translation) { this->translation = translation; CalculateMatrix(); }
 		Rotation3D& Rotation() { return rotation; }
 		void Rotation(Rotation3D& rotation) { this->rotation = rotation; CalculateMatrix(); }
+		Matrix4 Matrix() const { return m; }
 
-		double At(size_t row, size_t col) const;
 		Frame3D Inverse();
 
 		static Frame3D RelativeTransform(
@@ -40,12 +42,14 @@ namespace softengine
 		);
 
 		Frame3D operator*(const Frame3D& rhs);
+		Frame3D operator*(const Matrix4& rhs);
 
 	private:
 		Vector3D translation;
 		Rotation3D rotation;
-		double m[4][4] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+		Matrix4 m = Matrix4::Identity();
 
 		void CalculateMatrix();
+		void CalculateFromMatrix();
 	};
 }

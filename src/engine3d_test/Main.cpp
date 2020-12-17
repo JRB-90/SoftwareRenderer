@@ -6,6 +6,8 @@
 #include "Frame3D.h"
 #include "Rotation3D.h"
 #include "Quaternion.h"
+#include "Matrix3.h"
+#include "Matrix4.h"
 
 #include <iostream>
 #include <random>

@@ -28,38 +28,38 @@ Quaternion::Quaternion(
 
 Quaternion::Quaternion(Rotation3D& rotation)
 {
-    double tr = rotation.At(0, 0) + rotation.At(1, 1) + rotation.At(2, 2);
+    double tr = rotation.Matrix().At(0, 0) + rotation.Matrix().At(1, 1) + rotation.Matrix().At(2, 2);
 
     if (tr > 0)
     {
         double s = std::sqrt(tr + 1.0) * 2; // s=4*qw 
         w = 0.25 * s;
-        x = (rotation.At(2, 1) - rotation.At(1, 2)) / s;
-        y = (rotation.At(0, 2) - rotation.At(2, 0)) / s;
-        z = (rotation.At(1, 0) - rotation.At(0, 1)) / s;
+        x = (rotation.Matrix().At(2, 1) - rotation.Matrix().At(1, 2)) / s;
+        y = (rotation.Matrix().At(0, 2) - rotation.Matrix().At(2, 0)) / s;
+        z = (rotation.Matrix().At(1, 0) - rotation.Matrix().At(0, 1)) / s;
     }
-    else if ((rotation.At(0, 0) > rotation.At(1, 1)) && (rotation.At(0, 0) > rotation.At(2, 2)))
+    else if ((rotation.Matrix().At(0, 0) > rotation.Matrix().At(1, 1)) && (rotation.Matrix().At(0, 0) > rotation.Matrix().At(2, 2)))
     {
-        double s = std::sqrt(1.0 + rotation.At(0, 0) - rotation.At(1, 1) - rotation.At(2, 2)) * 2; // s=4*qx 
-        w = (rotation.At(2, 1) - rotation.At(1, 2)) / s;
+        double s = std::sqrt(1.0 + rotation.Matrix().At(0, 0) - rotation.Matrix().At(1, 1) - rotation.Matrix().At(2, 2)) * 2; // s=4*qx 
+        w = (rotation.Matrix().At(2, 1) - rotation.Matrix().At(1, 2)) / s;
         x = 0.25 * s;
-        y = (rotation.At(0, 1) + rotation.At(1, 0)) / s;
-        z = (rotation.At(0, 2) + rotation.At(2, 0)) / s;
+        y = (rotation.Matrix().At(0, 1) + rotation.Matrix().At(1, 0)) / s;
+        z = (rotation.Matrix().At(0, 2) + rotation.Matrix().At(2, 0)) / s;
     }
-    else if (rotation.At(1, 1) > rotation.At(2, 2))
+    else if (rotation.Matrix().At(1, 1) > rotation.Matrix().At(2, 2))
     {
-        double s = std::sqrt(1.0 + rotation.At(1, 1) - rotation.At(0, 0) - rotation.At(2, 2)) * 2; // s=4*qy
-        w = (rotation.At(0, 2) - rotation.At(2, 0)) / s;
-        x = (rotation.At(0, 1) + rotation.At(1, 0)) / s;
+        double s = std::sqrt(1.0 + rotation.Matrix().At(1, 1) - rotation.Matrix().At(0, 0) - rotation.Matrix().At(2, 2)) * 2; // s=4*qy
+        w = (rotation.Matrix().At(0, 2) - rotation.Matrix().At(2, 0)) / s;
+        x = (rotation.Matrix().At(0, 1) + rotation.Matrix().At(1, 0)) / s;
         y = 0.25 * s;
-        z = (rotation.At(1, 2) + rotation.At(2, 1)) / s;
+        z = (rotation.Matrix().At(1, 2) + rotation.Matrix().At(2, 1)) / s;
     }
     else
     {
-        double s = std::sqrt(1.0 + rotation.At(2, 2) - rotation.At(0, 0) - rotation.At(1, 1)) * 2; // s=4*qz
-        w = (rotation.At(1, 0) - rotation.At(0, 1)) / s;
-        x = (rotation.At(0, 2) + rotation.At(2, 0)) / s;
-        y = (rotation.At(1, 2) + rotation.At(2, 1)) / s;
+        double s = std::sqrt(1.0 + rotation.Matrix().At(2, 2) - rotation.Matrix().At(0, 0) - rotation.Matrix().At(1, 1)) * 2; // s=4*qz
+        w = (rotation.Matrix().At(1, 0) - rotation.Matrix().At(0, 1)) / s;
+        x = (rotation.Matrix().At(0, 2) + rotation.Matrix().At(2, 0)) / s;
+        y = (rotation.Matrix().At(1, 2) + rotation.Matrix().At(2, 1)) / s;
         z = 0.25 * s;
     }
 }

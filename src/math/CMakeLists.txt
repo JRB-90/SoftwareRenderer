@@ -19,6 +19,10 @@ add_library(math STATIC
 	Rotation3D.cpp
     Quaternion.h
 	Quaternion.cpp
+    Matrix4.h
+	Matrix4.cpp
+    Matrix3.h
+	Matrix3.cpp
 )
 
 target_include_directories(math PUBLIC
