@@ -73,11 +73,6 @@ namespace softengine
 			Sprite2D& sprite
 		);
 		static Color InterpolateColor(
-			Color& c1,
-			Color& c2,
-			double factor
-		);
-		static Color InterpolateColor(
 			Vertex2D& v1,
 			Vertex2D& v2,
 			Vertex2D& v3,

@@ -7,6 +7,7 @@
 #include "Color.h"
 #include "RenderSurface.h"
 #include "TextOverlay.h"
+#include "Camera.h"
 #include "SDL.h"
 #include <memory>
 
@@ -23,6 +24,7 @@ namespace softengine
 		~RenderingEngine3D();
 
 		TextOverlay& GetTextOverLay() { return textOverlay; }
+		Camera& GetCamera() { return camera; }
 		Color& RefreshColor() { return refreshColor; }
 		void RefreshColor(Color& refreshColor) { this->refreshColor = refreshColor; }
 
@@ -44,6 +46,7 @@ namespace softengine
 		std::shared_ptr<Scene3D> scene;
 		std::unique_ptr<RenderSurface> surface;
 		TextOverlay textOverlay;
+		Camera camera;
 		Color refreshColor;
 		bool isInitialised;
 

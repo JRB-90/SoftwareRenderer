@@ -35,12 +35,19 @@ RenderSurface::RenderSurface(
 		);
 
 	pixels = new Uint8[screenBufSize];
+	zBuffer = new int32_t[pixelCount];
+	for (size_t i = 0; i < pixelCount; i++)
+	{
+		zBuffer[i] = INT32_MIN;
+	}
 }
 
 RenderSurface::~RenderSurface()
 {
 	delete[] pixels;
+	delete[] zBuffer;
 	pixels = NULL;
+	zBuffer = NULL;
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyTexture(texture);
 }
@@ -133,6 +140,32 @@ void RenderSurface::SetPixelValue(
 	pixels[offset + 3] = color.GetAs4B().a;
 }
 
+bool RenderSurface::PassesZCheck(
+	int pixelX, 
+	int pixelY, 
+	int32_t zVal)
+{
+	if (pixelX < 0 || pixelX >= pixelsWidth ||
+		pixelY < 0 || pixelY >= pixelsHeight)
+	{
+		return false;
+	}
+
+	const size_t offset = (pixelsWidth * pixelY) + pixelX;
+	int32_t zBufVal = zBuffer[offset];
+
+	if (zVal >= zBuffer[offset])
+	{
+		zBuffer[offset] = zVal;
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 SDL_Texture* RenderSurface::CreateSDLTexture(SDL_Surface* surface)
 {
 	return
@@ -177,6 +210,14 @@ void RenderSurface::FillWithColor(Color color)
 		pixels[i + 1] = color.GetAs4B().g;
 		pixels[i + 2] = color.GetAs4B().r;
 		pixels[i + 3] = color.GetAs4B().a;
+	}
+}
+
+void RenderSurface::ResetZBuffer()
+{
+	for (size_t i = 0; i < pixelCount; i++)
+	{
+		zBuffer[i] = INT32_MIN;
 	}
 }
 

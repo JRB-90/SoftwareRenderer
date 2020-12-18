@@ -81,6 +81,12 @@ namespace softengine
 		static const Color Magenta;
 		static const Color Cyan;
 
+		static Color InterpolateColor(
+			Color& c1,
+			Color& c2,
+			double factor
+		);
+
 	private:
 		Color4D color;
 

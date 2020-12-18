@@ -2,7 +2,6 @@
 
 #include "VBO2D.h"
 #include "Frame2D.h"
-#include "Color.h"
 #include "DrawType.h"
 #include <vector>
 

@@ -1,5 +1,5 @@
 #include "Color.h"
-
+#include "MathUtils.h"
 #include <algorithm>
 
 using namespace softengine;
@@ -138,4 +138,21 @@ uint8_t Color::ToColorByte(double val) const
 double Color::ToColorDouble(uint8_t val) const
 {
 	return ((double)val / 255.0);
+}
+
+Color Color::InterpolateColor(
+	Color& c1,
+	Color& c2,
+	double factor)
+{
+	Color4D c1d = c1.GetAs4D();
+	Color4D c2d = c2.GetAs4D();
+
+	return
+		Color(
+			MathUtils::Interpolate(c1d.r, c2d.r, factor),
+			MathUtils::Interpolate(c1d.g, c2d.g, factor),
+			MathUtils::Interpolate(c1d.b, c2d.b, factor),
+			MathUtils::Interpolate(c1d.a, c2d.a, factor)
+		);
 }

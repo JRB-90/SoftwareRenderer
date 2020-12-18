@@ -1,5 +1,6 @@
 #include "RenderingEngine3D.h"
 #include "Engine.h"
+#include "Primitive3DRenderer.h"
 
 using namespace softengine;
 
@@ -13,17 +14,17 @@ RenderingEngine3D::RenderingEngine3D(
 	pixelsHeight(pixelsHeight),
 	pixelCount(pixelsWidth* pixelsHeight),
 	screenBufSize(pixelCount * 4),
-	refreshColor(
-		Color(
-			0.0,
-			0.0,
-			0.0,
-			1.0
-		)
-	),
+	refreshColor(Color::Black),
 	textOverlay(
 		14,
 		Color::White
+	),
+	camera(
+		pixelsWidth,
+		pixelsHeight,
+		90.0,
+		0.001,
+		10000.0
 	),
 	isInitialised(false)
 {
@@ -42,7 +43,7 @@ void RenderingEngine3D::InitialiseToWindow(
 		pixelsHeight,
 		window,
 		renderingMode
-		);
+	);
 
 	isInitialised = true;
 }
@@ -69,12 +70,20 @@ void RenderingEngine3D::Render()
 	}
 
 	surface->FillWithColor(refreshColor);
+	surface->ResetZBuffer();
 	RenderScene3D();
-	textOverlay.RenderToSurface(*surface);
 	surface->RenderPixels();
+	textOverlay.RenderToSurface(*surface);
 }
 
 void RenderingEngine3D::RenderScene3D()
 {
-	// TODO
+	for (Mesh3D& mesh : scene->Meshes())
+	{
+		Primitive3DRenderer::RenderMesh(
+			*surface,
+			mesh,
+			camera
+		);
+	}
 }

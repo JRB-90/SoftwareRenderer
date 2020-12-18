@@ -37,6 +37,11 @@ namespace softengine
 			int pixelY,
 			Color& color
 		);
+		bool PassesZCheck(
+			int pixelX,
+			int pixelY,
+			int32_t zVal
+		);
 		SDL_Texture* CreateSDLTexture(SDL_Surface* surface);
 		void RenderTexture(
 			SDL_Rect& position,
@@ -44,6 +49,7 @@ namespace softengine
 		);
 		void Clear(Color color);
 		void FillWithColor(Color color);
+		void ResetZBuffer();
 		void RenderPixels();
 
 		size_t Width() const { return pixelsWidth; }
@@ -59,5 +65,6 @@ namespace softengine
 		SDL_Renderer* renderer;
 		SDL_Texture* texture;
 		Uint8* pixels;
+		int32_t* zBuffer;
 	};
 }

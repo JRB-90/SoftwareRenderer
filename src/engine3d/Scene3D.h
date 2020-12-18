@@ -1,6 +1,8 @@
 #pragma once
 
 #include "IScene.h"
+#include "Mesh3D.h"
+#include <vector>
 
 namespace softengine
 {
@@ -11,6 +13,9 @@ namespace softengine
 
 		void ClearAll() override;
 
+		std::vector<Mesh3D>& Meshes() { return meshes; }
+
 	private:
+		std::vector<Mesh3D> meshes;
 	};
 }

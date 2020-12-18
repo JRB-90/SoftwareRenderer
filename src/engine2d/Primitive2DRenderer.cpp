@@ -86,7 +86,7 @@ void Primitive2DRenderer::RenderLinePoints(
 		surface.SetPixelValue(
 			x,
 			y,
-			InterpolateColor(
+			Color::InterpolateColor(
 				v1.VertColor,
 				v2.VertColor,
 				factor
@@ -498,23 +498,6 @@ void Primitive2DRenderer::RenderSprite(
 		),
 		sprite.GetTexture()
 	);
-}
-
-Color Primitive2DRenderer::InterpolateColor(
-	Color& c1, 
-	Color& c2, 
-	double factor)
-{
-	Color4D c1d = c1.GetAs4D();
-	Color4D c2d = c2.GetAs4D();
-
-	return 
-		Color(
-			MathUtils::Interpolate(c1d.r, c2d.r, factor),
-			MathUtils::Interpolate(c1d.g, c2d.g, factor),
-			MathUtils::Interpolate(c1d.b, c2d.b, factor),
-			MathUtils::Interpolate(c1d.a, c2d.a, factor)
-		);	
 }
 
 Color Primitive2DRenderer::InterpolateColor(Vertex2D& v1, Vertex2D& v2, Vertex2D& v3, Vector2D& pos)
