@@ -73,7 +73,8 @@ void Primitive3DRenderer::RenderMesh(
 					mesh.VBO().Vertices(vertexIndex3),
 					mesh.Transform(),
 					camera
-				)
+				),
+				mesh.GetTextrue()
 			);
 		}
 		break;
@@ -164,7 +165,8 @@ void Primitive3DRenderer::RenderTriangle(
 	Camera& camera,
 	Vertex3D& v1, 
 	Vertex3D& v2, 
-	Vertex3D& v3)
+	Vertex3D& v3,
+	Texture& texture)
 {
 	Vector3D v12 = (v2.Position - v1.Position).Normalised();
 	Vector3D v13 = (v3.Position - v1.Position).Normalised();
@@ -274,20 +276,35 @@ void Primitive3DRenderer::RenderTriangle(
 
 			double z = v1.Position.Z() * f1 + v2.Position.Z() * f2 + v3.Position.Z() * f3;
 			Vector3D cur(x, y, z);
-			Color c = InterpolateColor(
-				v1,
-				v2,
-				v3,
-				cur
-			);
+			Color c = Color::Black;
 
-			if (
-				surface.PassesZCheck(
-					x,
-					y,
-					z
-				)
-			)
+			if (texture.Height() > 0 &&
+				texture.Width() > 0)
+			{
+				c = InterpolateTexture(
+					v1,
+					v2,
+					v3,
+					cur,
+					texture
+				);
+
+				if (!IsValidSpritePixel(c))
+				{
+					continue;
+				}
+			}
+			else
+			{
+				c = InterpolateColor(
+					v1,
+					v2,
+					v3,
+					cur
+				);
+			}
+
+			if (surface.PassesZCheck(x, y, z))
 			{
 				surface.SetPixelValue(
 					x,
@@ -303,16 +320,6 @@ void Primitive3DRenderer::RenderTriangle(
 	}
 }
 
-void Primitive3DRenderer::RenderTriangleWithTexture(
-	RenderSurface& surface,
-	Camera& camera,
-	Vertex3D& v1, 
-	Vertex3D& v2, 
-	Vertex3D& v3, 
-	Texture& texture)
-{
-}
-
 Color Primitive3DRenderer::InterpolateColor(
 	Vertex3D& v1, 
 	Vertex3D& v2, 
@@ -323,21 +330,21 @@ Color Primitive3DRenderer::InterpolateColor(
 		(
 			((v2.Position.Y() - v3.Position.Y()) * (pos.X() - v3.Position.X())) +
 			((v3.Position.X() - v2.Position.X()) * (pos.Y() - v3.Position.Y()))
-			) /
+		) /
 		(
 			((v2.Position.Y() - v3.Position.Y()) * (v1.Position.X() - v3.Position.X())) +
 			((v3.Position.X() - v2.Position.X()) * (v1.Position.Y() - v3.Position.Y()))
-			);
+		);
 
 	double f2 =
 		(
 			((v3.Position.Y() - v1.Position.Y()) * (pos.X() - v3.Position.X())) +
 			((v1.Position.X() - v3.Position.X()) * (pos.Y() - v3.Position.Y()))
-			) /
+		) /
 		(
 			((v2.Position.Y() - v3.Position.Y()) * (v1.Position.X() - v3.Position.X())) +
 			((v3.Position.X() - v2.Position.X()) * (v1.Position.Y() - v3.Position.Y()))
-			);
+		);
 
 	double f3 = 1.0 - f1 - f2;
 
@@ -368,9 +375,56 @@ Color Primitive3DRenderer::InterpolateTexture(
 	Vector3D& pos, 
 	Texture& texture)
 {
-	// TODO
+	double f1 =
+		(
+			((v2.Position.Y() - v3.Position.Y()) * (pos.X() - v3.Position.X())) +
+			((v3.Position.X() - v2.Position.X()) * (pos.Y() - v3.Position.Y()))
+		) /
+		(
+			((v2.Position.Y() - v3.Position.Y()) * (v1.Position.X() - v3.Position.X())) +
+			((v3.Position.X() - v2.Position.X()) * (v1.Position.Y() - v3.Position.Y()))
+		);
 
-	return Color();
+	double f2 =
+		(
+			((v3.Position.Y() - v1.Position.Y()) * (pos.X() - v3.Position.X())) +
+			((v1.Position.X() - v3.Position.X()) * (pos.Y() - v3.Position.Y()))
+		) /
+		(
+			((v2.Position.Y() - v3.Position.Y()) * (v1.Position.X() - v3.Position.X())) +
+			((v3.Position.X() - v2.Position.X()) * (v1.Position.Y() - v3.Position.Y()))
+		);
+
+	double f3 = 1.0 - f1 - f2;
+
+	Vector2D v =
+		((v1.UVCoord * f1) + (v2.UVCoord * f2) + (v3.UVCoord * f3)) /
+		(f1 + f2 + f3);
+
+	int varX = v.X() * (double)texture.Width();
+	int varY = v.Y() * (double)texture.Height();
+
+	return
+		texture.GetPixel(
+			varX,
+			varY
+		);
+}
+
+bool Primitive3DRenderer::IsValidSpritePixel(Color& color)
+{
+	Color4B c = color.GetAs4B();
+	if (c.r == 164 &&
+		c.g == 117 &&
+		c.b == 160 &&
+		c.a == 255)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
 }
 
 Vertex3D Primitive3DRenderer::VertexShader(

@@ -36,19 +36,26 @@ Texture ResourceLoader::LoadImageResource(const std::string& name)
 
 		for (size_t i = 0; i < totalSize; i++)
 		{
-			SDL_GetRGBA(
-				p[i],
-				image->format,
-				&r,
-				&g,
-				&b,
-				&a
-			);
+			if (image->format->BytesPerPixel == 1)
+			{
+				SDL_GetRGBA(
+					p[i],
+					image->format,
+					&r,
+					&g,
+					&b,
+					&a
+				);
 
-			pixels[(i * 4) + 0] = r;
-			pixels[(i * 4) + 1] = g;
-			pixels[(i * 4) + 2] = b;
-			pixels[(i * 4) + 3] = a;
+				pixels[(i * 4) + 0] = r;
+				pixels[(i * 4) + 1] = g;
+				pixels[(i * 4) + 2] = b;
+				pixels[(i * 4) + 3] = a;
+			}
+			else if (image->format->BytesPerPixel == 4)
+			{
+				pixels[i] = p[i];
+			}
 		}
 
 		Texture texture = Texture(

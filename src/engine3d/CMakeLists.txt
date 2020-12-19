@@ -24,6 +24,8 @@ add_library(engine3d STATIC
     Vertex3D.h
     Primitive3DRenderer.h
 	Primitive3DRenderer.cpp
+    MeshBuilder.h
+	MeshBuilder.cpp
 )
 
 target_link_libraries(engine3d PUBLIC

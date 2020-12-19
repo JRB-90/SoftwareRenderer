@@ -86,7 +86,7 @@ void SetupScene()
 		ResourceLoader imageLoader;
 		Texture texture = imageLoader.LoadImageResource("sprites\\cat.png");
 		Sprite2D cat(texture);
-		cat.Transform().Position(
+		cat.Transform().Translation(
 			Vector2D(200, 200)
 		);
 		scene->Sprites().push_back(cat);
@@ -128,26 +128,26 @@ void Update(
 
 	if (inputState.up)
 	{
-		scene->Sprites()[0].Transform().Position().Y(
-			scene->Sprites()[0].Transform().Position().Y() - speed
+		scene->Sprites()[0].Transform().Translation().Y(
+			scene->Sprites()[0].Transform().Translation().Y() - speed
 		);
 	}
 	if (inputState.down)
 	{
-		scene->Sprites()[0].Transform().Position().Y(
-			scene->Sprites()[0].Transform().Position().Y() + speed
+		scene->Sprites()[0].Transform().Translation().Y(
+			scene->Sprites()[0].Transform().Translation().Y() + speed
 		);
 	}
 	if (inputState.left)
 	{
-		scene->Sprites()[0].Transform().Position().X(
-			scene->Sprites()[0].Transform().Position().X() - speed
+		scene->Sprites()[0].Transform().Translation().X(
+			scene->Sprites()[0].Transform().Translation().X() - speed
 		);
 	}
 	if (inputState.right)
 	{
-		scene->Sprites()[0].Transform().Position().X(
-			scene->Sprites()[0].Transform().Position().X() + speed
+		scene->Sprites()[0].Transform().Translation().X(
+			scene->Sprites()[0].Transform().Translation().X() + speed
 		);
 	}
 	if (inputState.in)

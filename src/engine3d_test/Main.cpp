@@ -64,6 +64,10 @@ int main(int argc, const char* argv[])
 
 void SetupScene()
 {
+	ResourceLoader imageLoader;
+	Texture catTexture = imageLoader.LoadImageResource("sprites\\cat.png");
+	Texture brickTexture = imageLoader.LoadImageResource("textures\\brick.png");
+
 	std::vector<size_t> indices =
 	{
 		0, 1, 2
@@ -71,45 +75,47 @@ void SetupScene()
 
 	std::vector<Vertex3D> vertices =
 	{
-		Vertex3D(Vector3D(0.0, -100.0, 0.0), Color::Red),
-		Vertex3D(Vector3D(100.0, 100.0, 0.0), Color::Green),
-		Vertex3D(Vector3D(-100.0, 100.0, 0.0), Color::Blue)
+		Vertex3D(Vector3D(0.0, -100.0, 0.0), Vector2D(0.5, 0), Color::Red),
+		Vertex3D(Vector3D(100.0, 100.0, 0.0), Vector2D(1.0, 1.0), Color::Green),
+		Vertex3D(Vector3D(-100.0, 100.0, 0.0), Vector2D(0, 1.0), Color::Blue)
 	};
 
 	scene->Meshes().push_back(
 		Mesh3D(
 			indices,
 			vertices,
-			DrawType::Triangles,
 			Frame3D(
 				Vector3D(PIXELS_WIDTH / 2, PIXELS_HEIGHT / 2, 0),
 				Rotation3D()
-			)
+			),
+			brickTexture,
+			DrawType::Triangles
 		)
 	);
 
 	std::vector<size_t> indicesSq =
 	{
-		0, 1, 2
+		0, 1, 2, 1, 3, 2
 	};
 
 	std::vector<Vertex3D> verticesSq =
 	{
-		Vertex3D(Vector3D(-180.0, -180.0, 0.0), Color::White),
-		Vertex3D(Vector3D(180.0, -180.0, 0.0), Color::White),
-		Vertex3D(Vector3D(-180.0, 180.0, 0.0), Color::White),
-		Vertex3D(Vector3D(180.0, 180.0, 0.0), Color::White)
+		Vertex3D(Vector3D(-180.0, -180.0, 0.0), Vector2D(0, 0), Color::White),
+		Vertex3D(Vector3D(180.0, -180.0, 0.0), Vector2D(1, 0), Color::White),
+		Vertex3D(Vector3D(-180.0, 180.0, 0.0), Vector2D(0, 1), Color::White),
+		Vertex3D(Vector3D(180.0, 180.0, 0.0), Vector2D(1, 1), Color::White)
 	};
 
 	scene->Meshes().push_back(
 		Mesh3D(
 			indicesSq,
 			verticesSq,
-			DrawType::Triangles,
 			Frame3D(
 				Vector3D(PIXELS_WIDTH / 2, PIXELS_HEIGHT / 2, -1.0),
 				Rotation3D()
-			)
+			),
+			catTexture,
+			DrawType::Triangles
 		)
 	);
 }

@@ -40,7 +40,7 @@ namespace softengine
 		bool PassesZCheck(
 			int pixelX,
 			int pixelY,
-			int32_t zVal
+			double zVal
 		);
 		SDL_Texture* CreateSDLTexture(SDL_Surface* surface);
 		void RenderTexture(
@@ -65,6 +65,6 @@ namespace softengine
 		SDL_Renderer* renderer;
 		SDL_Texture* texture;
 		Uint8* pixels;
-		int32_t* zBuffer;
+		double* zBuffer;
 	};
 }

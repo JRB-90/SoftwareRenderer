@@ -16,4 +16,3 @@ add_subdirectory("src/engine3d_test")
 add_subdirectory("src/starfield")
 
 file(COPY res DESTINATION .)
-file(COPY res DESTINATION .)

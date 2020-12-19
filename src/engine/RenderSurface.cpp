@@ -2,6 +2,8 @@
 
 #include "Engine.h"
 
+#define Z_BUFF_MIN -1000000
+
 using namespace softengine;
 
 RenderSurface::RenderSurface(
@@ -35,11 +37,8 @@ RenderSurface::RenderSurface(
 		);
 
 	pixels = new Uint8[screenBufSize];
-	zBuffer = new int32_t[pixelCount];
-	for (size_t i = 0; i < pixelCount; i++)
-	{
-		zBuffer[i] = INT32_MIN;
-	}
+	zBuffer = new double[pixelCount];
+	ResetZBuffer();
 }
 
 RenderSurface::~RenderSurface()
@@ -143,7 +142,7 @@ void RenderSurface::SetPixelValue(
 bool RenderSurface::PassesZCheck(
 	int pixelX, 
 	int pixelY, 
-	int32_t zVal)
+	double zVal)
 {
 	if (pixelX < 0 || pixelX >= pixelsWidth ||
 		pixelY < 0 || pixelY >= pixelsHeight)
@@ -152,7 +151,7 @@ bool RenderSurface::PassesZCheck(
 	}
 
 	const size_t offset = (pixelsWidth * pixelY) + pixelX;
-	int32_t zBufVal = zBuffer[offset];
+	double zBufVal = zBuffer[offset];
 
 	if (zVal >= zBuffer[offset])
 	{
@@ -217,7 +216,7 @@ void RenderSurface::ResetZBuffer()
 {
 	for (size_t i = 0; i < pixelCount; i++)
 	{
-		zBuffer[i] = INT32_MIN;
+		zBuffer[i] = Z_BUFF_MIN;
 	}
 }
 

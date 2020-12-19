@@ -34,15 +34,8 @@ namespace softengine
 			Camera& camera,
 			Vertex3D& v1,
 			Vertex3D& v2,
-			Vertex3D& v3
-		);
-		static void RenderTriangleWithTexture(
-			RenderSurface& surface,
-			Camera& camera,
-			Vertex3D& v1,
-			Vertex3D& v2,
 			Vertex3D& v3,
-			Texture& texture
+			Texture& texture = Texture()
 		);
 
 		static Color InterpolateColor(
@@ -59,6 +52,8 @@ namespace softengine
 			Vector3D& pos,
 			Texture& texture
 		);
+
+		static bool IsValidSpritePixel(Color& color);
 
 		static Vertex3D VertexShader(
 			Vertex3D& vertex,
