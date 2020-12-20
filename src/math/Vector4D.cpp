@@ -1,5 +1,6 @@
 #include "Vector4D.h"
 
+#include "Matrix4.h"
 #include <cmath>
 
 using namespace softengine;
@@ -90,6 +91,28 @@ Vector4D Vector4D::operator*(const double scalar)
 			y * scalar,
 			z * scalar,
 			w * scalar
+		);
+}
+
+Vector4D Vector4D::operator*(const Matrix4 mat)
+{
+	double res[4] = { 0, 0, 0, 0 };
+
+	for (size_t i = 0; i < 4; i++)
+	{
+		res[i] =
+			x * mat.At(i, 0) +
+			y * mat.At(i, 1) +
+			z * mat.At(i, 2) +
+			w * mat.At(i, 3);
+	}
+
+	return 
+		Vector4D(
+			res[0],
+			res[1],
+			res[2],
+			res[3]
 		);
 }
 

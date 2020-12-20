@@ -16,21 +16,21 @@ namespace softengine
 			double farClip
 		);
 
-		Frame3D Position() { return position; }
-		void Position(Frame3D position) { this->position = position; CalculateView(); }
-		Matrix4 ProjectionMatrix() const { return projection; }
-		Matrix4 ViewMatrix() const { return view; }
+		Frame3D& Position() { return position; }
+		void Position(Frame3D position) { this->position = position; }
+		Matrix4 ProjectionMatrix() { CalculateProjection(); return projection; }
+		Matrix4 ViewMatrix() { CalculateView(); return view; }
 
 		double Width() const { return width; }
-		void Width(double width) { this->width = width; CalculateProjection(); }
+		void Width(double width) { this->width = width; }
 		double Height() const { return height; }
-		void Height(double height) { this->height = height; CalculateProjection(); }
+		void Height(double height) { this->height = height; }
 		double FOV() const { return fov; }
-		void FOV(double fov) { this->fov = fov; CalculateProjection(); }
+		void FOV(double fov) { this->fov = fov; }
 		double NearClip() const { return nearClip; }
-		void NearClip(double nearClip) { this->nearClip = nearClip; CalculateProjection(); }
+		void NearClip(double nearClip) { this->nearClip = nearClip; }
 		double FarClip() const { return farClip; }
-		void FarClip(double farClip) { this->farClip = farClip; CalculateProjection(); }
+		void FarClip(double farClip) { this->farClip = farClip; }
 
 	private:
 		Frame3D position;

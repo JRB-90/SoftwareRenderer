@@ -67,8 +67,8 @@ void Engine::Run()
 				ss << "Time taken: " << timeTaken << "s" << std::endl;
 				ss << "FPS: " << 1.0 / timeTaken << std::endl;
 				ss << "Delta percentage: " << timeTaken / targetTime;
-				std::cout << "\033[2J" << "" << "\033[H";
-				std::cout << ss.str();
+				//std::cout << "\033[2J" << "" << "\033[H";
+				//std::cout << ss.str();
 				renderingEngine->GetTextOverLay().SetText(ss.str());
 			}
 		}

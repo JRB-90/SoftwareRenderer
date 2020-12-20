@@ -2,6 +2,8 @@
 
 namespace softengine
 {
+	class Matrix4;
+
 	class Vector4D
 	{
 	public:
@@ -31,6 +33,7 @@ namespace softengine
 		Vector4D operator+(const Vector4D& vec);
 		Vector4D operator-(const Vector4D& vec);
 		Vector4D operator*(const double scalar);
+		Vector4D operator*(const Matrix4 mat);
 		Vector4D operator/(const double scalar);
 
 	private:

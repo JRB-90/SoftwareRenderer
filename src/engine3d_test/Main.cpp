@@ -1,13 +1,7 @@
 #include "Engine.h"
 #include "RenderingEngine3D.h"
 #include "Scene3D.h"
-
-#include "Vector3D.h"
-#include "Frame3D.h"
-#include "Rotation3D.h"
-#include "Quaternion.h"
-#include "Matrix3.h"
-#include "Matrix4.h"
+#include "Camera.h"
 
 #include <iostream>
 #include <random>
@@ -22,6 +16,8 @@ const size_t PIXELS_HEIGHT = 480;
 const int UPDATE_RATE = 30;
 
 std::shared_ptr<Scene3D> scene;
+std::shared_ptr<Camera> camera;
+std::shared_ptr<RenderingEngine3D> renderingEngine;
 
 void SetupScene();
 void Update(
@@ -37,9 +33,20 @@ int main(int argc, const char* argv[])
 	scene = std::make_shared<Scene3D>();
 	SetupScene();
 
-	std::shared_ptr<IRenderingEngine> renderingEngine =
+	camera =
+		std::make_shared<Camera>(
+			PIXELS_WIDTH,
+			PIXELS_HEIGHT,
+			90.0,
+			0.001,
+			10000.0
+		);
+	camera->Position(Frame3D(Vector3D(0, 0, 200.0)));
+
+	renderingEngine =
 		std::make_shared<RenderingEngine3D>(
 			scene,
+			camera,
 			PIXELS_WIDTH,
 			PIXELS_HEIGHT
 		);
@@ -67,6 +74,7 @@ void SetupScene()
 	ResourceLoader imageLoader;
 	Texture catTexture = imageLoader.LoadImageResource("sprites\\cat.png");
 	Texture brickTexture = imageLoader.LoadImageResource("textures\\brick.png");
+	Texture nullTexture;
 
 	std::vector<size_t> indices =
 	{
@@ -85,7 +93,7 @@ void SetupScene()
 			indices,
 			vertices,
 			Frame3D(
-				Vector3D(PIXELS_WIDTH / 2, PIXELS_HEIGHT / 2, 0),
+				Vector3D(0, 0, 0),
 				Rotation3D()
 			),
 			brickTexture,
@@ -93,34 +101,34 @@ void SetupScene()
 		)
 	);
 
-	std::vector<size_t> indicesSq =
-	{
-		0, 1, 2, 1, 3, 2
-	};
+	//std::vector<size_t> indicesSq =
+	//{
+	//	0, 1, 2, 1, 3, 2
+	//};
 
-	std::vector<Vertex3D> verticesSq =
-	{
-		Vertex3D(Vector3D(-180.0, -180.0, 0.0), Vector2D(0, 0), Color::White),
-		Vertex3D(Vector3D(180.0, -180.0, 0.0), Vector2D(1, 0), Color::White),
-		Vertex3D(Vector3D(-180.0, 180.0, 0.0), Vector2D(0, 1), Color::White),
-		Vertex3D(Vector3D(180.0, 180.0, 0.0), Vector2D(1, 1), Color::White)
-	};
+	//std::vector<Vertex3D> verticesSq =
+	//{
+	//	Vertex3D(Vector3D(-180.0, -180.0, 0.0), Vector2D(0, 0), Color::White),
+	//	Vertex3D(Vector3D(180.0, -180.0, 0.0), Vector2D(1, 0), Color::White),
+	//	Vertex3D(Vector3D(-180.0, 180.0, 0.0), Vector2D(0, 1), Color::White),
+	//	Vertex3D(Vector3D(180.0, 180.0, 0.0), Vector2D(1, 1), Color::White)
+	//};
 
-	scene->Meshes().push_back(
-		Mesh3D(
-			indicesSq,
-			verticesSq,
-			Frame3D(
-				Vector3D(PIXELS_WIDTH / 2, PIXELS_HEIGHT / 2, -1.0),
-				Rotation3D()
-			),
-			catTexture,
-			DrawType::Triangles
-		)
-	);
+	//scene->Meshes().push_back(
+	//	Mesh3D(
+	//		indicesSq,
+	//		verticesSq,
+	//		Frame3D(
+	//			Vector3D(0, 0, 1.0),
+	//			Rotation3D()
+	//		),
+	//		catTexture,
+	//		DrawType::Triangles
+	//	)
+	//);
 }
 
-double speed = 2.0;
+double speed = 20.0;
 
 void Update(
 	InputState inputState,
@@ -128,44 +136,50 @@ void Update(
 {
 	if (inputState.up)
 	{
-		scene->Meshes()[0].Transform().Rotation(
-			scene->Meshes()[0].Transform().Rotation() *
-			Rotation3D(-speed, 0.0, 0.0)
+		camera->Position().Translation().Z(
+			camera->Position().Translation().Z() - speed
 		);
 	}
 	if (inputState.down)
 	{
-		scene->Meshes()[0].Transform().Rotation(
-			scene->Meshes()[0].Transform().Rotation() *
-			Rotation3D(speed, 0.0, 0.0)
+		camera->Position().Translation().Z(
+			camera->Position().Translation().Z() + speed
 		);
 	}
 	if (inputState.left)
 	{
-		scene->Meshes()[0].Transform().Rotation(
-			scene->Meshes()[0].Transform().Rotation() *
-			Rotation3D(0.0, speed, 0.0)
+		camera->Position().Translation().X(
+			camera->Position().Translation().X() - speed
 		);
 	}
 	if (inputState.right)
 	{
-		scene->Meshes()[0].Transform().Rotation(
-			scene->Meshes()[0].Transform().Rotation() *
-			Rotation3D(0.0, -speed, 0.0)
+		camera->Position().Translation().X(
+			camera->Position().Translation().X() + speed
+		);
+	}
+	if (inputState.in)
+	{
+		camera->Position().Translation().Y(
+			camera->Position().Translation().Y() + speed
+		);
+	}
+	if (inputState.out)
+	{
+		camera->Position().Translation().Y(
+			camera->Position().Translation().Y() - speed
 		);
 	}
 	if (inputState.rotR)
 	{
-		scene->Meshes()[0].Transform().Rotation(
-			scene->Meshes()[0].Transform().Rotation() *
-			Rotation3D(0.0, 0.0, speed)
+		camera->Position().Rotation().Ry(
+			camera->Position().Rotation().Ry() - (speed / 10.0)
 		);
 	}
 	if (inputState.rotL)
 	{
-		scene->Meshes()[0].Transform().Rotation(
-			scene->Meshes()[0].Transform().Rotation() *
-			Rotation3D(0.0, 0.0, -speed)
+		camera->Position().Rotation().Ry(
+			camera->Position().Rotation().Ry() + (speed / 10.0)
 		);
 	}
 }

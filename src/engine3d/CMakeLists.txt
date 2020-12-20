@@ -22,10 +22,15 @@ add_library(engine3d STATIC
     VBO3D.h
 	VBO3D.cpp
     Vertex3D.h
-    Primitive3DRenderer.h
-	Primitive3DRenderer.cpp
+    
+	
     MeshBuilder.h
 	MeshBuilder.cpp
+    RenderPipeline3D.h
+	RenderPipeline3D.cpp
+    PipelineConfiguration3D.h
+    RasteringTools.h
+	RasteringTools.cpp
 )
 
 target_link_libraries(engine3d PUBLIC

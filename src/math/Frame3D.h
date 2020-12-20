@@ -29,7 +29,7 @@ namespace softengine
 		);
 
 		Vector3D& Translation() { return translation; }
-		void Tranlation(Vector3D& translation) { this->translation = translation; CalculateMatrix(); }
+		void Translation(Vector3D& translation) { this->translation = translation; CalculateMatrix(); }
 		Rotation3D& Rotation() { return rotation; }
 		void Rotation(Rotation3D& rotation) { this->rotation = rotation; CalculateMatrix(); }
 		Matrix4 Matrix() const { return m; }

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "RenderingWindow.h"
-#include "RenderingMode.h"
 #include "Color.h"
 #include "SDL.h"
 
@@ -9,6 +7,9 @@
 
 namespace softengine
 {
+	class RenderingWindow;
+	enum class RenderingMode;
+
 	class RenderSurface
 	{
 	public:

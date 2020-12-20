@@ -1,5 +1,8 @@
+#define _USE_MATH_DEFINES
+
 #include "Camera.h"
 #include "Rotation3D.h"
+#include "MathUtils.h"
 #include <cmath>
 
 using namespace softengine;
@@ -10,7 +13,7 @@ Camera::Camera(
 	double fov,
 	double nearClip,
 	double farClip)
-	:
+  :
 	width(width),
 	height(height),
 	fov(fov),
@@ -23,11 +26,13 @@ Camera::Camera(
 
 void Camera::CalculateProjection()
 {
+	double a = width / height;
+	double t = std::tan(MathUtils::ToRad(fov) / 2);
 	projection = Matrix4::Zeros();
-	projection.At(0, 0, (1.0 / std::tan(fov / 2.0)) / (width / height));
-	projection.At(1, 1, (1.0 / std::tan(fov / 2.0)));
-	projection.At(2, 2, (nearClip + farClip) / (nearClip - farClip));
-	projection.At(2, 3, (2.0 * nearClip * farClip) / (nearClip - farClip));
+	projection.At(0, 0, 1.0 / t * a);
+	projection.At(1, 1, 1.0 / t);
+	projection.At(2, 2, -(farClip + nearClip) / (farClip - nearClip));
+	projection.At(2, 3, -(2 * farClip * nearClip) / (farClip - nearClip));
 	projection.At(3, 2, -1.0);
 }
 

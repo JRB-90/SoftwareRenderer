@@ -1,11 +1,20 @@
 #include "RenderingEngine3D.h"
 #include "Engine.h"
-#include "Primitive3DRenderer.h"
+#include "Scene3D.h"
+#include "Camera.h"
+#include "RenderSurface.h"
+#include "PipelineConfiguration3D.h"
+#include "RenderPipeline3D.h"
+#include "RenderingWindow.h"
+#include "RenderingMode.h"
+
+#include <iostream>
 
 using namespace softengine;
 
 RenderingEngine3D::RenderingEngine3D(
 	std::shared_ptr<Scene3D> scene,
+	std::shared_ptr<Camera> camera,
 	size_t pixelsWidth,
 	size_t pixelsHeight)
   :
@@ -19,15 +28,15 @@ RenderingEngine3D::RenderingEngine3D(
 		14,
 		Color::White
 	),
-	camera(
-		pixelsWidth,
-		pixelsHeight,
-		90.0,
-		0.001,
-		10000.0
-	),
+	camera(std::move(camera)),
 	isInitialised(false)
 {
+	pipeline = std::make_unique<RenderPipeline3D>(
+		false,
+		DrawType::Points,
+		BackFaceCullingMode::Clockwise,
+		DepthCheckMode::DepthCheckGreaterThan
+	);
 }
 
 RenderingEngine3D::~RenderingEngine3D()
@@ -69,21 +78,23 @@ void RenderingEngine3D::Render()
 		return;
 	}
 
+	std::cout << camera->Position().Translation().Z() << std::endl;
+
 	surface->FillWithColor(refreshColor);
 	surface->ResetZBuffer();
-	RenderScene3D();
-	surface->RenderPixels();
-	textOverlay.RenderToSurface(*surface);
-}
 
-void RenderingEngine3D::RenderScene3D()
-{
 	for (Mesh3D& mesh : scene->Meshes())
 	{
-		Primitive3DRenderer::RenderMesh(
+		pipeline->SetDrawType(mesh.GetDrawType());
+		pipeline->Run(
 			*surface,
-			mesh,
-			camera
+			mesh.VBO(),
+			mesh.Transform().Matrix(),
+			*camera,
+			mesh.GetTextrue()
 		);
 	}
+
+	surface->RenderPixels();
+	textOverlay.RenderToSurface(*surface);
 }

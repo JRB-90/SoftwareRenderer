@@ -5,6 +5,8 @@
 
 namespace softengine
 {
+	class Matrix4;
+
 	class Utils
 	{
 	public:
@@ -14,5 +16,7 @@ namespace softengine
 			const std::string& input, 
 			char delimiter
 		);
+
+		static void PrintMatrix(Matrix4 mat);
 	};
 }

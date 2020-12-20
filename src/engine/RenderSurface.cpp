@@ -1,6 +1,8 @@
 #include "RenderSurface.h"
 
 #include "Engine.h"
+#include "RenderingWindow.h"
+#include "RenderingMode.h"
 
 #define Z_BUFF_MIN -1000000
 
