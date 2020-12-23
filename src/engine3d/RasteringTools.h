@@ -6,7 +6,9 @@ namespace softengine
 {
 	class Vector2D;
 	class Vector3D;
+	class Vector4D;
 	class Vertex3D;
+	class Vertex4D;
 	class Color;
 	class Texture;
 
@@ -29,14 +31,28 @@ namespace softengine
 			int y1
 		);
 
-		static Vector3D FindBaryCentricCoords(
+		static Vector3D FindBaryCentricFactors(
 			Vector2D& v1,
 			Vector2D& v2,
 			Vector2D& v3,
 			Vector2D& pos
 		);
 
-		static Vector3D FindBaryCentricCoords(
+		static Vector3D FindBaryCentricFactors(
+			Vector3D& v1,
+			Vector3D& v2,
+			Vector3D& v3,
+			Vector3D& pos
+		);
+
+		static Vector3D FindBaryCentricFactors(
+			Vector4D& v1,
+			Vector4D& v2,
+			Vector4D& v3,
+			Vector4D& pos
+		);
+
+		static Vector3D FindBaryCentricFactors(
 			Vertex3D& v1,
 			Vertex3D& v2,
 			Vertex3D& v3,
@@ -44,18 +60,22 @@ namespace softengine
 		);
 
 		static Color InterpolateColor(
-			Vertex3D& v1,
-			Vertex3D& v2,
-			Vertex3D& v3,
-			Vector3D& pos
+			Vector3D& baryCoords,
+			Vertex4D& v1,
+			Vertex4D& v2,
+			Vertex4D& v3,
+			Vector4D& pos,
+			bool perspectiveCorrect = true
 		);
 
 		static Color InterpolateTexture(
-			Vertex3D& v1,
-			Vertex3D& v2,
-			Vertex3D& v3,
-			Vector3D& pos,
-			Texture& texture
+			Vector3D& baryCoords,
+			Vertex4D& v1,
+			Vertex4D& v2,
+			Vertex4D& v3,
+			Vector4D& pos,
+			Texture& texture,
+			bool perspectiveCorrect = true
 		);
 	};
 }

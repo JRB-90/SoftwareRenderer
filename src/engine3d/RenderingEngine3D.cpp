@@ -78,8 +78,6 @@ void RenderingEngine3D::Render()
 		return;
 	}
 
-	std::cout << camera->Position().Translation().Z() << std::endl;
-
 	surface->FillWithColor(refreshColor);
 	surface->ResetZBuffer();
 

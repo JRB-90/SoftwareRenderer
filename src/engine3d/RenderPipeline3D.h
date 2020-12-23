@@ -9,9 +9,9 @@ namespace softengine
 	class VBO3D;
 	class Matrix4;
 	class Camera;
-	class Vector3D;
-	struct Vertex3D;
 	class Vector4D;
+	struct Vertex3D;
+	struct Vertex4D;
 	class Color;
 	class Texture;
 	enum class BackFaceCullingMode;
@@ -74,43 +74,46 @@ namespace softengine
 			Texture& texture
 		);
 
-		Vector4D VertexShader(
+		Vertex4D VertexShader(
 			RenderSurface& surface,
 			Vertex3D& vertex,
 			Matrix4& model,
 			Camera& camera
 		);
 
-		bool PassesClipTest(Vector4D& v1);
+		bool PassesClipTest(Vertex4D& v1);
 
-		Vector3D TranformToRasterSpace(
-			Vector4D& vertex,
+		void TranformToRasterSpace(
+			Vertex4D& vertex,
 			Camera& camera
 		);
 
 		void PointRasteriser(
 			RenderSurface& surface,
-			Vertex3D& vertex
+			Vertex4D& vertex
 		);
 
 		void LineRasteriser(
 			RenderSurface& surface,
-			Vertex3D& vertex1,
-			Vertex3D& vertex2
+			Vertex4D& vertex1,
+			Vertex4D& vertex2
 		);
 
 		void TriangleRasteriser(
 			RenderSurface& surface,
-			Vertex3D& vertex1,
-			Vertex3D& vertex2,
-			Vertex3D& vertex3,
+			Vertex4D& vertex1,
+			Vertex4D& vertex2,
+			Vertex4D& vertex3,
+			Vertex4D& oV1,
+			Vertex4D& oV2,
+			Vertex4D& oV3,
 			Texture& texture
 		);
 
 		void PixelShader(
 			RenderSurface& surface,
-			Vector3D& fragment,
-			Vector3D& normal,
+			Vector4D& fragment,
+			Vector4D& normal,
 			Color& color
 		);
 

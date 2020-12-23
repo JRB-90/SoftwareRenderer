@@ -2,6 +2,10 @@
 #include "RenderingEngine3D.h"
 #include "Scene3D.h"
 #include "Camera.h"
+#include "MeshBuilder.h"
+
+#include "MathUtils.h"
+#include "Vector4D.h"
 
 #include <iostream>
 #include <random>
@@ -37,11 +41,11 @@ int main(int argc, const char* argv[])
 		std::make_shared<Camera>(
 			PIXELS_WIDTH,
 			PIXELS_HEIGHT,
-			90.0,
-			0.001,
-			10000.0
+			60.0,
+			0.1,
+			1000.0
 		);
-	camera->Position(Frame3D(Vector3D(0, 0, 200.0)));
+	camera->Position(Frame3D(Vector3D(0, 0, 250.0)));
 
 	renderingEngine =
 		std::make_shared<RenderingEngine3D>(
@@ -50,6 +54,7 @@ int main(int argc, const char* argv[])
 			PIXELS_WIDTH,
 			PIXELS_HEIGHT
 		);
+	renderingEngine->RefreshColor(Color(0.3, 0.3, 0.3, 1.0));
 
 	Engine engine(
 		renderingEngine,
@@ -74,112 +79,107 @@ void SetupScene()
 	ResourceLoader imageLoader;
 	Texture catTexture = imageLoader.LoadImageResource("sprites\\cat.png");
 	Texture brickTexture = imageLoader.LoadImageResource("textures\\brick.png");
+	Texture skyboxTexture = imageLoader.LoadImageResource("textures\\skybox.png");
+	Texture checkerboardTexture = imageLoader.LoadImageResource("textures\\checkerboard.png");
 	Texture nullTexture;
 
-	std::vector<size_t> indices =
-	{
-		0, 1, 2
-	};
-
-	std::vector<Vertex3D> vertices =
-	{
-		Vertex3D(Vector3D(0.0, -100.0, 0.0), Vector2D(0.5, 0), Color::Red),
-		Vertex3D(Vector3D(100.0, 100.0, 0.0), Vector2D(1.0, 1.0), Color::Green),
-		Vertex3D(Vector3D(-100.0, 100.0, 0.0), Vector2D(0, 1.0), Color::Blue)
-	};
-
-	scene->Meshes().push_back(
-		Mesh3D(
-			indices,
-			vertices,
-			Frame3D(
-				Vector3D(0, 0, 0),
-				Rotation3D()
-			),
-			brickTexture,
-			DrawType::Triangles
-		)
-	);
-
-	//std::vector<size_t> indicesSq =
+	//std::vector<size_t> indices =
 	//{
-	//	0, 1, 2, 1, 3, 2
+	//	0, 1, 2, 2, 3, 0
 	//};
 
-	//std::vector<Vertex3D> verticesSq =
+	//std::vector<Vertex3D> vertices =
 	//{
-	//	Vertex3D(Vector3D(-180.0, -180.0, 0.0), Vector2D(0, 0), Color::White),
-	//	Vertex3D(Vector3D(180.0, -180.0, 0.0), Vector2D(1, 0), Color::White),
-	//	Vertex3D(Vector3D(-180.0, 180.0, 0.0), Vector2D(0, 1), Color::White),
-	//	Vertex3D(Vector3D(180.0, 180.0, 0.0), Vector2D(1, 1), Color::White)
+	//	Vertex3D(Vector3D(-50.0, -50.0, -200.0), Vector2D(0, 0), Color::White),
+	//	Vertex3D(Vector3D(50.0, -50.0, -200.0), Vector2D(1.0, 0), Color::Black),
+	//	Vertex3D(Vector3D(50.0, 50.0, 0.0), Vector2D(1.0, 1.0), Color::White),
+	//	Vertex3D(Vector3D(-50.0, 50.0, 0.0), Vector2D(0, 1.0), Color::Black)
 	//};
 
 	//scene->Meshes().push_back(
 	//	Mesh3D(
-	//		indicesSq,
-	//		verticesSq,
+	//		indices,
+	//		vertices,
 	//		Frame3D(
-	//			Vector3D(0, 0, 1.0),
+	//			Vector3D(0, 0, 0),
 	//			Rotation3D()
 	//		),
-	//		catTexture,
+	//		checkerboardTexture,
 	//		DrawType::Triangles
+	//	)
+	//);
+
+	scene->Meshes().push_back(
+		MeshBuilder::BuildCube(
+			100.0,
+			100.0,
+			100.0,
+			skyboxTexture
+		)
+	);
+
+	//scene->Meshes().push_back(
+	//	MeshBuilder::BuildCube(
+	//		100.0,
+	//		100.0,
+	//		100.0,
+	//		Color::Red,
+	//		Color::Blue,
+	//		Color::Green,
+	//		Color::Magenta,
+	//		Color::Yellow,
+	//		Color::Cyan,
+	//		Color::White,
+	//		Color::Black
 	//	)
 	//);
 }
 
-double speed = 20.0;
+double speed = 10.0;
 
 void Update(
 	InputState inputState,
 	double delta)
 {
+	Frame3D camMove;
+	double moveDelta = speed * delta;
+
 	if (inputState.up)
 	{
-		camera->Position().Translation().Z(
-			camera->Position().Translation().Z() - speed
-		);
+		camMove = camMove * Frame3D(Vector3D(0, 0, -moveDelta));
 	}
 	if (inputState.down)
 	{
-		camera->Position().Translation().Z(
-			camera->Position().Translation().Z() + speed
-		);
+		camMove = camMove * Frame3D(Vector3D(0, 0, moveDelta));
 	}
 	if (inputState.left)
 	{
-		camera->Position().Translation().X(
-			camera->Position().Translation().X() - speed
-		);
+		camMove = camMove * Frame3D(Vector3D(-moveDelta, 0, 0));
 	}
 	if (inputState.right)
 	{
-		camera->Position().Translation().X(
-			camera->Position().Translation().X() + speed
-		);
+		camMove = camMove * Frame3D(Vector3D(moveDelta, 0, 0));
 	}
 	if (inputState.in)
 	{
-		camera->Position().Translation().Y(
-			camera->Position().Translation().Y() + speed
-		);
+		camMove = camMove * Frame3D(Vector3D(0, moveDelta, 0));
 	}
 	if (inputState.out)
 	{
-		camera->Position().Translation().Y(
-			camera->Position().Translation().Y() - speed
-		);
+		camMove = camMove * Frame3D(Vector3D(0, -moveDelta, 0));
 	}
 	if (inputState.rotR)
 	{
-		camera->Position().Rotation().Ry(
-			camera->Position().Rotation().Ry() - (speed / 10.0)
-		);
+		camMove = camMove * Frame3D(Rotation3D(0, -moveDelta / 10.0, 0));
 	}
 	if (inputState.rotL)
 	{
-		camera->Position().Rotation().Ry(
-			camera->Position().Rotation().Ry() + (speed / 10.0)
-		);
+		camMove = camMove * Frame3D(Rotation3D(0, moveDelta / 10.0, 0));
 	}
+
+	camera->Position(camera->Position() * camMove);
+
+	scene->Meshes()[0].Transform(
+		scene->Meshes()[0].Transform() * Rotation3D((-speed * delta) / 4.0, (speed * delta) / 6.0, 0.0)
+	);
 }

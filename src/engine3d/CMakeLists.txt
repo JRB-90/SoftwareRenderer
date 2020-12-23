@@ -31,6 +31,7 @@ add_library(engine3d STATIC
     PipelineConfiguration3D.h
     RasteringTools.h
 	RasteringTools.cpp
+    Vertex4D.h
 )
 
 target_link_libraries(engine3d PUBLIC

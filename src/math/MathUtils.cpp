@@ -1,6 +1,12 @@
+#define _USE_MATH_DEFINES
+
 #include "MathUtils.h"
 
-#define _USE_MATH_DEFINES
+#include "Vector2D.h"
+#include "Frame2D.h"
+#include "Matrix4.h"
+
+#include <iostream>
 #include <cmath>
 
 using namespace softengine;
@@ -60,4 +66,12 @@ double MathUtils::Interpolate(
 	double delta = val2 - val1;
 
 	return val1 + (delta * factor);
+}
+
+void MathUtils::PrintMatrix4(Matrix4 mat)
+{
+	std::printf("%.3f\t%.3f\t%.3f\t%.3f\n", mat.At(0, 0), mat.At(0, 1), mat.At(0, 2), mat.At(0, 3));
+	std::printf("%.3f\t%.3f\t%.3f\t%.3f\n", mat.At(1, 0), mat.At(1, 1), mat.At(1, 2), mat.At(1, 3));
+	std::printf("%.3f\t%.3f\t%.3f\t%.3f\n", mat.At(2, 0), mat.At(2, 1), mat.At(2, 2), mat.At(2, 3));
+	std::printf("%.3f\t%.3f\t%.3f\t%.3f\n\n", mat.At(3, 0), mat.At(3, 1), mat.At(3, 2), mat.At(3, 3));
 }

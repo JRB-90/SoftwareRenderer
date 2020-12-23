@@ -1,12 +1,13 @@
 #pragma once
 
-#include "Vector2D.h"
-#include "Frame2D.h"
-
 #include <cinttypes>
 
 namespace softengine
 {
+	class Vector2D;
+	class Frame2D;
+	class Matrix4;
+
 	class MathUtils
 	{
 	public:
@@ -28,5 +29,6 @@ namespace softengine
 			double val2,
 			double factor
 		);
+		static void PrintMatrix4(Matrix4 mat);
 	};
 }

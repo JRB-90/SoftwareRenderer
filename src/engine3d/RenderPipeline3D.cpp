@@ -5,11 +5,14 @@
 #include "Vector3D.h"
 #include "Vertex3D.h"
 #include "Vector4D.h"
+#include "Vertex4D.h"
 #include "Matrix4.h"
 #include "Camera.h"
 #include "Color.h"
 #include "Texture.h"
 #include "RasteringTools.h"
+
+#include <iostream>
 
 using namespace softengine;
 
@@ -82,8 +85,7 @@ void RenderPipeline3D::RunPoints(
 {
 	for (size_t i = 0; i < vbo.IndicesSize(); i++)
 	{
-		// TODO - Make a Vertex4D object to store the homogenous space position + normal
-		Vector4D vert = 
+		Vertex4D vert = 
 			VertexShader(
 				surface,
 				vbo.Vertices(vbo.Indices(i)),
@@ -93,19 +95,18 @@ void RenderPipeline3D::RunPoints(
 
 		if (PassesClipTest(vert))
 		{
-			PointRasteriser(
-				surface,
-				Vertex3D(
-					TranformToRasterSpace(
-						vert,
-						camera
-					),
-					vbo.Vertices(vbo.Indices(i)).UVCoord,
-					vbo.Vertices(vbo.Indices(i)).Normal,
-					vbo.Vertices(vbo.Indices(i)).VertColor
-				)
-			);
+			continue;
 		}
+
+		TranformToRasterSpace(
+			vert,
+			camera
+		);
+
+		PointRasteriser(
+			surface,
+			vert
+		);
 	}
 }
 
@@ -117,14 +118,14 @@ void RenderPipeline3D::RunLines(
 {
 	for (size_t i = 0; i < vbo.IndicesSize() - 1; i += 2)
 	{
-		Vector4D vert1 =
+		Vertex4D vert1 =
 			VertexShader(
 				surface,
 				vbo.Vertices(vbo.Indices(i)),
 				model,
 				camera
 			);
-		Vector4D vert2 =
+		Vertex4D vert2 =
 			VertexShader(
 				surface,
 				vbo.Vertices(vbo.Indices(i + 1)),
@@ -132,58 +133,54 @@ void RenderPipeline3D::RunLines(
 				camera
 			);
 
-		if (PassesClipTest(vert1) &&
-			PassesClipTest(vert2))
+		if (!PassesClipTest(vert1) &&
+			!PassesClipTest(vert2))
 		{
-			LineRasteriser(
-				surface,
-				Vertex3D(
-					TranformToRasterSpace(
-						vert1,
-						camera
-					),
-					vbo.Vertices(vbo.Indices(i)).UVCoord,
-					vbo.Vertices(vbo.Indices(i)).Normal,
-					vbo.Vertices(vbo.Indices(i)).VertColor
-				),
-				Vertex3D(
-					TranformToRasterSpace(
-						vert2,
-						camera
-					),
-					vbo.Vertices(vbo.Indices(i + 1)).UVCoord,
-					vbo.Vertices(vbo.Indices(i + 1)).Normal,
-					vbo.Vertices(vbo.Indices(i + 1)).VertColor
-				)
-			);
+			continue;
 		}
+
+		TranformToRasterSpace(
+			vert1,
+			camera
+		);
+
+		TranformToRasterSpace(
+			vert2,
+			camera
+		);
+
+		LineRasteriser(
+			surface,
+			vert1,
+			vert2
+		);
 	}
 }
 
 void RenderPipeline3D::RunTriangles(
 	RenderSurface& surface,
-	VBO3D& vbo, 
+	VBO3D& vbo,
 	Matrix4& model, 
 	Camera& camera,
 	Texture& texture)
 {
 	for (size_t i = 0; i < vbo.IndicesSize() - 2; i += 3)
 	{
-		Vector4D vert1 =
+		Vertex4D vert1 =
 			VertexShader(
 				surface,
 				vbo.Vertices(vbo.Indices(i)),
 				model,
 				camera
 			);
-		Vector4D vert2 =
+		Vertex4D vert2 =
 			VertexShader(
 				surface,
 				vbo.Vertices(vbo.Indices(i + 1)),
 				model,
 				camera
 			);
-		Vector4D vert3 =
+		Vertex4D vert3 =
 			VertexShader(
 				surface,
 				vbo.Vertices(vbo.Indices(i + 2)),
@@ -191,42 +188,40 @@ void RenderPipeline3D::RunTriangles(
 				camera
 			);
 
-		if (PassesClipTest(vert1) &&
-			PassesClipTest(vert2) &&
-			PassesClipTest(vert3))
+		if (!PassesClipTest(vert1) &&
+			!PassesClipTest(vert2) &&
+			!PassesClipTest(vert3))
 		{
-			TriangleRasteriser(
-				surface,
-				Vertex3D(
-					TranformToRasterSpace(
-						vert1,
-						camera
-					),
-					vbo.Vertices(vbo.Indices(i)).UVCoord,
-					vbo.Vertices(vbo.Indices(i)).Normal,
-					vbo.Vertices(vbo.Indices(i)).VertColor
-				),
-				Vertex3D(
-					TranformToRasterSpace(
-						vert2,
-						camera
-					),
-					vbo.Vertices(vbo.Indices(i + 1)).UVCoord,
-					vbo.Vertices(vbo.Indices(i + 1)).Normal,
-					vbo.Vertices(vbo.Indices(i + 1)).VertColor
-				),
-				Vertex3D(
-					TranformToRasterSpace(
-						vert3,
-						camera
-					),
-					vbo.Vertices(vbo.Indices(i + 2)).UVCoord,
-					vbo.Vertices(vbo.Indices(i + 2)).Normal,
-					vbo.Vertices(vbo.Indices(i + 2)).VertColor
-				),
-				texture
-			);
+			continue;
 		}
+
+		Vertex4D screenSpaceV1(vert1);
+		Vertex4D screenSpaceV2(vert2);
+		Vertex4D screenSpaceV3(vert3);
+
+		TranformToRasterSpace(
+			vert1,
+			camera
+		);
+		TranformToRasterSpace(
+			vert2,
+			camera
+		);
+		TranformToRasterSpace(
+			vert3,
+			camera
+		);
+
+		TriangleRasteriser(
+			surface,
+			vert1,
+			vert2,
+			vert3,
+			screenSpaceV1,
+			screenSpaceV2,
+			screenSpaceV3,
+			texture
+		);
 	}
 }
 
@@ -240,7 +235,7 @@ void RenderPipeline3D::RunQuads(
 	// TODO
 }
 
-Vector4D RenderPipeline3D::VertexShader(
+Vertex4D RenderPipeline3D::VertexShader(
 	RenderSurface& surface, 
 	Vertex3D& vertex,
 	Matrix4& model, 
@@ -260,45 +255,54 @@ Vector4D RenderPipeline3D::VertexShader(
 	// Project point into camera plane
 	vert = vert * camera.ProjectionMatrix();
 
-	return vert;
-}
-
-bool RenderPipeline3D::PassesClipTest(Vector4D& v1)
-{
-	return true;
-
-	// TODO - Need to investigate this a little more as it seems to be clipping too early
-
 	return
-		-v1.W() <= v1.X() &&
-		v1.X() <= v1.W() &&
-		-v1.W() <= v1.Y() &&
-		v1.Y() <= v1.W() &&
-		-v1.W() <= v1.Z() &&
-		v1.Z() <= v1.W();
+		Vertex4D(
+			vert,
+			Vector4D(
+				vertex.UVCoord.X(),
+				vertex.UVCoord.Y(),
+				0.0,
+				1.0
+			),
+			Vector4D(
+				vertex.Normal.X(),
+				vertex.Normal.Y(),
+				vertex.Normal.Z(),
+				1.0
+			),
+			vertex.VertColor
+		);
 }
 
-Vector3D RenderPipeline3D::TranformToRasterSpace(
-	Vector4D& vertex,
+bool RenderPipeline3D::PassesClipTest(Vertex4D& v1)
+{
+	return
+		-v1.Position.W() <= v1.Position.X() &&
+		v1.Position.X() <= v1.Position.W() &&
+		-v1.Position.W() <= v1.Position.Y() &&
+		v1.Position.Y() <= v1.Position.W() &&
+		-v1.Position.W() <= v1.Position.Z() &&
+		v1.Position.Z() <= v1.Position.W();
+}
+
+void RenderPipeline3D::TranformToRasterSpace(
+	Vertex4D& vertex,
 	Camera& camera)
 {
 	// Perspective divide
-	Vector3D vert(
-		vertex.X() / vertex.W(),
-		vertex.Y() / vertex.W(),
-		vertex.Z() / vertex.W()
-	);
+	vertex.Position.X(vertex.Position.X() / vertex.Position.W());
+	vertex.Position.Y(vertex.Position.Y() / vertex.Position.W());
+	vertex.Position.Z(vertex.Position.Z() / vertex.Position.W());
+	vertex.Position.W(1.0 / vertex.Position.W());
 
 	// Viewport transform
-	vert.X((vert.X() + 1.0) * 0.5 * (camera.Width() - 1));
-	vert.Y((vert.Y() + 1.0) * 0.5 * (camera.Height() - 1));
-
-	return vert;
+	vertex.Position.X((vertex.Position.X() + 1.0) * 0.5 * (camera.Width() - 1.0));
+	vertex.Position.Y((vertex.Position.Y() + 1.0) * 0.5 * (camera.Height() - 1.0));
 }
 
 void RenderPipeline3D::PointRasteriser(
 	RenderSurface& surface, 
-	Vertex3D& vertex)
+	Vertex4D& vertex)
 {
 	PixelShader(
 		surface,
@@ -310,8 +314,8 @@ void RenderPipeline3D::PointRasteriser(
 
 void RenderPipeline3D::LineRasteriser(
 	RenderSurface& surface, 
-	Vertex3D& vertex1,
-	Vertex3D& vertex2)
+	Vertex4D& vertex1,
+	Vertex4D& vertex2)
 {
 	double x = vertex1.Position.X();
 	double y = vertex1.Position.Y();
@@ -343,7 +347,7 @@ void RenderPipeline3D::LineRasteriser(
 
 		PixelShader(
 			surface,
-			Vector3D(x, y, z),
+			Vector4D(x, y, z, 1.0), // TODO - Should this be 1??
 			vertex1.Normal, //TODO - Interpolate normal
 			Color::InterpolateColor(
 				vertex1.VertColor,
@@ -356,13 +360,19 @@ void RenderPipeline3D::LineRasteriser(
 
 void RenderPipeline3D::TriangleRasteriser(
 	RenderSurface& surface, 
-	Vertex3D& vertex1,
-	Vertex3D& vertex2,
-	Vertex3D& vertex3,
+	Vertex4D& vertex1,
+	Vertex4D& vertex2,
+	Vertex4D& vertex3,
+	Vertex4D& oV1,
+	Vertex4D& oV2,
+	Vertex4D& oV3,
 	Texture& texture)
 {
-	Vector3D v12 = (vertex2.Position - vertex1.Position).Normalised();
-	Vector3D v13 = (vertex3.Position - vertex1.Position).Normalised();
+	Vector3D vec3_1 = Vector3D(vertex1.Position.X(), vertex1.Position.Y(), vertex1.Position.Z());
+	Vector3D vec3_2 = Vector3D(vertex2.Position.X(), vertex2.Position.Y(), vertex2.Position.Z());
+	Vector3D vec3_3 = Vector3D(vertex3.Position.X(), vertex3.Position.Y(), vertex3.Position.Z());
+	Vector3D v12 = (vec3_2 - vec3_1).Normalised();
+	Vector3D v13 = (vec3_3 - vec3_1).Normalised();
 	Vector3D cross = v12.Cross(v13);
 
 	if ((cullingMode == BackFaceCullingMode::Clockwise) &&
@@ -453,29 +463,27 @@ void RenderPipeline3D::TriangleRasteriser(
 		for (int x = xLeft[y - p0.Y()]; x < xRight[y - p0.Y()]; x++)
 		{
 			Vector3D baryCoords =
-				RasteringTools::FindBaryCentricCoords(
-					vertex1,
-					vertex2,
-					vertex3,
-					Vector2D(x, y)
+				RasteringTools::FindBaryCentricFactors(
+					vertex1.Position,
+					vertex2.Position,
+					vertex3.Position,
+					Vector4D(x, y, 0.0, 1.0)
 				);
 
-			double z = 
-				vertex1.Position.Z() * baryCoords.X() + 
-				vertex2.Position.Z() * baryCoords.Y() +
-				vertex3.Position.Z() * baryCoords.Z();
-			Vector3D cur(x, y, z);
+		    Vector4D currentPosition(x, y, 0.0, 1.0);
 			Color c = Color::Black;
 
 			if (texture.Height() > 0 &&
 				texture.Width() > 0)
 			{
 				c = RasteringTools::InterpolateTexture(
-					vertex1,
-					vertex2,
-					vertex3,
-					cur,
-					texture
+					baryCoords,
+					oV1,
+					oV2,
+					oV3,
+					currentPosition,
+					texture,
+					true
 				);
 
 				// TODO
@@ -487,16 +495,18 @@ void RenderPipeline3D::TriangleRasteriser(
 			else
 			{
 				c = RasteringTools::InterpolateColor(
+					baryCoords,
 					vertex1,
 					vertex2,
 					vertex3,
-					cur
+					currentPosition,
+					true
 				);
 			}
 
 			PixelShader(
 				surface,
-				cur,
+				currentPosition,
 				vertex1.Normal, // TODO - Interpolate normal
 				c
 			);
@@ -506,8 +516,8 @@ void RenderPipeline3D::TriangleRasteriser(
 
 void RenderPipeline3D::PixelShader(
 	RenderSurface& surface,
-	Vector3D& fragment,
-	Vector3D& normal,
+	Vector4D& fragment,
+	Vector4D& normal,
 	Color& color)
 {
 	switch (depthCheckMode)
