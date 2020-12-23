@@ -22,8 +22,6 @@ add_library(engine3d STATIC
     VBO3D.h
 	VBO3D.cpp
     Vertex3D.h
-    
-	
     MeshBuilder.h
 	MeshBuilder.cpp
     RenderPipeline3D.h
@@ -32,7 +30,13 @@ add_library(engine3d STATIC
     RasteringTools.h
 	RasteringTools.cpp
     Vertex4D.h
-)
+    Light.h
+	Light.cpp
+	DirectionalLight.h
+	DirectionalLight.cpp
+    AmbientLight.h
+    AmbientLight.cpp
+ )
 
 target_link_libraries(engine3d PUBLIC
 	SDL2

@@ -3,9 +3,9 @@
 #include "Scene3D.h"
 #include "Camera.h"
 #include "MeshBuilder.h"
-
-#include "MathUtils.h"
-#include "Vector4D.h"
+#include "Light.h"
+#include "AmbientLight.h"
+#include "DirectionalLight.h"
 
 #include <iostream>
 #include <random>
@@ -118,21 +118,18 @@ void SetupScene()
 		)
 	);
 
-	//scene->Meshes().push_back(
-	//	MeshBuilder::BuildCube(
-	//		100.0,
-	//		100.0,
-	//		100.0,
-	//		Color::Red,
-	//		Color::Blue,
-	//		Color::Green,
-	//		Color::Magenta,
-	//		Color::Yellow,
-	//		Color::Cyan,
-	//		Color::White,
-	//		Color::Black
-	//	)
-	//);
+	AmbientLight ambient(
+		Color::White,
+		0.5
+	);
+
+	DirectionalLight direcitonal(
+		Vector3D(-1, -1, -1),
+		Color::Red
+	);
+	
+	scene->Lights().push_back(ambient);
+	scene->Lights().push_back(direcitonal);
 }
 
 double speed = 10.0;

@@ -9,4 +9,5 @@ Scene3D::Scene3D()
 void Scene3D::ClearAll()
 {
 	meshes.clear();
+	lights.clear();
 }
