@@ -36,7 +36,8 @@ add_library(engine3d STATIC
 	DirectionalLight.cpp
     AmbientLight.h
     AmbientLight.cpp
- )
+    ShadingType.h
+)
 
 target_link_libraries(engine3d PUBLIC
 	SDL2

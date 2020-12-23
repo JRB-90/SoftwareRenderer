@@ -77,7 +77,7 @@ void RenderingEngine3D::Render()
 	{
 		return;
 	}
-
+	
 	surface->FillWithColor(refreshColor);
 	surface->ResetZBuffer();
 
@@ -89,7 +89,10 @@ void RenderingEngine3D::Render()
 			mesh.VBO(),
 			mesh.Transform().Matrix(),
 			*camera,
-			mesh.GetTextrue()
+			mesh.GetTextrue(),
+			scene->Lights(),
+			//mesh.GetShadingType()
+			ShadingType::Flat  // TODO - Make sure to swap this back after testing
 		);
 	}
 

@@ -4,6 +4,7 @@
 #include "Frame3D.h"
 #include "DrawType.h"
 #include "Texture.h"
+#include "ShadingType.h"
 #include <vector>
 
 namespace softengine
@@ -37,6 +38,13 @@ namespace softengine
 			std::vector<size_t> indices,
 			std::vector<Vertex3D> vertices,
 			Frame3D transform,
+			DrawType drawType,
+			ShadingType shadingType
+		);
+		Mesh3D(
+			std::vector<size_t> indices,
+			std::vector<Vertex3D> vertices,
+			Frame3D transform,
 			Texture texture
 		);
 		Mesh3D(
@@ -46,6 +54,14 @@ namespace softengine
 			Texture texture,
 			DrawType drawType
 		);
+		Mesh3D(
+			std::vector<size_t> indices,
+			std::vector<Vertex3D> vertices,
+			Frame3D transform,
+			Texture texture,
+			DrawType drawType,
+			ShadingType shadingType
+		);
 
 		VBO3D& VBO() { return vbo; }
 		void VBO(VBO3D& vbo) { this->vbo = vbo; }
@@ -54,11 +70,14 @@ namespace softengine
 		DrawType GetDrawType() { return drawType; }
 		void SetDrawType(DrawType drawType) { this->drawType = drawType; }
 		Texture& GetTextrue() { return texture; }
+		ShadingType GetShadingType() { return shadingType; }
+		void SetShadingType(ShadingType shadingType) { this->shadingType = shadingType; }
 
 	private:
 		VBO3D vbo;
 		Frame3D transform;
 		DrawType drawType;
 		Texture texture;
+		ShadingType shadingType;
 	};
 }

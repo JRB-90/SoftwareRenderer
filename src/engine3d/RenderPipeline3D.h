@@ -2,6 +2,7 @@
 
 #include "DrawType.h"
 #include <memory>
+#include <vector>
 
 namespace softengine
 {
@@ -10,12 +11,14 @@ namespace softengine
 	class Matrix4;
 	class Camera;
 	class Vector4D;
-	struct Vertex3D;
-	struct Vertex4D;
 	class Color;
 	class Texture;
+	class Light;
+	struct Vertex3D;
+	struct Vertex4D;
 	enum class BackFaceCullingMode;
 	enum class DepthCheckMode;
+	enum class ShadingType;
 
 	class RenderPipeline3D
 	{
@@ -41,21 +44,25 @@ namespace softengine
 			VBO3D& vbo,
 			Matrix4& model,
 			Camera& camera,
-			Texture& texture
+			Texture& texture,
+			std::vector<std::shared_ptr<Light>>& lights,
+			ShadingType shadingType
 		);
 
 		void RunPoints(
 			RenderSurface& surface,
 			VBO3D& vbo,
 			Matrix4& model,
-			Camera& camera
+			Camera& camera,
+			std::vector<std::shared_ptr<Light>>& lights
 		);
 
 		void RunLines(
 			RenderSurface& surface,
 			VBO3D& vbo,
 			Matrix4& model,
-			Camera& camera
+			Camera& camera,
+			std::vector<std::shared_ptr<Light>>& lights
 		);
 
 		void RunTriangles(
@@ -63,7 +70,9 @@ namespace softengine
 			VBO3D& vbo,
 			Matrix4& model,
 			Camera& camera,
-			Texture& texture
+			Texture& texture,
+			std::vector<std::shared_ptr<Light>>& lights,
+			ShadingType shadingType
 		);
 
 		void RunQuads(
@@ -71,7 +80,9 @@ namespace softengine
 			VBO3D& vbo,
 			Matrix4& model,
 			Camera& camera,
-			Texture& texture
+			Texture& texture,
+			std::vector<std::shared_ptr<Light>>& lights,
+			ShadingType shadingType
 		);
 
 		Vertex4D VertexShader(
@@ -90,13 +101,15 @@ namespace softengine
 
 		void PointRasteriser(
 			RenderSurface& surface,
-			Vertex4D& vertex
+			Vertex4D& vertex,
+			std::vector<std::shared_ptr<Light>>& lights
 		);
 
 		void LineRasteriser(
 			RenderSurface& surface,
 			Vertex4D& vertex1,
-			Vertex4D& vertex2
+			Vertex4D& vertex2,
+			std::vector<std::shared_ptr<Light>>& lights
 		);
 
 		void TriangleRasteriser(
@@ -107,14 +120,19 @@ namespace softengine
 			Vertex4D& oV1,
 			Vertex4D& oV2,
 			Vertex4D& oV3,
-			Texture& texture
+			Texture& texture,
+			std::vector<std::shared_ptr<Light>>& lights,
+			ShadingType shadingType
 		);
 
 		void PixelShader(
 			RenderSurface& surface,
 			Vector4D& fragment,
 			Vector4D& normal,
-			Color& color
+			Color& color,
+			Vector4D& faceNormal,
+			std::vector<std::shared_ptr<Light>>& lights,
+			ShadingType shadingType
 		);
 
 	private:

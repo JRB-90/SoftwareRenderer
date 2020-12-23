@@ -52,7 +52,5 @@ namespace softengine
 		std::shared_ptr<Camera> camera;
 		Color refreshColor;
 		bool isInitialised;
-
-		void RenderScene3D();
 	};
 }

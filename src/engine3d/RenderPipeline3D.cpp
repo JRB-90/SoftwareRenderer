@@ -11,6 +11,7 @@
 #include "Color.h"
 #include "Texture.h"
 #include "RasteringTools.h"
+#include "ShadingType.h"
 
 #include <iostream>
 
@@ -34,7 +35,9 @@ void RenderPipeline3D::Run(
 	VBO3D& vbo, 
 	Matrix4& model,
 	Camera& camera,
-	Texture& texture)
+	Texture& texture,
+	std::vector<std::shared_ptr<Light>>& lights,
+	ShadingType shadingType)
 {
 	switch (drawType)
 	{
@@ -43,7 +46,8 @@ void RenderPipeline3D::Run(
 			surface,
 			vbo,
 			model,
-			camera
+			camera,
+			lights
 		);
 		break;
 	case DrawType::Lines:
@@ -51,7 +55,8 @@ void RenderPipeline3D::Run(
 			surface,
 			vbo,
 			model,
-			camera
+			camera,
+			lights
 		);
 		break;
 	case DrawType::Triangles:
@@ -60,7 +65,9 @@ void RenderPipeline3D::Run(
 			vbo,
 			model,
 			camera,
-			texture
+			texture,
+			lights,
+			shadingType
 		);
 		break;
 	case DrawType::Quads:
@@ -69,7 +76,9 @@ void RenderPipeline3D::Run(
 			vbo,
 			model,
 			camera,
-			texture
+			texture,
+			lights,
+			shadingType
 		);
 		break;
 	default:
@@ -81,7 +90,8 @@ void RenderPipeline3D::RunPoints(
 	RenderSurface& surface, 
 	VBO3D& vbo, 
 	Matrix4& model, 
-	Camera& camera)
+	Camera& camera,
+	std::vector<std::shared_ptr<Light>>& lights)
 {
 	for (size_t i = 0; i < vbo.IndicesSize(); i++)
 	{
@@ -105,7 +115,8 @@ void RenderPipeline3D::RunPoints(
 
 		PointRasteriser(
 			surface,
-			vert
+			vert,
+			lights
 		);
 	}
 }
@@ -114,7 +125,8 @@ void RenderPipeline3D::RunLines(
 	RenderSurface& surface, 
 	VBO3D& vbo, 
 	Matrix4& model, 
-	Camera& camera)
+	Camera& camera,
+	std::vector<std::shared_ptr<Light>>& lights)
 {
 	for (size_t i = 0; i < vbo.IndicesSize() - 1; i += 2)
 	{
@@ -152,7 +164,8 @@ void RenderPipeline3D::RunLines(
 		LineRasteriser(
 			surface,
 			vert1,
-			vert2
+			vert2,
+			lights
 		);
 	}
 }
@@ -162,7 +175,9 @@ void RenderPipeline3D::RunTriangles(
 	VBO3D& vbo,
 	Matrix4& model, 
 	Camera& camera,
-	Texture& texture)
+	Texture& texture,
+	std::vector<std::shared_ptr<Light>>& lights,
+	ShadingType shadingType)
 {
 	for (size_t i = 0; i < vbo.IndicesSize() - 2; i += 3)
 	{
@@ -220,7 +235,9 @@ void RenderPipeline3D::RunTriangles(
 			screenSpaceV1,
 			screenSpaceV2,
 			screenSpaceV3,
-			texture
+			texture,
+			lights,
+			shadingType
 		);
 	}
 }
@@ -230,7 +247,9 @@ void RenderPipeline3D::RunQuads(
 	VBO3D& vbo,
 	Matrix4& model, 
 	Camera& camera,
-	Texture& texture)
+	Texture& texture,
+	std::vector<std::shared_ptr<Light>>& lights,
+	ShadingType shadingType)
 {
 	// TODO
 }
@@ -302,20 +321,25 @@ void RenderPipeline3D::TranformToRasterSpace(
 
 void RenderPipeline3D::PointRasteriser(
 	RenderSurface& surface, 
-	Vertex4D& vertex)
+	Vertex4D& vertex,
+	std::vector<std::shared_ptr<Light>>& lights)
 {
 	PixelShader(
 		surface,
 		vertex.Position,
 		vertex.Normal,
-		vertex.VertColor
+		vertex.VertColor,
+		Vector4D(),
+		lights,
+		ShadingType::None
 	);
 }
 
 void RenderPipeline3D::LineRasteriser(
 	RenderSurface& surface, 
 	Vertex4D& vertex1,
-	Vertex4D& vertex2)
+	Vertex4D& vertex2,
+	std::vector<std::shared_ptr<Light>>& lights)
 {
 	double x = vertex1.Position.X();
 	double y = vertex1.Position.Y();
@@ -353,7 +377,10 @@ void RenderPipeline3D::LineRasteriser(
 				vertex1.VertColor,
 				vertex2.VertColor,
 				factor
-			)
+			),
+			Vector4D(),
+			lights,
+			ShadingType::None
 		);
 	}
 }
@@ -366,7 +393,9 @@ void RenderPipeline3D::TriangleRasteriser(
 	Vertex4D& oV1,
 	Vertex4D& oV2,
 	Vertex4D& oV3,
-	Texture& texture)
+	Texture& texture,
+	std::vector<std::shared_ptr<Light>>& lights,
+	ShadingType shadingType)
 {
 	Vector3D vec3_1 = Vector3D(vertex1.Position.X(), vertex1.Position.Y(), vertex1.Position.Z());
 	Vector3D vec3_2 = Vector3D(vertex2.Position.X(), vertex2.Position.Y(), vertex2.Position.Z());
@@ -508,7 +537,15 @@ void RenderPipeline3D::TriangleRasteriser(
 				surface,
 				currentPosition,
 				vertex1.Normal, // TODO - Interpolate normal
-				c
+				c,
+				Vector4D(
+					cross.X(),
+					cross.Y(),
+					cross.Z(),
+					1.0
+				),
+				lights,
+				shadingType
 			);
 		}
 	}
@@ -518,7 +555,10 @@ void RenderPipeline3D::PixelShader(
 	RenderSurface& surface,
 	Vector4D& fragment,
 	Vector4D& normal,
-	Color& color)
+	Color& color,
+	Vector4D& faceNormal,
+	std::vector<std::shared_ptr<Light>>& lights,
+	ShadingType shadingType)
 {
 	switch (depthCheckMode)
 	{

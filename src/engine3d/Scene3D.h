@@ -4,6 +4,7 @@
 #include "Mesh3D.h"
 #include "Light.h"
 #include <vector>
+#include <memory>
 
 namespace softengine
 {
@@ -15,10 +16,10 @@ namespace softengine
 		void ClearAll() override;
 
 		std::vector<Mesh3D>& Meshes() { return meshes; }
-		std::vector<Light>& Lights() { return lights; }
+		std::vector<std::shared_ptr<Light>>& Lights() { return lights; }
 
 	private:
 		std::vector<Mesh3D> meshes;
-		std::vector<Light> lights;
+		std::vector<std::shared_ptr<Light>> lights;
 	};
 }

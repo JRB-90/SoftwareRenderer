@@ -118,15 +118,17 @@ void SetupScene()
 		)
 	);
 
-	AmbientLight ambient(
-		Color::White,
-		0.5
-	);
+	std::shared_ptr<AmbientLight> ambient =
+		std::make_shared<AmbientLight>(
+			Color::White,
+			0.5
+		);
 
-	DirectionalLight direcitonal(
-		Vector3D(-1, -1, -1),
-		Color::Red
-	);
+	std::shared_ptr<DirectionalLight> direcitonal =
+		std::make_shared<DirectionalLight>(
+			Vector3D(-1, -1, -1),
+			Color::Red
+		);
 	
 	scene->Lights().push_back(ambient);
 	scene->Lights().push_back(direcitonal);
