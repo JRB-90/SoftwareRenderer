@@ -119,6 +119,20 @@ Color Color::operator*(const double scalar)
 		);
 }
 
+Color Color::operator*(const Color& vec)
+{
+	Color4D ca = this->GetAs4D();
+	Color4D cb = vec.GetAs4D();
+	Color res(
+		ca.r * cb.r,
+		ca.g * cb.g,
+		ca.b * cb.b,
+		ca.a * cb.a
+	);
+
+	return res;
+}
+
 Color Color::operator/(const double scalar)
 {
 	return
@@ -128,6 +142,20 @@ Color Color::operator/(const double scalar)
 			std::max(std::min(color.b / scalar, 1.0), 0.0),
 			std::max(std::min(color.a / scalar, 1.0), 0.0)
 		);
+}
+
+Color Color::operator/(const Color& vec)
+{
+	Color4D ca = this->GetAs4D();
+	Color4D cb = vec.GetAs4D();
+	Color res(
+		ca.r / cb.r,
+		ca.g / cb.g,
+		ca.b / cb.b,
+		ca.a / cb.a
+	);
+
+	return res;
 }
 
 uint8_t Color::ToColorByte(double val) const

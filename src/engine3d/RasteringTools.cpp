@@ -7,6 +7,9 @@
 #include "Vertex4D.h"
 #include "Color.h"
 #include "Texture.h"
+#include "Camera.h"
+#include "RenderSurface.h"
+#include "PipelineConfiguration3D.h"
 
 using namespace softengine;
 
@@ -215,5 +218,109 @@ Color RasteringTools::InterpolateTexture(
 				texInterp.X() * (double)texture.Width(),
 				texInterp.Y() * (double)texture.Height()
 			);
+	}
+}
+
+Vector4D RasteringTools::InterpolateNormal(
+	Vector3D& baryCoords,
+	Vertex4D& v1,
+	Vertex4D& v2,
+	Vertex4D& v3,
+	Vector4D& pos,
+	bool perspectiveCorrect)
+{
+	if (!perspectiveCorrect)
+	{
+		Vector4D normInterp =
+			v1.Normal * baryCoords.X() +
+			v2.Normal * baryCoords.Y() +
+			v3.Normal * baryCoords.Z();
+
+		return normInterp;
+	}
+	else
+	{
+		Vector4D normInterp =
+			(v1.Normal * baryCoords.X()) / v1.Position.Z() +
+			(v2.Normal * baryCoords.Y()) / v2.Position.Z() +
+			(v3.Normal * baryCoords.Z()) / v3.Position.Z();
+
+		double zInterp =
+			(1 / v1.Position.Z()) * baryCoords.X() +
+			(1 / v2.Position.Z()) * baryCoords.Y() +
+			(1 / v3.Position.Z()) * baryCoords.Z();
+		normInterp = normInterp / zInterp;
+
+		return normInterp;
+	}
+}
+
+bool RasteringTools::PassesClipTest(Vertex4D& v1)
+{
+	return
+		-v1.Position.W() <= v1.Position.X() &&
+		v1.Position.X() <= v1.Position.W() &&
+		-v1.Position.W() <= v1.Position.Y() &&
+		v1.Position.Y() <= v1.Position.W() &&
+		-v1.Position.W() <= v1.Position.Z() &&
+		v1.Position.Z() <= v1.Position.W();
+}
+
+void RasteringTools::TranformToRasterSpace(
+	Vertex4D& vertex,
+	Camera& camera)
+{
+	// Perspective divide
+	vertex.Position.X(vertex.Position.X() / vertex.Position.W());
+	vertex.Position.Y(vertex.Position.Y() / vertex.Position.W());
+	vertex.Position.Z(vertex.Position.Z() / vertex.Position.W());
+	vertex.Position.W(1.0 / vertex.Position.W());
+
+	// Viewport transform
+	vertex.Position.X((vertex.Position.X() + 1.0) * 0.5 * (camera.Width() - 1.0));
+	vertex.Position.Y((vertex.Position.Y() + 1.0) * 0.5 * (camera.Height() - 1.0));
+	//vertex.Position.Z(
+	//	//(((camera.FarClip() - camera.NearClip()) * vertex.Position.Z()) / 2.0) + 
+	//	//((camera.FarClip() + camera.NearClip()) / 2.0)
+
+	//	-vertex.Position.Z()
+	//);
+}
+
+bool RasteringTools::PassesDepthCheck(
+	RenderSurface& surface,
+	Vector4D& fragment,
+	DepthCheckMode depthCheckMode)
+{
+	switch (depthCheckMode)
+	{
+	case DepthCheckMode::NoDepthCheck:
+		return true;
+	case DepthCheckMode::DepthCheckGreaterThan:
+		if (surface.PassesZCheck(
+			fragment.X(),
+			fragment.Y(),
+			fragment.Z()))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	case DepthCheckMode::DepthCheckLessThan:
+		if (!surface.PassesZCheck(
+			fragment.X(),
+			fragment.Y(),
+			fragment.Z()))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	default:
+		return false;
 	}
 }

@@ -70,7 +70,9 @@ namespace softengine
 		Color operator+(const Color& vec);
 		Color operator-(const Color& vec);
 		Color operator*(const double scalar);
+		Color operator*(const Color& vec);
 		Color operator/(const double scalar);
+		Color operator/(const Color& vec);
 
 		static const Color Black;
 		static const Color White;

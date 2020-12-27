@@ -13,7 +13,7 @@ namespace softengine
 	class Vector4D;
 	class Color;
 	class Texture;
-	class Light;
+	class SceneLighting;
 	struct Vertex3D;
 	struct Vertex4D;
 	enum class BackFaceCullingMode;
@@ -45,7 +45,7 @@ namespace softengine
 			Matrix4& model,
 			Camera& camera,
 			Texture& texture,
-			std::vector<std::shared_ptr<Light>>& lights,
+			SceneLighting& lights,
 			ShadingType shadingType
 		);
 
@@ -54,7 +54,7 @@ namespace softengine
 			VBO3D& vbo,
 			Matrix4& model,
 			Camera& camera,
-			std::vector<std::shared_ptr<Light>>& lights
+			SceneLighting& lights
 		);
 
 		void RunLines(
@@ -62,7 +62,7 @@ namespace softengine
 			VBO3D& vbo,
 			Matrix4& model,
 			Camera& camera,
-			std::vector<std::shared_ptr<Light>>& lights
+			SceneLighting& lights
 		);
 
 		void RunTriangles(
@@ -71,7 +71,7 @@ namespace softengine
 			Matrix4& model,
 			Camera& camera,
 			Texture& texture,
-			std::vector<std::shared_ptr<Light>>& lights,
+			SceneLighting& lights,
 			ShadingType shadingType
 		);
 
@@ -81,7 +81,7 @@ namespace softengine
 			Matrix4& model,
 			Camera& camera,
 			Texture& texture,
-			std::vector<std::shared_ptr<Light>>& lights,
+			SceneLighting& lights,
 			ShadingType shadingType
 		);
 
@@ -92,24 +92,17 @@ namespace softengine
 			Camera& camera
 		);
 
-		bool PassesClipTest(Vertex4D& v1);
-
-		void TranformToRasterSpace(
-			Vertex4D& vertex,
-			Camera& camera
-		);
-
 		void PointRasteriser(
 			RenderSurface& surface,
 			Vertex4D& vertex,
-			std::vector<std::shared_ptr<Light>>& lights
+			SceneLighting& lights
 		);
 
 		void LineRasteriser(
 			RenderSurface& surface,
 			Vertex4D& vertex1,
 			Vertex4D& vertex2,
-			std::vector<std::shared_ptr<Light>>& lights
+			SceneLighting& lights
 		);
 
 		void TriangleRasteriser(
@@ -121,7 +114,7 @@ namespace softengine
 			Vertex4D& oV2,
 			Vertex4D& oV3,
 			Texture& texture,
-			std::vector<std::shared_ptr<Light>>& lights,
+			SceneLighting& lights,
 			ShadingType shadingType
 		);
 
@@ -131,8 +124,25 @@ namespace softengine
 			Vector4D& normal,
 			Color& color,
 			Vector4D& faceNormal,
-			std::vector<std::shared_ptr<Light>>& lights,
+			SceneLighting& lights,
 			ShadingType shadingType
+		);
+
+		void PixelShaderFlat(
+			RenderSurface& surface,
+			Vector4D& fragment,
+			Vector4D& normal,
+			Color& color,
+			Vector4D& faceNormal,
+			SceneLighting& lights
+		);
+
+		void PixelShaderPhong(
+			RenderSurface& surface,
+			Vector4D& fragment,
+			Vector4D& normal,
+			Color& color,
+			SceneLighting& lights
 		);
 
 	private:

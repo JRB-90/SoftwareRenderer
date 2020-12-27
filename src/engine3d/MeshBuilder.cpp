@@ -73,40 +73,40 @@ Mesh3D MeshBuilder::BuildCube(
 	std::vector<Vertex3D> verticesSq =
 	{
 		// Front Verts
-		Vertex3D(Vector3D(-halfWidth, -halfHeight, halfDepth), Vector2D(0.26, 0.34), color),  // F_TL
-		Vertex3D(Vector3D(halfWidth, -halfHeight, halfDepth), Vector2D(0.49, 0.34), color),   // F_TR
-		Vertex3D(Vector3D(-halfWidth, halfHeight, halfDepth), Vector2D(0.26, 0.65), color),   // F_BR
-		Vertex3D(Vector3D(halfWidth, halfHeight, halfDepth), Vector2D(0.49, 0.65), color),    // F_BL
+		Vertex3D(Vector3D(-halfWidth, -halfHeight, halfDepth), Vector2D(0.26, 0.34), Vector3D(0, 0, 1).Normalised(), color),    // F_TL
+		Vertex3D(Vector3D(halfWidth, -halfHeight, halfDepth), Vector2D(0.49, 0.34), Vector3D(0, 0, 1).Normalised(), color),     // F_TR
+		Vertex3D(Vector3D(-halfWidth, halfHeight, halfDepth), Vector2D(0.26, 0.65), Vector3D(0, 0, 1).Normalised(), color),     // F_BR
+		Vertex3D(Vector3D(halfWidth, halfHeight, halfDepth), Vector2D(0.49, 0.65), Vector3D(0, 0, 1).Normalised(), color),      // F_BL
 
 		// Back Verts
-		Vertex3D(Vector3D(-halfWidth, -halfHeight, -halfDepth), Vector2D(0.99, 0.34), color),  // B_TR
-		Vertex3D(Vector3D(halfWidth, -halfHeight, -halfDepth), Vector2D(0.76, 0.34), color),   // B_TL
-		Vertex3D(Vector3D(-halfWidth, halfHeight, -halfDepth), Vector2D(0.99, 0.65), color),   // B_BR
-		Vertex3D(Vector3D(halfWidth, halfHeight, -halfDepth), Vector2D(0.76, 0.65), color),    // B_BL
+		Vertex3D(Vector3D(-halfWidth, -halfHeight, -halfDepth), Vector2D(0.99, 0.34), Vector3D(0, 0, -1).Normalised(), color),  // B_TR
+		Vertex3D(Vector3D(halfWidth, -halfHeight, -halfDepth), Vector2D(0.76, 0.34), Vector3D(0, 0, -1).Normalised(), color),   // B_TL
+		Vertex3D(Vector3D(-halfWidth, halfHeight, -halfDepth), Vector2D(0.99, 0.65), Vector3D(0, 0, -1).Normalised(), color),   // B_BR
+		Vertex3D(Vector3D(halfWidth, halfHeight, -halfDepth), Vector2D(0.76, 0.65), Vector3D(0, 0, -1).Normalised(), color),    // B_BL
 
 		// Left Verts
-		Vertex3D(Vector3D(-halfWidth, -halfHeight, halfDepth), Vector2D(0.24, 0.34), color),   // L_TR
-		Vertex3D(Vector3D(-halfWidth, halfHeight, halfDepth), Vector2D(0.24, 0.65), color),    // L_BR
-		Vertex3D(Vector3D(-halfWidth, -halfHeight, -halfDepth), Vector2D(0.01, 0.34), color),  // L_TL
-		Vertex3D(Vector3D(-halfWidth, halfHeight, -halfDepth), Vector2D(0.01, 0.65), color),   // L_BL
+		Vertex3D(Vector3D(-halfWidth, -halfHeight, halfDepth), Vector2D(0.24, 0.34), Vector3D(-1, 0, 0).Normalised(), color),   // L_TR
+		Vertex3D(Vector3D(-halfWidth, halfHeight, halfDepth), Vector2D(0.24, 0.65), Vector3D(-1, 0, 0).Normalised(), color),    // L_BR
+		Vertex3D(Vector3D(-halfWidth, -halfHeight, -halfDepth), Vector2D(0.01, 0.34), Vector3D(-1, 0, 0).Normalised(), color),  // L_TL
+		Vertex3D(Vector3D(-halfWidth, halfHeight, -halfDepth), Vector2D(0.01, 0.65), Vector3D(-1, 0, 0).Normalised(), color),   // L_BL
 
 		// Right Verts
-		Vertex3D(Vector3D(halfWidth, -halfHeight, halfDepth), Vector2D(0.51, 0.34), color),    // R_TL
-		Vertex3D(Vector3D(halfWidth, halfHeight, halfDepth), Vector2D(0.51, 0.65), color),     // R_BL
-		Vertex3D(Vector3D(halfWidth, -halfHeight, -halfDepth), Vector2D(0.74, 0.34), color),   // R_TR
-		Vertex3D(Vector3D(halfWidth, halfHeight, -halfDepth), Vector2D(0.74, 0.65), color),    // R_BR
+		Vertex3D(Vector3D(halfWidth, -halfHeight, halfDepth), Vector2D(0.51, 0.34), Vector3D(1, 0, 0).Normalised(), color),     // R_TL
+		Vertex3D(Vector3D(halfWidth, halfHeight, halfDepth), Vector2D(0.51, 0.65), Vector3D(1, 0, 0).Normalised(), color),      // R_BL
+		Vertex3D(Vector3D(halfWidth, -halfHeight, -halfDepth), Vector2D(0.74, 0.34), Vector3D(1, 0, 0).Normalised(), color),    // R_TR
+		Vertex3D(Vector3D(halfWidth, halfHeight, -halfDepth), Vector2D(0.74, 0.65), Vector3D(1, 0, 0).Normalised(), color),     // R_BR
 
 		// Bottom Verts
-		Vertex3D(Vector3D(-halfWidth, halfHeight, halfDepth), Vector2D(0.26, 0.67), color),    // Bo_TR
-		Vertex3D(Vector3D(halfWidth, halfHeight, halfDepth), Vector2D(0.49, 0.67), color),     // Bo_BR
-		Vertex3D(Vector3D(-halfWidth, halfHeight, -halfDepth), Vector2D(0.26, 0.99), color),   // Bo_BL
-		Vertex3D(Vector3D(halfWidth, halfHeight, -halfDepth), Vector2D(0.49, 0.99), color),    // Bo_TL
+		Vertex3D(Vector3D(-halfWidth, halfHeight, halfDepth), Vector2D(0.26, 0.67), Vector3D(0, 1, 0).Normalised(), color),     // Bo_TR
+		Vertex3D(Vector3D(halfWidth, halfHeight, halfDepth), Vector2D(0.49, 0.67), Vector3D(0, 1, 0).Normalised(), color),      // Bo_BR
+		Vertex3D(Vector3D(-halfWidth, halfHeight, -halfDepth), Vector2D(0.26, 0.99), Vector3D(0, 1, 0).Normalised(), color),    // Bo_BL
+		Vertex3D(Vector3D(halfWidth, halfHeight, -halfDepth), Vector2D(0.49, 0.99), Vector3D(0, 1, 0).Normalised(), color),     // Bo_TL
 
 		// Top Verts
-		Vertex3D(Vector3D(-halfWidth, -halfHeight, -halfDepth), Vector2D(0.26, 0.01), color),  // B_TL
-		Vertex3D(Vector3D(halfWidth, -halfHeight, -halfDepth), Vector2D(0.49, 0.01), color),   // B_TR
-		Vertex3D(Vector3D(-halfWidth, -halfHeight, halfDepth), Vector2D(0.26, 0.32), color),   // T_BL
-		Vertex3D(Vector3D(halfWidth, -halfHeight, halfDepth), Vector2D(0.49, 0.32), color),    // T_BR
+		Vertex3D(Vector3D(-halfWidth, -halfHeight, -halfDepth), Vector2D(0.26, 0.01), Vector3D(0, -1, 0).Normalised(), color),  // B_TL
+		Vertex3D(Vector3D(halfWidth, -halfHeight, -halfDepth), Vector2D(0.49, 0.01), Vector3D(0, -1, 0).Normalised(), color),   // B_TR
+		Vertex3D(Vector3D(-halfWidth, -halfHeight, halfDepth), Vector2D(0.26, 0.32), Vector3D(0, -1, 0).Normalised(), color),   // T_BL
+		Vertex3D(Vector3D(halfWidth, -halfHeight, halfDepth), Vector2D(0.49, 0.32), Vector3D(0, -1, 0).Normalised(), color),    // T_BR
 	};
 
 	return

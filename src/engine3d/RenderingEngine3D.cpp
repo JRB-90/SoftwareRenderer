@@ -90,7 +90,7 @@ void RenderingEngine3D::Render()
 			mesh.Transform().Matrix(),
 			*camera,
 			mesh.GetTextrue(),
-			scene->Lights(),
+			scene->Lighting(),
 			//mesh.GetShadingType()
 			ShadingType::Flat  // TODO - Make sure to swap this back after testing
 		);

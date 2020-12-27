@@ -11,6 +11,9 @@ namespace softengine
 	class Vertex4D;
 	class Color;
 	class Texture;
+	class Camera;
+	class RenderSurface;
+	enum class DepthCheckMode;
 
 	class RasteringTools
 	{
@@ -76,6 +79,28 @@ namespace softengine
 			Vector4D& pos,
 			Texture& texture,
 			bool perspectiveCorrect = true
+		);
+
+		static Vector4D InterpolateNormal (
+			Vector3D& baryCoords,
+			Vertex4D& v1,
+			Vertex4D& v2,
+			Vertex4D& v3,
+			Vector4D& pos,
+			bool perspectiveCorrect = true
+		);
+
+		static bool PassesClipTest(Vertex4D& v1);
+
+		static void TranformToRasterSpace(
+			Vertex4D& vertex,
+			Camera& camera
+		);
+
+		static bool PassesDepthCheck(
+			RenderSurface& surface,
+			Vector4D& fragment,
+			DepthCheckMode depthCheckMode
 		);
 	};
 }

@@ -118,20 +118,17 @@ void SetupScene()
 		)
 	);
 
-	std::shared_ptr<AmbientLight> ambient =
-		std::make_shared<AmbientLight>(
-			Color::White,
-			0.5
-		);
-
-	std::shared_ptr<DirectionalLight> direcitonal =
-		std::make_shared<DirectionalLight>(
-			Vector3D(-1, -1, -1),
-			Color::Red
-		);
+	AmbientLight ambient(
+		Color::White,
+		0.5
+	);
+	DirectionalLight directional(
+		Vector3D(-1, -1, -1),
+		Color::Red
+	);
 	
-	scene->Lights().push_back(ambient);
-	scene->Lights().push_back(direcitonal);
+	scene->Lighting().SetAmbientLight(ambient);
+	scene->Lighting().GetDirectionalLights().push_back(directional);
 }
 
 double speed = 10.0;
@@ -178,7 +175,11 @@ void Update(
 
 	camera->Position(camera->Position() * camMove);
 
-	scene->Meshes()[0].Transform(
-		scene->Meshes()[0].Transform() * Rotation3D((-speed * delta) / 4.0, (speed * delta) / 6.0, 0.0)
-	);
+	//scene->Meshes()[0].Transform(
+	//	scene->Meshes()[0].Transform() * Rotation3D((-speed * delta) / 3.0, (speed * delta) / 6.0, 0.0)
+	//);
+
+	//scene->Meshes()[0].Transform(
+	//	scene->Meshes()[0].Transform() * Frame3D(Vector3D(0.0, 0.0, speed))
+	//);
 }

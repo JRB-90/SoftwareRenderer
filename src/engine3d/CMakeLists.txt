@@ -37,6 +37,8 @@ add_library(engine3d STATIC
     AmbientLight.h
     AmbientLight.cpp
     ShadingType.h
+    SceneLighting.h
+	SceneLighting.cpp
 )
 
 target_link_libraries(engine3d PUBLIC

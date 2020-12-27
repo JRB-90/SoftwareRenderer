@@ -15,6 +15,7 @@ AmbientLight::AmbientLight(
 		Vector3D(0.0, 0.0, 0.0),
 		color,
 		Attenuation()
-	)
+	),
+	strength(strength)
 {
 }

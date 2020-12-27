@@ -12,8 +12,10 @@
 #include "Texture.h"
 #include "RasteringTools.h"
 #include "ShadingType.h"
+#include "SceneLighting.h"
 
 #include <iostream>
+#include <cmath>
 
 using namespace softengine;
 
@@ -36,7 +38,7 @@ void RenderPipeline3D::Run(
 	Matrix4& model,
 	Camera& camera,
 	Texture& texture,
-	std::vector<std::shared_ptr<Light>>& lights,
+	SceneLighting& lights,
 	ShadingType shadingType)
 {
 	switch (drawType)
@@ -91,7 +93,7 @@ void RenderPipeline3D::RunPoints(
 	VBO3D& vbo, 
 	Matrix4& model, 
 	Camera& camera,
-	std::vector<std::shared_ptr<Light>>& lights)
+	SceneLighting& lights)
 {
 	for (size_t i = 0; i < vbo.IndicesSize(); i++)
 	{
@@ -103,12 +105,12 @@ void RenderPipeline3D::RunPoints(
 				camera
 			);
 
-		if (PassesClipTest(vert))
+		if (RasteringTools::PassesClipTest(vert))
 		{
 			continue;
 		}
 
-		TranformToRasterSpace(
+		RasteringTools::TranformToRasterSpace(
 			vert,
 			camera
 		);
@@ -126,7 +128,7 @@ void RenderPipeline3D::RunLines(
 	VBO3D& vbo, 
 	Matrix4& model, 
 	Camera& camera,
-	std::vector<std::shared_ptr<Light>>& lights)
+	SceneLighting& lights)
 {
 	for (size_t i = 0; i < vbo.IndicesSize() - 1; i += 2)
 	{
@@ -145,18 +147,18 @@ void RenderPipeline3D::RunLines(
 				camera
 			);
 
-		if (!PassesClipTest(vert1) &&
-			!PassesClipTest(vert2))
+		if (!RasteringTools::PassesClipTest(vert1) &&
+			!RasteringTools::PassesClipTest(vert2))
 		{
 			continue;
 		}
 
-		TranformToRasterSpace(
+		RasteringTools::TranformToRasterSpace(
 			vert1,
 			camera
 		);
 
-		TranformToRasterSpace(
+		RasteringTools::TranformToRasterSpace(
 			vert2,
 			camera
 		);
@@ -176,7 +178,7 @@ void RenderPipeline3D::RunTriangles(
 	Matrix4& model, 
 	Camera& camera,
 	Texture& texture,
-	std::vector<std::shared_ptr<Light>>& lights,
+	SceneLighting& lights,
 	ShadingType shadingType)
 {
 	for (size_t i = 0; i < vbo.IndicesSize() - 2; i += 3)
@@ -203,9 +205,9 @@ void RenderPipeline3D::RunTriangles(
 				camera
 			);
 
-		if (!PassesClipTest(vert1) &&
-			!PassesClipTest(vert2) &&
-			!PassesClipTest(vert3))
+		if (!RasteringTools::PassesClipTest(vert1) &&
+			!RasteringTools::PassesClipTest(vert2) &&
+			!RasteringTools::PassesClipTest(vert3))
 		{
 			continue;
 		}
@@ -214,15 +216,15 @@ void RenderPipeline3D::RunTriangles(
 		Vertex4D screenSpaceV2(vert2);
 		Vertex4D screenSpaceV3(vert3);
 
-		TranformToRasterSpace(
+		RasteringTools::TranformToRasterSpace(
 			vert1,
 			camera
 		);
-		TranformToRasterSpace(
+		RasteringTools::TranformToRasterSpace(
 			vert2,
 			camera
 		);
-		TranformToRasterSpace(
+		RasteringTools::TranformToRasterSpace(
 			vert3,
 			camera
 		);
@@ -248,7 +250,7 @@ void RenderPipeline3D::RunQuads(
 	Matrix4& model, 
 	Camera& camera,
 	Texture& texture,
-	std::vector<std::shared_ptr<Light>>& lights,
+	SceneLighting& lights,
 	ShadingType shadingType)
 {
 	// TODO
@@ -293,36 +295,10 @@ Vertex4D RenderPipeline3D::VertexShader(
 		);
 }
 
-bool RenderPipeline3D::PassesClipTest(Vertex4D& v1)
-{
-	return
-		-v1.Position.W() <= v1.Position.X() &&
-		v1.Position.X() <= v1.Position.W() &&
-		-v1.Position.W() <= v1.Position.Y() &&
-		v1.Position.Y() <= v1.Position.W() &&
-		-v1.Position.W() <= v1.Position.Z() &&
-		v1.Position.Z() <= v1.Position.W();
-}
-
-void RenderPipeline3D::TranformToRasterSpace(
-	Vertex4D& vertex,
-	Camera& camera)
-{
-	// Perspective divide
-	vertex.Position.X(vertex.Position.X() / vertex.Position.W());
-	vertex.Position.Y(vertex.Position.Y() / vertex.Position.W());
-	vertex.Position.Z(vertex.Position.Z() / vertex.Position.W());
-	vertex.Position.W(1.0 / vertex.Position.W());
-
-	// Viewport transform
-	vertex.Position.X((vertex.Position.X() + 1.0) * 0.5 * (camera.Width() - 1.0));
-	vertex.Position.Y((vertex.Position.Y() + 1.0) * 0.5 * (camera.Height() - 1.0));
-}
-
 void RenderPipeline3D::PointRasteriser(
 	RenderSurface& surface, 
 	Vertex4D& vertex,
-	std::vector<std::shared_ptr<Light>>& lights)
+	SceneLighting& lights)
 {
 	PixelShader(
 		surface,
@@ -339,7 +315,7 @@ void RenderPipeline3D::LineRasteriser(
 	RenderSurface& surface, 
 	Vertex4D& vertex1,
 	Vertex4D& vertex2,
-	std::vector<std::shared_ptr<Light>>& lights)
+	SceneLighting& lights)
 {
 	double x = vertex1.Position.X();
 	double y = vertex1.Position.Y();
@@ -394,7 +370,7 @@ void RenderPipeline3D::TriangleRasteriser(
 	Vertex4D& oV2,
 	Vertex4D& oV3,
 	Texture& texture,
-	std::vector<std::shared_ptr<Light>>& lights,
+	SceneLighting& lights,
 	ShadingType shadingType)
 {
 	Vector3D vec3_1 = Vector3D(vertex1.Position.X(), vertex1.Position.Y(), vertex1.Position.Z());
@@ -402,7 +378,7 @@ void RenderPipeline3D::TriangleRasteriser(
 	Vector3D vec3_3 = Vector3D(vertex3.Position.X(), vertex3.Position.Y(), vertex3.Position.Z());
 	Vector3D v12 = (vec3_2 - vec3_1).Normalised();
 	Vector3D v13 = (vec3_3 - vec3_1).Normalised();
-	Vector3D cross = v12.Cross(v13);
+	Vector3D cross = v12.Cross(v13).Normalised();
 
 	if ((cullingMode == BackFaceCullingMode::Clockwise) &&
 		cross.Z() < 0.0)
@@ -536,14 +512,16 @@ void RenderPipeline3D::TriangleRasteriser(
 			PixelShader(
 				surface,
 				currentPosition,
-				vertex1.Normal, // TODO - Interpolate normal
-				c,
-				Vector4D(
-					cross.X(),
-					cross.Y(),
-					cross.Z(),
-					1.0
+				RasteringTools::InterpolateNormal(
+					baryCoords,
+					vertex1,
+					vertex2,
+					vertex3,
+					currentPosition,
+					true
 				),
+				c,
+				Vector4D(), // TODO - Figure out flat normal here
 				lights,
 				shadingType
 			);
@@ -557,51 +535,98 @@ void RenderPipeline3D::PixelShader(
 	Vector4D& normal,
 	Color& color,
 	Vector4D& faceNormal,
-	std::vector<std::shared_ptr<Light>>& lights,
+	SceneLighting& lights,
 	ShadingType shadingType)
 {
-	switch (depthCheckMode)
+	if (!RasteringTools::PassesDepthCheck(
+			surface,
+			fragment,
+			depthCheckMode)
+	)
 	{
-	case DepthCheckMode::NoDepthCheck:
+		return;
+	}
+
+	switch (shadingType)
+	{
+	case ShadingType::None:
 		surface.SetPixelValue(
 			fragment.X(),
 			fragment.Y(),
 			color
 		);
 		break;
-	case DepthCheckMode::DepthCheckGreaterThan:
-		if (
-			surface.PassesZCheck(
-				fragment.X(),
-				fragment.Y(),
-				fragment.Z()
-			)
-		)
-		{
-			surface.SetPixelValue(
-				fragment.X(),
-				fragment.Y(),
-				color
-			);
-		}
+	case ShadingType::Flat:
+		PixelShaderFlat(
+			surface,
+			fragment,
+			normal,
+			color,
+			faceNormal,
+			lights
+		);
 		break;
-	case DepthCheckMode::DepthCheckLessThan:
-		if (
-			!surface.PassesZCheck(
-				fragment.X(),
-				fragment.Y(),
-				fragment.Z()
-			)
-		)
-		{
-			surface.SetPixelValue(
-				fragment.X(),
-				fragment.Y(),
-				color
-			);
-		}
+	case ShadingType::Phong:
+		PixelShaderPhong(
+			surface,
+			fragment,
+			normal,
+			color,
+			lights
+		);
 		break;
 	default:
 		break;
 	}
+}
+
+void RenderPipeline3D::PixelShaderFlat(
+	RenderSurface& surface, 
+	Vector4D& fragment, 
+	Vector4D& normal, 
+	Color& color, 
+	Vector4D& faceNormal, 
+	SceneLighting& lights)
+{
+	Color ambientLight = lights.GetAmbientLight().GetColor() * lights.GetAmbientLight().Strength();
+	Vector3D flatNormal = Vector3D(faceNormal.X(), faceNormal.Y(), faceNormal.Z()).Normalised();
+	Vector3D lightDir = lights.GetDirectionalLights()[0].Direction().Normalised() * -1.0;
+
+	double intensity = 
+		std::max(
+			flatNormal.Dot(lightDir), 
+			0.0
+		);
+
+	//std::cout << intensity << std::endl;
+
+	Color diffuseLight = lights.GetDirectionalLights()[0].GetColor() * intensity;
+	Color ambient = color * ambientLight;
+	Color diffuse = color * diffuseLight;
+
+	//surface.SetPixelValue(
+	//	fragment.X(),
+	//	fragment.Y(),
+	//	diffuse
+	//);
+
+	surface.SetPixelValue(
+		fragment.X(),
+		fragment.Y(),
+		Color(
+			normal.X(),
+			normal.Y(),
+			normal.Z(),
+			1.0
+		)
+	);
+}
+
+void RenderPipeline3D::PixelShaderPhong(
+	RenderSurface& surface, 
+	Vector4D& fragment, 
+	Vector4D& normal, 
+	Color& color, 
+	SceneLighting& lights)
+{
 }

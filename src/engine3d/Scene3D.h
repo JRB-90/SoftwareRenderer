@@ -2,7 +2,7 @@
 
 #include "IScene.h"
 #include "Mesh3D.h"
-#include "Light.h"
+#include "SceneLighting.h"
 #include <vector>
 #include <memory>
 
@@ -16,10 +16,10 @@ namespace softengine
 		void ClearAll() override;
 
 		std::vector<Mesh3D>& Meshes() { return meshes; }
-		std::vector<std::shared_ptr<Light>>& Lights() { return lights; }
+		SceneLighting& Lighting() { return lighting; }
 
 	private:
 		std::vector<Mesh3D> meshes;
-		std::vector<std::shared_ptr<Light>> lights;
+		SceneLighting lighting;
 	};
 }
