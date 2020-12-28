@@ -28,15 +28,15 @@ void Camera::LookAt(
 	Vector3D lookAtPoint, 
 	Vector3D up)
 {
-	Vector3D zAxis = (position.Translation() - lookAtPoint).Normalised();
-	Vector3D xAxis = up.Cross(zAxis * -1).Normalised();
-	Vector3D yAxis = zAxis.Cross(xAxis).Normalised();
+	Vector3D zAxis = (lookAtPoint - position.Translation()).Normalised();
+	Vector3D xAxis = zAxis.Cross(up.Normalised()).Normalised();
+	Vector3D yAxis = xAxis.Cross(zAxis).Normalised();
 
 	position.Rotation(
 		Rotation3D(
 			xAxis,
 			yAxis,
-			zAxis
+			zAxis * -1
 		)
 	);
 }

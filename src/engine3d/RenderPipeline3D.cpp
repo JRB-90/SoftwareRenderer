@@ -147,7 +147,7 @@ void RenderPipeline3D::RunLines(
 				camera
 			);
 
-		if (!RasteringTools::PassesClipTest(vert1) &&
+		if (!RasteringTools::PassesClipTest(vert1) ||
 			!RasteringTools::PassesClipTest(vert2))
 		{
 			continue;
@@ -561,7 +561,7 @@ void RenderPipeline3D::PixelShader(
 	case ShadingType::None:
 		surface.SetPixelValue(
 			fragment.X(),
-			fragment.Y(),
+			480 - fragment.Y(),
 			color
 		);
 		break;

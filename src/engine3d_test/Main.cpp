@@ -6,6 +6,7 @@
 #include "Light.h"
 #include "AmbientLight.h"
 #include "DirectionalLight.h"
+#include "Utils.h"
 
 #include <iostream>
 #include <random>
@@ -42,13 +43,16 @@ int main(int argc, const char* argv[])
 			PIXELS_WIDTH,
 			PIXELS_HEIGHT,
 			60.0,
-			1000.0,
-			0.1
+			0.1,
+			1000.0
 		);
 	//camera->Position(Frame3D(Vector3D(500, 500, 500)));
-	camera->Position(Frame3D(Vector3D(1, 1, 1)));
+	camera->Position(Frame3D(Vector3D(2, 2, 2)));
 	//camera->Position(Frame3D(Vector3D(0.333, 0.333, 0.333)));
 	camera->LookAt(Vector3D(0, 0, 0), Vector3D(0, 1, 0));
+
+	Utils::PrintMatrix(camera->ProjectionMatrix());
+	Utils::PrintMatrix(camera->ViewMatrix());
 
 	renderingEngine =
 		std::make_shared<RenderingEngine3D>(

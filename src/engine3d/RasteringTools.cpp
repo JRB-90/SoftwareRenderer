@@ -273,14 +273,16 @@ void RasteringTools::TranformToRasterSpace(
 	Camera& camera)
 {
 	// Perspective divide
-	vertex.Position.X(vertex.Position.X() / vertex.Position.W());
-	vertex.Position.Y(vertex.Position.Y() / vertex.Position.W());
-	vertex.Position.Z(vertex.Position.Z() / vertex.Position.W());
-	vertex.Position.W(1.0 / vertex.Position.W());
+	//vertex.Position.X(vertex.Position.X() / vertex.Position.W());
+	//vertex.Position.Y(vertex.Position.Y() / vertex.Position.W());
+	//vertex.Position.Z(vertex.Position.Z() / vertex.Position.W());
+	//vertex.Position.W(1.0 / vertex.Position.W());
+	vertex.Position = vertex.Position / vertex.Position.W();
 
 	// Viewport transform
 	vertex.Position.X((vertex.Position.X() + 1.0) * 0.5 * (camera.Width() - 1.0));
 	vertex.Position.Y((vertex.Position.Y() + 1.0) * 0.5 * (camera.Height() - 1.0));
+	vertex.Position.Z(((camera.FarClip() - camera.NearClip()) / 2.0) * vertex.Position.Z() + ((camera.FarClip() - camera.NearClip()) / 2.0));
 }
 
 bool RasteringTools::PassesDepthCheck(
