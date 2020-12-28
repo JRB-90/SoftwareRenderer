@@ -7,6 +7,7 @@ namespace softengine
 	class Mesh3D;
 	class Color;
 	class Texture;
+	class Frame3D;
 
 	class MeshBuilder
 	{
@@ -47,6 +48,15 @@ namespace softengine
 			Color colorBTR,
 			Color colorBBL,
 			Color colorBBR
+		);
+
+		static Mesh3D BuildFrame(
+			double size
+		);
+
+		static Mesh3D BuildFrame(
+			double size,
+			Frame3D transform
 		);
 	};
 }

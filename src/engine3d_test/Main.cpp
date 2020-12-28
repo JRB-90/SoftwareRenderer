@@ -42,10 +42,13 @@ int main(int argc, const char* argv[])
 			PIXELS_WIDTH,
 			PIXELS_HEIGHT,
 			60.0,
-			0.1,
-			1000.0
+			1000.0,
+			0.1
 		);
-	camera->Position(Frame3D(Vector3D(0, 0, 250.0)));
+	//camera->Position(Frame3D(Vector3D(500, 500, 500)));
+	camera->Position(Frame3D(Vector3D(1, 1, 1)));
+	//camera->Position(Frame3D(Vector3D(0.333, 0.333, 0.333)));
+	camera->LookAt(Vector3D(0, 0, 0), Vector3D(0, 1, 0));
 
 	renderingEngine =
 		std::make_shared<RenderingEngine3D>(
@@ -54,7 +57,7 @@ int main(int argc, const char* argv[])
 			PIXELS_WIDTH,
 			PIXELS_HEIGHT
 		);
-	renderingEngine->RefreshColor(Color(0.3, 0.3, 0.3, 1.0));
+	//renderingEngine->RefreshColor(Color(0.3, 0.3, 0.3, 1.0));
 
 	Engine engine(
 		renderingEngine,
@@ -83,6 +86,16 @@ void SetupScene()
 	Texture checkerboardTexture = imageLoader.LoadImageResource("textures\\checkerboard.png");
 	Texture nullTexture;
 
+	std::vector<size_t> pointndices = { 0, 1, 2, 3 };
+	std::vector<Vertex3D> pointVertices =
+	{
+		Vertex3D(Vector3D(0, 0, 0), Color::White),
+		Vertex3D(Vector3D(1, 0, 0), Color::Red),
+		Vertex3D(Vector3D(0, 1, 0), Color::Green),
+		Vertex3D(Vector3D(0, 0, 1), Color::Blue)
+	};
+	//scene->Meshes().push_back(Mesh3D(pointndices, pointVertices, Frame3D(), DrawType::Points, ShadingType::None));
+
 	//std::vector<size_t> indices =
 	//{
 	//	0, 1, 2, 2, 3, 0
@@ -109,12 +122,19 @@ void SetupScene()
 	//	)
 	//);
 
+	//scene->Meshes().push_back(
+	//	MeshBuilder::BuildCube(
+	//		100.0,
+	//		100.0,
+	//		100.0,
+	//		skyboxTexture
+	//	)
+	//);
+
 	scene->Meshes().push_back(
-		MeshBuilder::BuildCube(
-			100.0,
-			100.0,
-			100.0,
-			skyboxTexture
+		MeshBuilder::BuildFrame(
+			1.0,
+			Frame3D(Vector3D(0, 0, 0))
 		)
 	);
 
@@ -131,12 +151,18 @@ void SetupScene()
 	scene->Lighting().GetDirectionalLights().push_back(directional);
 }
 
-double speed = 10.0;
+double speed = 0.1;
 
 void Update(
 	InputState inputState,
 	double delta)
 {
+	std::printf(
+		"%.3f\t\t%.3f\t\t%.3f\t\t%.3f\t\t%.3f\t\t%.3f\n", 
+		camera->Position().Translation().X(), camera->Position().Translation().Y(), camera->Position().Translation().Z(),
+		camera->Position().Rotation().Rx(), camera->Position().Rotation().Ry(), camera->Position().Rotation().Rz()
+	);
+
 	Frame3D camMove;
 	double moveDelta = speed * delta;
 
@@ -158,19 +184,19 @@ void Update(
 	}
 	if (inputState.in)
 	{
-		camMove = camMove * Frame3D(Vector3D(0, moveDelta, 0));
+		camMove = camMove * Frame3D(Vector3D(0, -moveDelta, 0));
 	}
 	if (inputState.out)
 	{
-		camMove = camMove * Frame3D(Vector3D(0, -moveDelta, 0));
+		camMove = camMove * Frame3D(Vector3D(0, moveDelta, 0));
 	}
 	if (inputState.rotR)
 	{
-		camMove = camMove * Frame3D(Rotation3D(0, -moveDelta / 10.0, 0));
+		camMove = camMove * Frame3D(Rotation3D(0, 0, -moveDelta * 10));
 	}
 	if (inputState.rotL)
 	{
-		camMove = camMove * Frame3D(Rotation3D(0, moveDelta / 10.0, 0));
+		camMove = camMove * Frame3D(Rotation3D(0, 0, moveDelta * 10));
 	}
 
 	camera->Position(camera->Position() * camMove);

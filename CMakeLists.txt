@@ -14,5 +14,6 @@ add_subdirectory("src/sdl_test")
 add_subdirectory("src/engine2d_test")
 add_subdirectory("src/engine3d_test")
 add_subdirectory("src/starfield")
+add_subdirectory("src/glut_test")
 
 file(COPY res DESTINATION .)

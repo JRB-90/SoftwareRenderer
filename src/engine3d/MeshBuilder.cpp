@@ -113,10 +113,7 @@ Mesh3D MeshBuilder::BuildCube(
 		Mesh3D(
 			indicesSq,
 			verticesSq,
-			Frame3D(
-				Vector3D(0, 0, 1.0),
-				Rotation3D()
-			),
+			Frame3D(),
 			texture,
 			DrawType::Triangles
 		);
@@ -179,11 +176,69 @@ Mesh3D MeshBuilder::BuildCube(
 		Mesh3D(
 			indicesSq,
 			verticesSq,
-			Frame3D(
-				Vector3D(0, 0, 1.0),
-				Rotation3D()
-			),
+			Frame3D(),
 			Texture(),
 			DrawType::Triangles
+		);
+}
+
+Mesh3D MeshBuilder::BuildFrame(double size)
+{
+	std::vector<size_t> indices = { 0, 1, 2, 3, 4, 5 };
+
+	std::vector<Vertex3D> vertices =
+	{
+		Vertex3D(Vector3D(0, 0, 0), Color::Red),		// X Origin
+		Vertex3D(Vector3D(size, 0, 0), Color::Red),		// X Axis
+		Vertex3D(Vector3D(0, 0, 0), Color::Green),		// Y Origin
+		Vertex3D(Vector3D(0, size, 0), Color::Green),	// Y Axis
+		Vertex3D(Vector3D(0, 0, 0), Color::Blue),		// Z Origin
+		Vertex3D(Vector3D(0, 0, size), Color::Blue),	// Z Axis
+	};
+
+	return
+		Mesh3D(
+			indices,
+			vertices,
+			Frame3D(),
+			DrawType::Lines,
+			ShadingType::None
+		);
+}
+
+Mesh3D MeshBuilder::BuildFrame(
+	double size,
+	Frame3D transform)
+{
+	std::vector<size_t> indices = 
+	{
+		0, 1, 2, 3, 4, 5,
+		6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 6
+	};
+
+	std::vector<Vertex3D> vertices =
+	{
+		Vertex3D(Vector3D(0, 0, 0), Color::Red),		// X Origin
+		Vertex3D(Vector3D(size, 0, 0), Color::Red),		// X Axis
+		Vertex3D(Vector3D(0, 0, 0), Color::Green),		// Y Origin
+		Vertex3D(Vector3D(0, size, 0), Color::Green),	// Y Axis
+		Vertex3D(Vector3D(0, 0, 0), Color::Blue),		// Z Origin
+		Vertex3D(Vector3D(0, 0, size), Color::Blue),	// Z Axis
+
+		Vertex3D(Vector3D(size / 5, size / 5, 0), Color::White),
+		Vertex3D(Vector3D(size / 5, 0, 0), Color::White),
+		Vertex3D(Vector3D(size / 5, 0, size / 5), Color::White),
+		Vertex3D(Vector3D(0, 0, size / 5), Color::White),
+		Vertex3D(Vector3D(0, size / 5, size / 5), Color::White),
+		Vertex3D(Vector3D(0, size / 5, 0), Color::White),
+	};
+
+	return
+		Mesh3D(
+			indices,
+			vertices,
+			transform,
+			DrawType::Lines,
+			ShadingType::None
 		);
 }

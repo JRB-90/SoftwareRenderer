@@ -20,6 +20,10 @@ namespace softengine
 		void Position(Frame3D position) { this->position = position; }
 		Matrix4 ProjectionMatrix() { CalculateProjection(); return projection; }
 		Matrix4 ViewMatrix() { CalculateView(); return view; }
+		void LookAt(
+			Vector3D lookAtPoint, 
+			Vector3D up
+		);
 
 		double Width() const { return width; }
 		void Width(double width) { this->width = width; }

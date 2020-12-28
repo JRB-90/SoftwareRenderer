@@ -182,7 +182,7 @@ Color RasteringTools::InterpolateTexture(
 	Vector3D& baryCoords,
 	Vertex4D& v1, 
 	Vertex4D& v2, 
-	Vertex4D& v3, 
+	Vertex4D& v3,
 	Vector4D& pos, 
 	Texture& texture,
 	bool perspectiveCorrect)
@@ -257,13 +257,15 @@ Vector4D RasteringTools::InterpolateNormal(
 
 bool RasteringTools::PassesClipTest(Vertex4D& v1)
 {
-	return
+	bool passes =
 		-v1.Position.W() <= v1.Position.X() &&
 		v1.Position.X() <= v1.Position.W() &&
 		-v1.Position.W() <= v1.Position.Y() &&
 		v1.Position.Y() <= v1.Position.W() &&
 		-v1.Position.W() <= v1.Position.Z() &&
 		v1.Position.Z() <= v1.Position.W();
+
+	return passes;
 }
 
 void RasteringTools::TranformToRasterSpace(

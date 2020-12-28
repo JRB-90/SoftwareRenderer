@@ -105,7 +105,7 @@ void RenderPipeline3D::RunPoints(
 				camera
 			);
 
-		if (RasteringTools::PassesClipTest(vert))
+		if (!RasteringTools::PassesClipTest(vert))
 		{
 			continue;
 		}
@@ -269,10 +269,19 @@ Vertex4D RenderPipeline3D::VertexShader(
 		1.0
 	);
 
+	Matrix4 handedFlipperMat(
+		1,  0,  0,  0,
+		0, -1,  0,  0,
+		0,  0, -1,  0,
+		0,  0,  0,  1
+	);
+
 	// Transform into world coordinates
 	vert = vert * model;
+
 	// Transform to camera space
 	vert = vert * camera.ViewMatrix();
+
 	// Project point into camera plane
 	vert = vert * camera.ProjectionMatrix();
 
@@ -347,8 +356,8 @@ void RenderPipeline3D::LineRasteriser(
 
 		PixelShader(
 			surface,
-			Vector4D(x, y, z, 1.0), // TODO - Should this be 1??
-			vertex1.Normal, //TODO - Interpolate normal
+			Vector4D(x, y, z, 1.0),
+			Vector4D(),
 			Color::InterpolateColor(
 				vertex1.VertColor,
 				vertex2.VertColor,
