@@ -8,6 +8,7 @@ namespace softengine
 	class Color;
 	class Texture;
 	class Frame3D;
+	class Material;
 
 	class MeshBuilder
 	{
@@ -18,22 +19,7 @@ namespace softengine
 			double width,
 			double height,
 			double depth,
-			Color color
-		);
-
-		static Mesh3D BuildCube(
-			double width,
-			double height,
-			double depth,
-			Texture& texture
-		);
-
-		static Mesh3D BuildCube(
-			double width,
-			double height,
-			double depth,
-			Color color,
-			Texture& texture
+			Material& material
 		);
 
 		static Mesh3D BuildCube(

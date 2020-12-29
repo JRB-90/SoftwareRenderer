@@ -36,9 +36,12 @@ add_library(engine3d STATIC
 	DirectionalLight.cpp
     AmbientLight.h
     AmbientLight.cpp
-    ShadingType.h
     SceneLighting.h
 	SceneLighting.cpp
+    ShaderTools.h
+	ShaderTools.cpp
+    InterpolationTools.h
+	InterpolationTools.cpp
 )
 
 target_link_libraries(engine3d PUBLIC

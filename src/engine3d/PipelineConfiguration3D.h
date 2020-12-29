@@ -15,4 +15,28 @@ namespace softengine
 		DepthCheckLessThan,
 		DepthCheckGreaterThan
 	};
+
+	struct PipelineConfiguration
+	{
+		bool wireframeModeEnabled;
+		BackFaceCullingMode backFaceCullingMode;
+		DepthCheckMode depthCheckMode;
+
+		PipelineConfiguration()
+		{
+			wireframeModeEnabled = false;
+			backFaceCullingMode = BackFaceCullingMode::Clockwise;
+			depthCheckMode = DepthCheckMode::DepthCheckGreaterThan;
+		}
+
+		PipelineConfiguration(
+			bool wireframeModeEnabled,
+			BackFaceCullingMode backFaceCullingMode,
+			DepthCheckMode depthCheckMode)
+		{
+			this->wireframeModeEnabled = wireframeModeEnabled;
+			this->backFaceCullingMode = backFaceCullingMode;
+			this->depthCheckMode = depthCheckMode;
+		}
+	};
 }

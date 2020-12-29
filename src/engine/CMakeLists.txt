@@ -35,6 +35,9 @@ add_library(engine STATIC
 	Utils.h
 	Utils.cpp
 	DrawType.h
+	ShadingType.h
+    Material.cpp
+	Material.h
 )
 
 target_link_libraries(engine PUBLIC

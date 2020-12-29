@@ -2,6 +2,7 @@
 #include "RenderingEngine3D.h"
 #include "Scene3D.h"
 #include "Camera.h"
+#include "Material.h"
 #include "MeshBuilder.h"
 #include "Light.h"
 #include "AmbientLight.h"
@@ -114,8 +115,8 @@ void SetupScene()
 			100.0,
 			100.0,
 			100.0,
-			skyboxTexture
-			//Color::Red
+			Material(skyboxTexture, ShadingType::Flat)
+			//Material(Color(Color::Red))
 		)
 	);
 

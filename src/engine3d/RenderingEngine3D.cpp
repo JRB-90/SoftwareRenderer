@@ -3,7 +3,6 @@
 #include "Scene3D.h"
 #include "Camera.h"
 #include "RenderSurface.h"
-#include "PipelineConfiguration3D.h"
 #include "RenderPipeline3D.h"
 #include "RenderingWindow.h"
 #include "RenderingMode.h"
@@ -32,11 +31,34 @@ RenderingEngine3D::RenderingEngine3D(
 	isInitialised(false)
 {
 	pipeline = std::make_unique<RenderPipeline3D>(
-		false,
-		DrawType::Points,
-		BackFaceCullingMode::Clockwise,
-		DepthCheckMode::DepthCheckGreaterThan
+		PipelineConfiguration(
+			false,
+			BackFaceCullingMode::Clockwise,
+			DepthCheckMode::DepthCheckGreaterThan
+		)
 	);
+}
+
+RenderingEngine3D::RenderingEngine3D(
+	std::shared_ptr<Scene3D> scene,
+	std::shared_ptr<Camera> camera,
+	size_t pixelsWidth,
+	size_t pixelsHeight,
+	PipelineConfiguration pipelineConfiguration)
+  :
+	scene(std::move(scene)),
+	pixelsWidth(pixelsWidth),
+	pixelsHeight(pixelsHeight),
+	pixelCount(pixelsWidth* pixelsHeight),
+	screenBufSize(pixelCount * 4),
+	refreshColor(Color::Black),
+	textOverlay(
+		14,
+		Color::White
+	),
+	camera(std::move(camera)),
+	isInitialised(false)
+{
 }
 
 RenderingEngine3D::~RenderingEngine3D()
@@ -83,16 +105,14 @@ void RenderingEngine3D::Render()
 
 	for (Mesh3D& mesh : scene->Meshes())
 	{
-		pipeline->SetDrawType(mesh.GetDrawType());
 		pipeline->Run(
 			*surface,
+			mesh.GetDrawType(),
 			mesh.VBO(),
 			mesh.Transform().Matrix(),
 			*camera,
-			mesh.GetTextrue(),
-			scene->Lighting(),
-			//mesh.GetShadingType()
-			ShadingType::Flat  // TODO - Make sure to swap this back after testing
+			mesh.GetMaterial(),
+			scene->Lighting()
 		);
 	}
 

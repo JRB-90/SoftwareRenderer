@@ -7,253 +7,14 @@
 #include "Vertex4D.h"
 #include "Color.h"
 #include "Texture.h"
+#include "Material.h"
 #include "Camera.h"
 #include "RenderSurface.h"
 #include "PipelineConfiguration3D.h"
+#include "ShaderTools.h"
+#include "InterpolationTools.h"
 
 using namespace softengine;
-
-std::vector<int> RasteringTools::InterpolateXPixelValues(
-	int x0, 
-	int y0, 
-	int x1, 
-	int y1)
-{
-	return InterpolateYPixelValues(y0, x0, y1, x1);
-}
-
-std::vector<int> RasteringTools::InterpolateYPixelValues(
-	int x0, 
-	int y0, 
-	int x1,
-	int y1)
-{
-	std::vector<int> pixels;
-
-	if (x0 == x1)
-	{
-		pixels.push_back(x0);
-
-		return pixels;
-	}
-
-	double grad = ((double)y1 - (double)y0) / ((double)x1 - (double)x0);
-	double d = (double)y0;
-
-	for (int i = x0; i <= x1; i++)
-	{
-		pixels.push_back(d);
-		d += grad;
-	}
-
-	return pixels;
-}
-
-Vector3D RasteringTools::FindBaryCentricFactors(
-	Vector2D& v1, 
-	Vector2D& v2, 
-	Vector2D& v3, 
-	Vector2D& pos)
-{
-	double f1 =
-		(
-			((v2.Y() - v3.Y()) * (pos.X() - v3.X())) +
-			((v3.X() - v2.X()) * (pos.Y() - v3.Y()))
-		) /
-		(
-			((v2.Y() - v3.Y()) * (v1.X() - v3.X())) +
-			((v3.X() - v2.X()) * (v1.Y() - v3.Y()))
-		);
-
-	double f2 =
-		(
-			((v3.Y() - v1.Y()) * (pos.X() - v3.X())) +
-			((v1.X() - v3.X()) * (pos.Y() - v3.Y()))
-		) /
-		(
-			((v2.Y() - v3.Y()) * (v1.X() - v3.X())) +
-			((v3.X() - v2.X()) * (v1.Y() - v3.Y()))
-		);
-
-	double f3 = 1.0 - f1 - f2;
-
-	return Vector3D(f1, f2, f3) / (f1 + f2 + f3);
-}
-
-Vector3D RasteringTools::FindBaryCentricFactors(
-	Vector3D& v1, 
-	Vector3D& v2, 
-	Vector3D& v3, 
-	Vector3D& pos)
-{
-	return
-		FindBaryCentricFactors(
-			Vector2D(v1.X(), v1.Y()),
-			Vector2D(v2.X(), v2.Y()),
-			Vector2D(v3.X(), v3.Y()),
-			Vector2D(pos.X(), pos.Y())
-		);
-}
-
-Vector3D RasteringTools::FindBaryCentricFactors(
-	Vector4D& v1, 
-	Vector4D& v2, 
-	Vector4D& v3, 
-	Vector4D& pos)
-{
-	return
-		FindBaryCentricFactors(
-			Vector2D(v1.X(), v1.Y()),
-			Vector2D(v2.X(), v2.Y()),
-			Vector2D(v3.X(), v3.Y()),
-			Vector2D(pos.X(), pos.Y())
-		);
-}
-
-Vector3D RasteringTools::FindBaryCentricFactors(
-	Vertex3D& v1, 
-	Vertex3D& v2, 
-	Vertex3D& v3, 
-	Vector2D& pos)
-{
-	return
-		FindBaryCentricFactors(
-			Vector2D(v1.Position.X(), v1.Position.Y()),
-			Vector2D(v2.Position.X(), v2.Position.Y()),
-			Vector2D(v3.Position.X(), v3.Position.Y()),
-			Vector2D(pos.X(), pos.Y())
-		);
-}
-
-Color RasteringTools::InterpolateColor(
-	Vector3D& baryCoords,
-	Vertex4D& v1, 
-	Vertex4D& v2, 
-	Vertex4D& v3, 
-	Vector4D& pos,
-	bool perspectiveCorrect)
-{
-	Color4D c1d = v1.VertColor.GetAs4D();
-	Vector4D vc1(c1d.r, c1d.g, c1d.b, c1d.a);
-	Color4D c2d = v2.VertColor.GetAs4D();
-	Vector4D vc2(c2d.r, c2d.g, c2d.b, c2d.a);
-	Color4D c3d = v3.VertColor.GetAs4D();
-	Vector4D vc3(c3d.r, c3d.g, c3d.b, c3d.a);
-
-	if (!perspectiveCorrect)
-	{
-		Vector4D colInterp =
-			vc1 * baryCoords.X() +
-			vc2 * baryCoords.Y() +
-			vc3 * baryCoords.Z();
-
-		return
-			Color(
-				colInterp.X(),
-				colInterp.Y(),
-				colInterp.Z(),
-				colInterp.W()
-			);
-	}
-	else
-	{
-		Vector4D colInterp =
-			(vc1 * baryCoords.X()) / v1.Position.Z() +
-			(vc2 * baryCoords.Y()) / v2.Position.Z() +
-			(vc3 * baryCoords.Z()) / v3.Position.Z();
-
-		double zInterp =
-			(1 / v1.Position.Z()) * baryCoords.X() +
-			(1 / v2.Position.Z()) * baryCoords.Y() +
-			(1 / v3.Position.Z()) * baryCoords.Z();
-		colInterp = colInterp / zInterp;
-
-		return
-			Color(
-				colInterp.X(),
-				colInterp.Y(),
-				colInterp.Z(),
-				colInterp.W()
-			);
-	}
-}
-
-Color RasteringTools::InterpolateTexture(
-	Vector3D& baryCoords,
-	Vertex4D& v1, 
-	Vertex4D& v2, 
-	Vertex4D& v3, 
-	Vector4D& pos, 
-	Texture& texture,
-	bool perspectiveCorrect)
-{
-	if (!perspectiveCorrect)
-	{
-		Vector4D texInterp =
-			v1.UVCoord * baryCoords.X() +
-			v2.UVCoord * baryCoords.Y() +
-			v3.UVCoord * baryCoords.Z();
-
-		return
-			texture.GetPixel(
-				texInterp.X() * (double)texture.Width(),
-				texInterp.Y() * (double)texture.Height()
-			);
-	}
-	else
-	{
-		Vector4D texInterp =
-			(v1.UVCoord * baryCoords.X()) / v1.Position.Z() +
-			(v2.UVCoord * baryCoords.Y()) / v2.Position.Z() +
-			(v3.UVCoord * baryCoords.Z()) / v3.Position.Z();
-
-		double zInterp =
-			(1 / v1.Position.Z()) * baryCoords.X() +
-			(1 / v2.Position.Z()) * baryCoords.Y() +
-			(1 / v3.Position.Z()) * baryCoords.Z();
-		texInterp = texInterp / zInterp;
-
-		return
-			texture.GetPixel(
-				texInterp.X() * (double)texture.Width(),
-				texInterp.Y() * (double)texture.Height()
-			);
-	}
-}
-
-Vector4D RasteringTools::InterpolateNormal(
-	Vector3D& baryCoords,
-	Vertex4D& v1,
-	Vertex4D& v2,
-	Vertex4D& v3,
-	Vector4D& pos,
-	bool perspectiveCorrect)
-{
-	if (!perspectiveCorrect)
-	{
-		Vector4D normInterp =
-			v1.Normal * baryCoords.X() +
-			v2.Normal * baryCoords.Y() +
-			v3.Normal * baryCoords.Z();
-
-		return normInterp;
-	}
-	else
-	{
-		Vector4D normInterp =
-			(v1.Normal * baryCoords.X()) / v1.Position.Z() +
-			(v2.Normal * baryCoords.Y()) / v2.Position.Z() +
-			(v3.Normal * baryCoords.Z()) / v3.Position.Z();
-
-		double zInterp =
-			(1 / v1.Position.Z()) * baryCoords.X() +
-			(1 / v2.Position.Z()) * baryCoords.Y() +
-			(1 / v3.Position.Z()) * baryCoords.Z();
-		normInterp = normInterp / zInterp;
-
-		return normInterp;
-	}
-}
 
 bool RasteringTools::PassesClipTest(Vertex4D& v1)
 {
@@ -320,5 +81,250 @@ bool RasteringTools::PassesDepthCheck(
 		}
 	default:
 		return false;
+	}
+}
+
+void RasteringTools::PointRasteriser(
+	RenderSurface& surface,
+	PipelineConfiguration& pipelineConfiguration,
+	Camera& camera,
+	Vertex4D& vertex,
+	SceneLighting& lights)
+{
+	ShaderTools::PixelShader(
+		surface,
+		camera,
+		vertex.Position,
+		vertex.Normal,
+		Vector4D(),
+		vertex.VertColor,
+		Material(),
+		lights,
+		pipelineConfiguration.depthCheckMode
+	);
+}
+
+void RasteringTools::LineRasteriser(
+	RenderSurface& surface,
+	PipelineConfiguration& pipelineConfiguration,
+	Camera& camera,
+	Vertex4D& vertex1,
+	Vertex4D& vertex2,
+	SceneLighting& lights)
+{
+	double x = vertex1.Position.X();
+	double y = vertex1.Position.Y();
+	double z = vertex1.Position.Z();
+	double dx = vertex2.Position.X() - vertex1.Position.X();
+	double dy = vertex2.Position.Y() - vertex1.Position.Y();
+	double dz = vertex2.Position.Z() - vertex1.Position.Z();
+	int steps;
+
+	if (std::abs(dx) > std::abs(dy))
+	{
+		steps = (int)std::abs(dx);
+	}
+	else
+	{
+		steps = (int)std::abs(dy);
+	}
+
+	double xInc = dx / (double)steps;
+	double yInc = dy / (double)steps;
+	double zInc = dz / (double)steps;
+
+	for (int i = 0; i < steps; i++)
+	{
+		x += xInc;
+		y += yInc;
+		z += zInc;
+		double factor = (double)i / (double)steps;
+
+		ShaderTools::PixelShader(
+			surface,
+			camera,
+			Vector4D(x, y, z, 1.0), // TODO - Should this be 1??
+			vertex1.Normal, //TODO - Interpolate normal
+			Vector4D(),
+			Color::InterpolateColor(
+				vertex1.VertColor,
+				vertex2.VertColor,
+				factor
+			),
+			Material(),
+			lights,
+			pipelineConfiguration.depthCheckMode
+		);
+	}
+}
+
+void RasteringTools::TriangleRasteriser(
+	RenderSurface& surface,
+	PipelineConfiguration& pipelineConfiguration,
+	Camera& camera,
+	Vertex4D& vertex1,
+	Vertex4D& vertex2,
+	Vertex4D& vertex3,
+	Vertex4D& oV1,
+	Vertex4D& oV2,
+	Vertex4D& oV3,
+	Material& material,
+	SceneLighting& lights)
+{
+	Vector3D vec3_1 = Vector3D(vertex1.Position.X(), vertex1.Position.Y(), vertex1.Position.Z());
+	Vector3D vec3_2 = Vector3D(vertex2.Position.X(), vertex2.Position.Y(), vertex2.Position.Z());
+	Vector3D vec3_3 = Vector3D(vertex3.Position.X(), vertex3.Position.Y(), vertex3.Position.Z());
+	Vector3D v12 = (vec3_2 - vec3_1).Normalised();
+	Vector3D v13 = (vec3_3 - vec3_1).Normalised();
+	Vector3D cross = v12.Cross(v13).Normalised();
+
+	if ((pipelineConfiguration.backFaceCullingMode == BackFaceCullingMode::Clockwise) &&
+		cross.Z() < 0.0)
+	{
+		return;
+	}
+	else if ((pipelineConfiguration.backFaceCullingMode == BackFaceCullingMode::AntiClockwise) &&
+		cross.Z() > 0.0)
+	{
+		return;
+	}
+
+	Vector2D p0 = Vector2D(vertex1.Position.X(), vertex1.Position.Y());
+	Vector2D p1 = Vector2D(vertex2.Position.X(), vertex2.Position.Y());
+	Vector2D p2 = Vector2D(vertex3.Position.X(), vertex3.Position.Y());
+
+	if (p1.Y() < p0.Y())
+	{
+		Vector2D temp = p1;
+		p1 = p0;
+		p0 = temp;
+	}
+	if (p2.Y() < p0.Y())
+	{
+		Vector2D temp = p2;
+		p2 = p0;
+		p0 = temp;
+	}
+	if (p2.Y() < p1.Y())
+	{
+		Vector2D temp = p2;
+		p2 = p1;
+		p1 = temp;
+	}
+
+	std::vector<int> x01 =
+		InterpolationTools::InterpolateXPixelValues(
+			p0.X(),
+			p0.Y(),
+			p1.X(),
+			p1.Y()
+		);
+
+	std::vector<int> x12 =
+		InterpolationTools::InterpolateXPixelValues(
+			p1.X(),
+			p1.Y(),
+			p2.X(),
+			p2.Y()
+		);
+
+	std::vector<int> x02 =
+		InterpolationTools::InterpolateXPixelValues(
+			p0.X(),
+			p0.Y(),
+			p2.X(),
+			p2.Y()
+		);
+
+	x01.pop_back();
+	std::vector<int> x012;
+	for (auto x : x01)
+	{
+		x012.push_back(x);
+	}
+	for (auto x : x12)
+	{
+		x012.push_back(x);
+	}
+
+	std::vector<int> xLeft;
+	std::vector<int> xRight;
+	int m = x02.size() / 2;
+	if (x02[m] < x012[m])
+	{
+		xLeft = x02;
+		xRight = x012;
+	}
+	else
+	{
+		xLeft = x012;
+		xRight = x02;
+	}
+
+	for (int y = p0.Y(); y < p2.Y(); y++)
+	{
+		for (int x = xLeft[y - p0.Y()]; x < xRight[y - p0.Y()]; x++)
+		{
+			Vector3D baryCoords =
+				InterpolationTools::FindBaryCentricFactors(
+					vertex1.Position,
+					vertex2.Position,
+					vertex3.Position,
+					Vector4D(x, y, 0.0, 1.0)
+				);
+
+			Vector4D currentPosition(x, y, 0.0, 1.0);
+			Color c = Color::Black;
+
+			if (material.GetTexture().Height() > 0 &&
+				material.GetTexture().Width() > 0)
+			{
+				c = InterpolationTools::InterpolateTexture(
+					baryCoords,
+					oV1,
+					oV2,
+					oV3,
+					currentPosition,
+					material.GetTexture(),
+					true
+				);
+
+				// TODO
+				//if (!IsValidSpritePixel(c))
+				//{
+				//	continue;
+				//}
+			}
+			else
+			{
+				c = InterpolationTools::InterpolateColor(
+					baryCoords,
+					vertex1,
+					vertex2,
+					vertex3,
+					currentPosition,
+					true
+				);
+			}
+
+			ShaderTools::PixelShader(
+				surface,
+				camera,
+				currentPosition,
+				InterpolationTools::InterpolateNormal(
+					baryCoords,
+					vertex1,
+					vertex2,
+					vertex3,
+					currentPosition,
+					true
+				),
+				Vector4D(), // TODO - Figure out flat normal here,
+				c,
+				material,
+				lights,
+				pipelineConfiguration.depthCheckMode
+			);
+		}
 	}
 }

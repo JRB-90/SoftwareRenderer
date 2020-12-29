@@ -2,6 +2,7 @@
 
 #include "IRenderingEngine.h"
 #include "TextOverlay.h"
+#include "PipelineConfiguration3D.h"
 #include "Color.h"
 #include <memory>
 
@@ -23,9 +24,15 @@ namespace softengine
 			size_t pixelsWidth,
 			size_t pixelsHeight
 		);
+		RenderingEngine3D(
+			std::shared_ptr<Scene3D> scene,
+			std::shared_ptr<Camera> camera,
+			size_t pixelsWidth,
+			size_t pixelsHeight,
+			PipelineConfiguration pipelineConfiguration
+		);
 		~RenderingEngine3D();
 
-		std::unique_ptr<RenderPipeline3D>& Pipeline() { return pipeline; }
 		TextOverlay& GetTextOverLay() { return textOverlay; }
 		Color& RefreshColor() { return refreshColor; }
 		void RefreshColor(Color& refreshColor) { this->refreshColor = refreshColor; }
