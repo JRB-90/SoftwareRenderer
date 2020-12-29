@@ -71,6 +71,20 @@ Rotation3D::Rotation3D(Matrix3 mat)
 }
 
 Rotation3D::Rotation3D(
+	Vector3D xAxis,
+	Vector3D yAxis,
+	Vector3D zAxis)
+{
+	m = Matrix3(
+		xAxis.X(), yAxis.X(), zAxis.X(),
+		xAxis.Y(), yAxis.Y(), zAxis.Y(),
+		xAxis.Z(), yAxis.Z(), zAxis.Z()
+	);
+
+	CalculateFromMatrix();
+}
+
+Rotation3D::Rotation3D(
 	double m00, double m01, double m02, 
 	double m10, double m11, double m12, 
 	double m20, double m21, double m22)

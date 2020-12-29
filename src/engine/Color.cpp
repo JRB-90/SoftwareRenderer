@@ -88,23 +88,27 @@ Color4D Color::GetAs4D() const
 
 Color Color::operator+(const Color& vec)
 {
+	Color4D rhs = vec.GetAs4D();
+
 	return
 		Color(
-			std::max(std::min(color.r + color.r, 1.0), 0.0),
-			std::max(std::min(color.g + color.g, 1.0), 0.0),
-			std::max(std::min(color.b + color.b, 1.0), 0.0),
-			std::max(std::min(color.a + color.a, 1.0), 0.0)
+			std::max(std::min(color.r + rhs.r, 1.0), 0.0),
+			std::max(std::min(color.g + rhs.g, 1.0), 0.0),
+			std::max(std::min(color.b + rhs.b, 1.0), 0.0),
+			std::max(std::min(color.a + rhs.a, 1.0), 0.0)
 		);
 }
 
 Color Color::operator-(const Color& vec)
 {
+	Color4D rhs = vec.GetAs4D();
+
 	return
 		Color(
-			std::max(std::min((color.r - color.r) * 2.0, 1.0), 0.0),
-			std::max(std::min((color.g - color.g) * 2.0, 1.0), 0.0),
-			std::max(std::min((color.b - color.b) * 2.0, 1.0), 0.0),
-			std::max(std::min((color.a - color.a) * 2.0, 1.0), 0.0)
+			std::max(std::min((color.r - rhs.r), 1.0), 0.0),
+			std::max(std::min((color.g - rhs.g), 1.0), 0.0),
+			std::max(std::min((color.b - rhs.b), 1.0), 0.0),
+			std::max(std::min((color.a - rhs.a), 1.0), 0.0)
 		);
 }
 

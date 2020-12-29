@@ -94,12 +94,14 @@ namespace softengine
 
 		void PointRasteriser(
 			RenderSurface& surface,
+			Camera& camera,
 			Vertex4D& vertex,
 			SceneLighting& lights
 		);
 
 		void LineRasteriser(
 			RenderSurface& surface,
+			Camera& camera,
 			Vertex4D& vertex1,
 			Vertex4D& vertex2,
 			SceneLighting& lights
@@ -107,6 +109,7 @@ namespace softengine
 
 		void TriangleRasteriser(
 			RenderSurface& surface,
+			Camera& camera,
 			Vertex4D& vertex1,
 			Vertex4D& vertex2,
 			Vertex4D& vertex3,
@@ -120,6 +123,7 @@ namespace softengine
 
 		void PixelShader(
 			RenderSurface& surface,
+			Camera& camera,
 			Vector4D& fragment,
 			Vector4D& normal,
 			Color& color,
@@ -130,6 +134,7 @@ namespace softengine
 
 		void PixelShaderFlat(
 			RenderSurface& surface,
+			Camera& camera,
 			Vector4D& fragment,
 			Vector4D& normal,
 			Color& color,
@@ -139,6 +144,7 @@ namespace softengine
 
 		void PixelShaderPhong(
 			RenderSurface& surface,
+			Camera& camera,
 			Vector4D& fragment,
 			Vector4D& normal,
 			Color& color,

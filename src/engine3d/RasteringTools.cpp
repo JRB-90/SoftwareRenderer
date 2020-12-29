@@ -277,8 +277,12 @@ void RasteringTools::TranformToRasterSpace(
 	vertex.Position.W(1.0 / vertex.Position.W());
 
 	// Viewport transform
-	vertex.Position.X((vertex.Position.X() + 1.0) * 0.5 * (camera.Width() - 1.0));
-	vertex.Position.Y((vertex.Position.Y() + 1.0) * 0.5 * (camera.Height() - 1.0));
+	vertex.Position.X(((vertex.Position.X() + 1) * (camera.Width() / 2)) + 0);
+	vertex.Position.Y(((vertex.Position.Y() + 1) * (-camera.Height() / 2)) + 480);
+	//vertex.Position.Z(
+	//	(((camera.FarClip() - camera.NearClip()) / 2) * vertex.Position.Z()) +
+	//	((camera.FarClip() + camera.NearClip()) / 2)
+	//);
 }
 
 bool RasteringTools::PassesDepthCheck(

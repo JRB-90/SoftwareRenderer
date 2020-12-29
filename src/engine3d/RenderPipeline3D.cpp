@@ -117,6 +117,7 @@ void RenderPipeline3D::RunPoints(
 
 		PointRasteriser(
 			surface,
+			camera,
 			vert,
 			lights
 		);
@@ -165,6 +166,7 @@ void RenderPipeline3D::RunLines(
 
 		LineRasteriser(
 			surface,
+			camera,
 			vert1,
 			vert2,
 			lights
@@ -231,6 +233,7 @@ void RenderPipeline3D::RunTriangles(
 
 		TriangleRasteriser(
 			surface,
+			camera,
 			vert1,
 			vert2,
 			vert3,
@@ -262,46 +265,47 @@ Vertex4D RenderPipeline3D::VertexShader(
 	Matrix4& model, 
 	Camera& camera)
 {
-	Vector4D vert(
+	Vector4D vertPosition(
 		vertex.Position.X(),
 		vertex.Position.Y(),
 		vertex.Position.Z(),
 		1.0
 	);
 
-	// Transform into world coordinates
-	vert = vert * model;
-	// Transform to camera space
-	vert = vert * camera.ViewMatrix();
-	// Project point into camera plane
-	vert = vert * camera.ProjectionMatrix();
+	Vector4D vertNormal(
+		vertex.Normal.X(),
+		vertex.Normal.Y(),
+		vertex.Normal.Z(),
+		0.0
+	);
+
+	Matrix4 MVP = camera.ProjectionMatrix() * camera.ViewMatrix() * model;
+	vertPosition = vertPosition * MVP;
+	vertNormal = vertNormal * MVP;
 
 	return
 		Vertex4D(
-			vert,
+			vertPosition,
 			Vector4D(
 				vertex.UVCoord.X(),
 				vertex.UVCoord.Y(),
 				0.0,
 				1.0
 			),
-			Vector4D(
-				vertex.Normal.X(),
-				vertex.Normal.Y(),
-				vertex.Normal.Z(),
-				1.0
-			),
+			vertNormal.Normalised(),
 			vertex.VertColor
 		);
 }
 
 void RenderPipeline3D::PointRasteriser(
-	RenderSurface& surface, 
+	RenderSurface& surface,
+	Camera& camera,
 	Vertex4D& vertex,
 	SceneLighting& lights)
 {
 	PixelShader(
 		surface,
+		camera,
 		vertex.Position,
 		vertex.Normal,
 		vertex.VertColor,
@@ -312,7 +316,8 @@ void RenderPipeline3D::PointRasteriser(
 }
 
 void RenderPipeline3D::LineRasteriser(
-	RenderSurface& surface, 
+	RenderSurface& surface,
+	Camera& camera,
 	Vertex4D& vertex1,
 	Vertex4D& vertex2,
 	SceneLighting& lights)
@@ -347,6 +352,7 @@ void RenderPipeline3D::LineRasteriser(
 
 		PixelShader(
 			surface,
+			camera,
 			Vector4D(x, y, z, 1.0), // TODO - Should this be 1??
 			vertex1.Normal, //TODO - Interpolate normal
 			Color::InterpolateColor(
@@ -363,6 +369,7 @@ void RenderPipeline3D::LineRasteriser(
 
 void RenderPipeline3D::TriangleRasteriser(
 	RenderSurface& surface, 
+	Camera& camera,
 	Vertex4D& vertex1,
 	Vertex4D& vertex2,
 	Vertex4D& vertex3,
@@ -511,6 +518,7 @@ void RenderPipeline3D::TriangleRasteriser(
 
 			PixelShader(
 				surface,
+				camera,
 				currentPosition,
 				RasteringTools::InterpolateNormal(
 					baryCoords,
@@ -531,6 +539,7 @@ void RenderPipeline3D::TriangleRasteriser(
 
 void RenderPipeline3D::PixelShader(
 	RenderSurface& surface,
+	Camera& camera,
 	Vector4D& fragment,
 	Vector4D& normal,
 	Color& color,
@@ -559,6 +568,7 @@ void RenderPipeline3D::PixelShader(
 	case ShadingType::Flat:
 		PixelShaderFlat(
 			surface,
+			camera,
 			fragment,
 			normal,
 			color,
@@ -569,6 +579,7 @@ void RenderPipeline3D::PixelShader(
 	case ShadingType::Phong:
 		PixelShaderPhong(
 			surface,
+			camera,
 			fragment,
 			normal,
 			color,
@@ -581,7 +592,8 @@ void RenderPipeline3D::PixelShader(
 }
 
 void RenderPipeline3D::PixelShaderFlat(
-	RenderSurface& surface, 
+	RenderSurface& surface,
+	Camera& camera,
 	Vector4D& fragment, 
 	Vector4D& normal, 
 	Color& color, 
@@ -589,14 +601,20 @@ void RenderPipeline3D::PixelShaderFlat(
 	SceneLighting& lights)
 {
 	Color ambientLight = lights.GetAmbientLight().GetColor() * lights.GetAmbientLight().Strength();
+	Vector3D norm = Vector3D(normal.X(), normal.Y(), normal.Z());
 	Vector3D flatNormal = Vector3D(faceNormal.X(), faceNormal.Y(), faceNormal.Z()).Normalised();
 	Vector3D lightDir = lights.GetDirectionalLights()[0].Direction().Normalised() * -1.0;
 
 	double intensity = 
 		std::max(
-			flatNormal.Dot(lightDir), 
+			norm.Dot(lightDir), 
 			0.0
 		);
+
+	if (intensity > 0.5)
+	{
+		int test = 0;
+	}
 
 	//std::cout << intensity << std::endl;
 
@@ -604,26 +622,29 @@ void RenderPipeline3D::PixelShaderFlat(
 	Color ambient = color * ambientLight;
 	Color diffuse = color * diffuseLight;
 
-	//surface.SetPixelValue(
-	//	fragment.X(),
-	//	fragment.Y(),
-	//	diffuse
-	//);
+	Color finalColor = ambient + diffuse;
 
 	surface.SetPixelValue(
 		fragment.X(),
 		fragment.Y(),
-		Color(
-			normal.X(),
-			normal.Y(),
-			normal.Z(),
-			1.0
-		)
+		finalColor
 	);
+
+	//surface.SetPixelValue(
+	//	fragment.X(),
+	//	fragment.Y(),
+	//	Color(
+	//		(normal.X() + 1.0) / 2.0,
+	//		(normal.Y() + 1.0) / 2.0,
+	//		(normal.Z() + 1.0) / 2.0,
+	//		1.0
+	//	)
+	//);
 }
 
 void RenderPipeline3D::PixelShaderPhong(
-	RenderSurface& surface, 
+	RenderSurface& surface,
+	Camera& camera,
 	Vector4D& fragment, 
 	Vector4D& normal, 
 	Color& color, 

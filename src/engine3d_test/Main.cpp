@@ -45,7 +45,7 @@ int main(int argc, const char* argv[])
 			0.1,
 			1000.0
 		);
-	camera->Position(Frame3D(Vector3D(0, 0, 250.0)));
+	camera->Position(Frame3D(Vector3D(0, 0, 350.0)));
 
 	renderingEngine =
 		std::make_shared<RenderingEngine3D>(
@@ -115,22 +115,31 @@ void SetupScene()
 			100.0,
 			100.0,
 			skyboxTexture
+			//Color::Red
 		)
 	);
 
+	//scene->Meshes().push_back(
+	//	MeshBuilder::BuildFrame(
+	//		100.0,
+	//		Frame3D(Vector3D(0, 0, 0))
+	//	)
+	//);
+
 	AmbientLight ambient(
 		Color::White,
-		0.5
+		0.25
 	);
 	DirectionalLight directional(
-		Vector3D(-1, -1, -1),
-		Color::Red
+		Vector3D(0, 0, 1),
+		Color::Blue
 	);
 	
 	scene->Lighting().SetAmbientLight(ambient);
 	scene->Lighting().GetDirectionalLights().push_back(directional);
 }
 
+double modelSpeed = 3.0;
 double speed = 10.0;
 
 void Update(
@@ -158,11 +167,11 @@ void Update(
 	}
 	if (inputState.in)
 	{
-		camMove = camMove * Frame3D(Vector3D(0, moveDelta, 0));
+		camMove = camMove * Frame3D(Vector3D(0, -moveDelta, 0));
 	}
 	if (inputState.out)
 	{
-		camMove = camMove * Frame3D(Vector3D(0, -moveDelta, 0));
+		camMove = camMove * Frame3D(Vector3D(0, moveDelta, 0));
 	}
 	if (inputState.rotR)
 	{
@@ -175,9 +184,9 @@ void Update(
 
 	camera->Position(camera->Position() * camMove);
 
-	//scene->Meshes()[0].Transform(
-	//	scene->Meshes()[0].Transform() * Rotation3D((-speed * delta) / 3.0, (speed * delta) / 6.0, 0.0)
-	//);
+	scene->Meshes()[0].Transform(
+		scene->Meshes()[0].Transform() * Rotation3D((-modelSpeed * delta) / 3.0, (modelSpeed * delta) / 3.0, 0.0)
+	);
 
 	//scene->Meshes()[0].Transform(
 	//	scene->Meshes()[0].Transform() * Frame3D(Vector3D(0.0, 0.0, speed))

@@ -2,6 +2,7 @@
 
 #include "Camera.h"
 #include "Rotation3D.h"
+#include "Vector3D.h"
 #include "MathUtils.h"
 #include <cmath>
 
@@ -24,24 +25,32 @@ Camera::Camera(
 {
 }
 
+void Camera::LookAt(
+	Vector3D lookAtPoint,
+	Vector3D up)
+{
+	Vector3D zAxis = (lookAtPoint - position.Translation()).Normalised();
+	Vector3D xAxis = zAxis.Cross(up.Normalised()).Normalised();
+	Vector3D yAxis = xAxis.Cross(zAxis).Normalised();
+
+	position.Rotation(
+		Rotation3D(
+			xAxis,
+			yAxis,
+			zAxis * -1
+		)
+	);
+}
+
 void Camera::CalculateProjection()
 {
-	//double a = height / width;
-	//double t = std::tan(MathUtils::ToRad(fov) / 2.0);
-	//projection = Matrix4::Zeros();
-	//projection.At(0, 0, 1.0 / t * a);
-	//projection.At(1, 1, 1.0 / t);
-	//projection.At(2, 2, -(farClip + nearClip) / (farClip - nearClip));
-	//projection.At(2, 3, -(2.0 * farClip * nearClip) / (farClip - nearClip));
-	//projection.At(3, 2, -1.0);
-
 	double a = width / height;
-	double t = std::tan(MathUtils::ToRad(fov) / 2.0);
+	double t = 1.0 / std::tan(MathUtils::ToRad(fov) / 2.0);
 	projection = Matrix4::Zeros();
-	projection.At(0, 0, (1.0 / t) / a);
-	projection.At(1, 1, (1.0 / t));
-	projection.At(2, 2, (nearClip + farClip) / (nearClip - farClip));
-	projection.At(2, 3, (2.0 * nearClip * farClip) / (nearClip - farClip));
+	projection.At(0, 0, t / a);
+	projection.At(1, 1, t);
+	projection.At(2, 2, -(farClip + nearClip) / (farClip - nearClip));
+	projection.At(2, 3, -2.0 * (nearClip * farClip) / (farClip - nearClip));
 	projection.At(3, 2, -1.0);
 }
 
