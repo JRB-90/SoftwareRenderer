@@ -19,7 +19,8 @@ namespace softengine
 			double width,
 			double height,
 			double depth,
-			Material& material
+			Material& material,
+			bool wrappedTexCoords = true
 		);
 
 		static Mesh3D BuildCube(

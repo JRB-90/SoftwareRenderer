@@ -44,7 +44,7 @@ int main(int argc, const char* argv[])
 			PIXELS_HEIGHT,
 			60.0,
 			0.1,
-			1000.0
+			10000.0
 		);
 	camera->Position(Frame3D(Vector3D(0, 0, 350.0)));
 
@@ -84,39 +84,14 @@ void SetupScene()
 	Texture checkerboardTexture = imageLoader.LoadImageResource("textures\\checkerboard.png");
 	Texture nullTexture;
 
-	//std::vector<size_t> indices =
-	//{
-	//	0, 1, 2, 2, 3, 0
-	//};
-
-	//std::vector<Vertex3D> vertices =
-	//{
-	//	Vertex3D(Vector3D(-50.0, -50.0, -200.0), Vector2D(0, 0), Color::White),
-	//	Vertex3D(Vector3D(50.0, -50.0, -200.0), Vector2D(1.0, 0), Color::Black),
-	//	Vertex3D(Vector3D(50.0, 50.0, 0.0), Vector2D(1.0, 1.0), Color::White),
-	//	Vertex3D(Vector3D(-50.0, 50.0, 0.0), Vector2D(0, 1.0), Color::Black)
-	//};
-
-	//scene->Meshes().push_back(
-	//	Mesh3D(
-	//		indices,
-	//		vertices,
-	//		Frame3D(
-	//			Vector3D(0, 0, 0),
-	//			Rotation3D()
-	//		),
-	//		checkerboardTexture,
-	//		DrawType::Triangles
-	//	)
-	//);
-
 	scene->Meshes().push_back(
 		MeshBuilder::BuildCube(
 			100.0,
 			100.0,
 			100.0,
-			//Material(skyboxTexture, ShadingType::Normal)
-			Material(Color(Color::Red), ShadingType::Flat)
+			Material(brickTexture, ShadingType::Flat),
+			//Material(Color(Color::Red), ShadingType::Flat),
+			false
 		)
 	);
 
