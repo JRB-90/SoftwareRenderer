@@ -6,6 +6,7 @@
 #include "RenderPipeline3D.h"
 #include "RenderingWindow.h"
 #include "RenderingMode.h"
+#include "Profiler.h"
 
 #include <iostream>
 
@@ -99,9 +100,14 @@ void RenderingEngine3D::Render()
 	{
 		return;
 	}
+
+	Profiler profiler;
 	
 	surface->FillWithColor(refreshColor);
+	profiler.AddTiming("Refresh Screen");
+	
 	surface->ResetZBuffer();
+	profiler.AddTiming("Reset Z Buffer");
 
 	for (Mesh3D& mesh : scene->Meshes())
 	{
@@ -116,6 +122,13 @@ void RenderingEngine3D::Render()
 		);
 	}
 
+	profiler.AddTiming("Pipeline Total");
+
 	surface->RenderPixels();
+	profiler.AddTiming("Swap Chain");
+
 	textOverlay.RenderToSurface(*surface);
+	profiler.AddTiming("Text Overlay");
+
+	profiler.PrintTimings();
 }

@@ -38,6 +38,8 @@ add_library(engine STATIC
 	ShadingType.h
     Material.cpp
 	Material.h
+	Profiler.h
+	Profiler.cpp
 )
 
 target_link_libraries(engine PUBLIC

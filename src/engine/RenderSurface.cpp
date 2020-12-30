@@ -204,13 +204,14 @@ void RenderSurface::Clear(Color color)
 
 void RenderSurface::FillWithColor(Color color)
 {
+	Color4B c = color.GetAs4B();
 	for (size_t i = 0; i < screenBufSize; i += 4)
 	{
 		const size_t offset = i;
-		pixels[i + 0] = color.GetAs4B().b;
-		pixels[i + 1] = color.GetAs4B().g;
-		pixels[i + 2] = color.GetAs4B().r;
-		pixels[i + 3] = color.GetAs4B().a;
+		pixels[i + 0] = c.b;
+		pixels[i + 1] = c.g;
+		pixels[i + 2] = c.r;
+		pixels[i + 3] = c.a;
 	}
 }
 

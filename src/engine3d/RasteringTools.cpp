@@ -27,6 +27,17 @@ bool RasteringTools::PassesClipTest(Vertex4D& v1)
 		v1.Position.Z() <= v1.Position.W();
 }
 
+bool RasteringTools::PassesClipTest(VertexShaderOut& out)
+{
+	return
+		-out.vertex.Position.W() <= out.vertex.Position.X() &&
+		out.vertex.Position.X() <= out.vertex.Position.W() &&
+		-out.vertex.Position.W() <= out.vertex.Position.Y() &&
+		out.vertex.Position.Y() <= out.vertex.Position.W() &&
+		-out.vertex.Position.W() <= out.vertex.Position.Z() &&
+		out.vertex.Position.Z() <= out.vertex.Position.W();
+}
+
 void RasteringTools::TranformToRasterSpace(
 	Vertex4D& vertex,
 	Camera& camera)
@@ -40,6 +51,25 @@ void RasteringTools::TranformToRasterSpace(
 	// Viewport transform
 	vertex.Position.X(((vertex.Position.X() + 1) * (camera.Width() / 2)) + 0);
 	vertex.Position.Y(((vertex.Position.Y() + 1) * (-camera.Height() / 2)) + 480);
+	//vertex.Position.Z(
+	//	(((camera.FarClip() - camera.NearClip()) / 2) * vertex.Position.Z()) +
+	//	((camera.FarClip() + camera.NearClip()) / 2)
+	//);
+}
+
+void RasteringTools::TranformToRasterSpace(
+	VertexShaderOut& out,
+	Camera& camera)
+{
+	// Perspective divide
+	out.vertex.Position.X(out.vertex.Position.X() / out.vertex.Position.W());
+	out.vertex.Position.Y(out.vertex.Position.Y() / out.vertex.Position.W());
+	out.vertex.Position.Z(out.vertex.Position.Z() / out.vertex.Position.W());
+	out.vertex.Position.W(1.0 / out.vertex.Position.W());
+
+	// Viewport transform
+	out.vertex.Position.X(((out.vertex.Position.X() + 1) * (camera.Width() / 2)) + 0);
+	out.vertex.Position.Y(((out.vertex.Position.Y() + 1) * (-camera.Height() / 2)) + 480);
 	//vertex.Position.Z(
 	//	(((camera.FarClip() - camera.NearClip()) / 2) * vertex.Position.Z()) +
 	//	((camera.FarClip() + camera.NearClip()) / 2)
@@ -101,6 +131,21 @@ void RasteringTools::PointRasteriser(
 		Material(),
 		lights,
 		pipelineConfiguration.depthCheckMode
+	);
+}
+
+void RasteringTools::PointRasteriser(PointRasteriserIn in)
+{
+	ShaderTools::PixelShader(
+		*in.surface,
+		*in.camera,
+		in.vertex1->Position,
+		in.vertex1->Normal,
+		Vector4D(),
+		in.vertex1->VertColor,
+		Material(),
+		*in.lights,
+		in.pipelineConfiguration->depthCheckMode
 	);
 }
 

@@ -1,4 +1,6 @@
 #include "Engine.h"
+
+#include "Profiler.h"
 #include <iostream>
 #include <chrono>
 #include <sstream>
@@ -47,6 +49,7 @@ void Engine::Run()
 	Uint64 targetInterval = SDL_GetPerformanceFrequency() / updateFrequency;
 	Uint64 current = SDL_GetPerformanceCounter();
 	Uint64 previous = current;
+	Profiler profiler;
 
 	while (isRunning)
 	{
@@ -57,9 +60,14 @@ void Engine::Run()
 			double timeTaken = (double)delta / (double)SDL_GetPerformanceFrequency();
 			previous = current;
 
+			std::printf("======================================================================================\n");
+			profiler.ResetProfileRun();
 			InputState inputState = PollInput();
+			profiler.AddTiming("Input Handling");
 			Update(inputState, timeTaken / targetTime);
+			profiler.AddTiming("Update Total");
 			Render();
+			profiler.AddTiming("Render Total");
 
 			if (debugModeEnabled)
 			{
@@ -70,6 +78,8 @@ void Engine::Run()
 				//std::cout << "\033[2J" << "" << "\033[H";
 				//std::cout << ss.str();
 				renderingEngine->GetTextOverLay().SetText(ss.str());
+				profiler.PrintTimings();
+				std::printf("\n");
 			}
 		}
 		std::this_thread::sleep_for(std::chrono::nanoseconds(0));

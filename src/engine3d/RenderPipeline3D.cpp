@@ -16,6 +16,7 @@
 #include "ShadingType.h"
 #include "SceneLighting.h"
 #include "ShaderTools.h"
+#include "Profiler.h"
 
 #include <iostream>
 #include <cmath>
@@ -90,15 +91,12 @@ void RenderPipeline3D::RunPoints(
 	Camera& camera,
 	SceneLighting& lights)
 {
-	//VertexShaderIn vertIn(
-	//	surface,
-	//	vbo.Vertices(vbo.Indices(i)),
-	//	model,
-	//	camera
-	//);
+	Profiler profiler;
 
 	for (size_t i = 0; i < vbo.IndicesSize(); i++)
 	{
+		profiler.ResetTimer();
+
 		Vertex4D vert = 
 			ShaderTools::SimpleVertexShader(
 				surface,
@@ -107,15 +105,40 @@ void RenderPipeline3D::RunPoints(
 				camera
 			);
 
+		//VertexShaderIn vertIn(
+		//	&surface,
+		//	&vbo.Vertices(vbo.Indices(i)),
+		//	&model,
+		//	&camera
+		//);
+		//VertexShaderOut vertOut;
+		//ShaderTools::SimpleVertexShader(vertIn, vertOut);
+
+		profiler.AddTiming("Vertex Shader");
+
 		if (RasteringTools::PassesClipTest(vert))
 		{
 			continue;
 		}
 
+		//if (RasteringTools::PassesClipTest(vertOut))
+		//{
+		//	continue;
+		//}
+
+		profiler.AddTiming("Clip Test");
+
 		RasteringTools::TranformToRasterSpace(
 			vert,
 			camera
 		);
+
+		//RasteringTools::TranformToRasterSpace(
+		//	vertOut,
+		//	camera
+		//);
+
+		profiler.AddTiming("Raster Space");
 
 		RasteringTools::PointRasteriser(
 			surface,
@@ -124,7 +147,25 @@ void RenderPipeline3D::RunPoints(
 			vert,
 			lights
 		);
+
+		//Vertex4D oV1(
+		//	vbo.Vertices(vbo.Indices(i)).Position
+		//);
+		//PointRasteriserIn rastIn(
+		//	&surface,
+		//	&pipelineConfiguration,
+		//	&camera,
+		//	&Material(),
+		//	&lights,
+		//	&vertOut.vertex,
+		//	&oV1
+		//);
+		//RasteringTools::PointRasteriser(rastIn);
+
+		profiler.AddTiming("Point Raster");
 	}
+
+	profiler.PrintTimings();
 }
 
 void RenderPipeline3D::RunLines(
@@ -134,8 +175,12 @@ void RenderPipeline3D::RunLines(
 	Camera& camera,
 	SceneLighting& lights)
 {
+	Profiler profiler;
+
 	for (size_t i = 0; i < vbo.IndicesSize() - 1; i += 2)
 	{
+		profiler.ResetTimer();
+
 		Vertex4D vert1 =
 			ShaderTools::SimpleVertexShader(
 				surface,
@@ -151,11 +196,15 @@ void RenderPipeline3D::RunLines(
 				camera
 			);
 
+		profiler.AddTiming("Vertex Shader");
+
 		if (!RasteringTools::PassesClipTest(vert1) &&
 			!RasteringTools::PassesClipTest(vert2))
 		{
 			continue;
 		}
+
+		profiler.AddTiming("Clip Test");
 
 		RasteringTools::TranformToRasterSpace(
 			vert1,
@@ -166,6 +215,8 @@ void RenderPipeline3D::RunLines(
 			vert2,
 			camera
 		);
+
+		profiler.AddTiming("Raster Space");
 
 		RasteringTools::LineRasteriser(
 			surface,
@@ -175,7 +226,11 @@ void RenderPipeline3D::RunLines(
 			vert2,
 			lights
 		);
+
+		profiler.AddTiming("Line Raster");
 	}
+
+	profiler.PrintTimings();
 }
 
 void RenderPipeline3D::RunTriangles(
@@ -186,8 +241,12 @@ void RenderPipeline3D::RunTriangles(
 	Material& material,
 	SceneLighting& lights)
 {
+	Profiler profiler;
+
 	for (size_t i = 0; i < vbo.IndicesSize() - 2; i += 3)
 	{
+		profiler.ResetTimer();
+
 		Vertex4D vert1 =
 			ShaderTools::SimpleVertexShader(
 				surface,
@@ -210,12 +269,16 @@ void RenderPipeline3D::RunTriangles(
 				camera
 			);
 
+		profiler.AddTiming("Vertex Shader");
+
 		if (!RasteringTools::PassesClipTest(vert1) &&
 			!RasteringTools::PassesClipTest(vert2) &&
 			!RasteringTools::PassesClipTest(vert3))
 		{
 			continue;
 		}
+
+		profiler.AddTiming("Clip Test");
 
 		Vertex4D screenSpaceV1(vert1);
 		Vertex4D screenSpaceV2(vert2);
@@ -234,6 +297,8 @@ void RenderPipeline3D::RunTriangles(
 			camera
 		);
 
+		profiler.AddTiming("Raster Space");
+
 		RasteringTools::TriangleRasteriser(
 			surface,
 			pipelineConfiguration,
@@ -247,7 +312,11 @@ void RenderPipeline3D::RunTriangles(
 			material,
 			lights
 		);
+
+		profiler.AddTiming("Tri Raster");
 	}
+
+	profiler.PrintTimings();
 }
 
 void RenderPipeline3D::RunQuads(
