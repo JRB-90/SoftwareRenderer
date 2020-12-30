@@ -179,6 +179,10 @@ void ShaderTools::PixelShaderNormal(RenderSurface& surface,
 	);
 }
 
+// TODO - Change these to only have a normal attribute and get the calling function to calc the
+//        flat normal and pass it in as the normal, that I don't have to duplicate the flat
+//        and phong?
+
 void ShaderTools::PixelShaderFlat(
 	RenderSurface& surface,
 	Camera& camera,
@@ -200,13 +204,12 @@ void ShaderTools::PixelShaderFlat(
 	}
 
 	Color ambientLight = lights.GetAmbientLight().GetColor() * lights.GetAmbientLight().Strength();
-	Vector3D norm = Vector3D(normal.X(), normal.Y(), normal.Z());
 	Vector3D flatNormal = Vector3D(faceNormal.X(), faceNormal.Y(), faceNormal.Z()).Normalised();
 	Vector3D lightDir = lights.GetDirectionalLights()[0].Direction().Normalised() * -1.0;
 
 	double intensity =
 		std::max(
-			norm.Dot(lightDir),
+			flatNormal.Dot(lightDir),
 			0.0
 		);
 
@@ -237,4 +240,40 @@ void ShaderTools::PixelShaderPhong(
 	Material& material,
 	SceneLighting& lights)
 {
+	Color matAmbient = material.Ambient();
+	Color matDiffuse = material.Difffuse();
+
+	if (material.GetTexture().Height() > 0 &&
+		material.GetTexture().Width() > 0)
+	{
+		matAmbient = interpolatedColor * 0.4;
+		matDiffuse = interpolatedColor;
+	}
+
+	Color ambientLight = lights.GetAmbientLight().GetColor() * lights.GetAmbientLight().Strength();
+	Vector3D norm = Vector3D(normal.X(), normal.Y(), normal.Z());
+	Vector3D lightDir = lights.GetDirectionalLights()[0].Direction().Normalised() * -1.0;
+
+	double intensity =
+		std::max(
+			norm.Dot(lightDir),
+			0.0
+		);
+
+	if (intensity > 0.5)
+	{
+		int test = 0;
+	}
+
+	Color diffuseLight = lights.GetDirectionalLights()[0].GetColor() * intensity;
+
+	Color ambient = matAmbient * ambientLight;
+	Color diffuse = matDiffuse * diffuseLight;
+	Color finalColor = ambient + diffuse;
+
+	surface.SetPixelValue(
+		fragment.X(),
+		fragment.Y(),
+		finalColor
+	);
 }

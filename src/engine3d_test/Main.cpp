@@ -89,9 +89,10 @@ void SetupScene()
 			100.0,
 			100.0,
 			100.0,
-			Material(brickTexture, ShadingType::Flat),
-			//Material(Color(Color::Red), ShadingType::Flat),
-			false
+			//Material(brickTexture, ShadingType::Flat),
+			//false
+			Material(Color(Color::Red), ShadingType::Phong),
+			true
 		)
 	);
 

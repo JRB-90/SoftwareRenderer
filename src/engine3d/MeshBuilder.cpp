@@ -47,40 +47,40 @@ Mesh3D MeshBuilder::BuildCube(
 		verticesSq =
 		{
 			// Front Verts
-			Vertex3D(Vector3D(-halfWidth, halfHeight, halfDepth), Vector2D(0.26, 0.34), Vector3D(0, 0, 1).Normalised(), material.Difffuse()),		// F_TL
-			Vertex3D(Vector3D(halfWidth, halfHeight, halfDepth), Vector2D(0.49, 0.34), Vector3D(0, 0, 1).Normalised(), material.Difffuse()),		// F_TR
-			Vertex3D(Vector3D(halfWidth, -halfHeight, halfDepth), Vector2D(0.49, 0.65), Vector3D(0, 0, 1).Normalised(), material.Difffuse()),		// F_BR
-			Vertex3D(Vector3D(-halfWidth, -halfHeight, halfDepth), Vector2D(0.26, 0.65), Vector3D(0, 0, 1).Normalised(), material.Difffuse()),		// F_BL
+			Vertex3D(Vector3D(-halfWidth, halfHeight, halfDepth), Vector2D(0.26, 0.34), Vector3D(-1, 1, 1).Normalised(), material.Difffuse()),		// F_TL
+			Vertex3D(Vector3D(halfWidth, halfHeight, halfDepth), Vector2D(0.49, 0.34), Vector3D(1, 1, 1).Normalised(), material.Difffuse()),		// F_TR
+			Vertex3D(Vector3D(halfWidth, -halfHeight, halfDepth), Vector2D(0.49, 0.65), Vector3D(1, -1, 1).Normalised(), material.Difffuse()),		// F_BR
+			Vertex3D(Vector3D(-halfWidth, -halfHeight, halfDepth), Vector2D(0.26, 0.65), Vector3D(-1, -1, 1).Normalised(), material.Difffuse()),	// F_BL
 
 			// Back Verts
-			Vertex3D(Vector3D(halfWidth, halfHeight, -halfDepth), Vector2D(0.76, 0.34), Vector3D(0, 0, -1).Normalised(), material.Difffuse()),		// B_TL
-			Vertex3D(Vector3D(-halfWidth, halfHeight, -halfDepth), Vector2D(0.99, 0.34), Vector3D(0, 0, -1).Normalised(), material.Difffuse()),		// B_TR
-			Vertex3D(Vector3D(-halfWidth, -halfHeight, -halfDepth), Vector2D(0.99, 0.65), Vector3D(0, 0, -1).Normalised(), material.Difffuse()),	// B_BR
-			Vertex3D(Vector3D(halfWidth, -halfHeight, -halfDepth), Vector2D(0.76, 0.65), Vector3D(0, 0, -1).Normalised(), material.Difffuse()),		// B_BL
+			Vertex3D(Vector3D(halfWidth, halfHeight, -halfDepth), Vector2D(0.76, 0.34), Vector3D(1, 1, -1).Normalised(), material.Difffuse()),		// B_TL
+			Vertex3D(Vector3D(-halfWidth, halfHeight, -halfDepth), Vector2D(0.99, 0.34), Vector3D(-1, 1, -1).Normalised(), material.Difffuse()),	// B_TR
+			Vertex3D(Vector3D(-halfWidth, -halfHeight, -halfDepth), Vector2D(0.99, 0.65), Vector3D(-1, -1, -1).Normalised(), material.Difffuse()),	// B_BR
+			Vertex3D(Vector3D(halfWidth, -halfHeight, -halfDepth), Vector2D(0.76, 0.65), Vector3D(1, -1, -1).Normalised(), material.Difffuse()),	// B_BL
 
 			// Left Verts
-			Vertex3D(Vector3D(-halfWidth, halfHeight, -halfDepth), Vector2D(0.01, 0.34), Vector3D(-1, 0, 0).Normalised(), material.Difffuse()),		// L_TL
-			Vertex3D(Vector3D(-halfWidth, halfHeight, halfDepth), Vector2D(0.24, 0.34), Vector3D(-1, 0, 0).Normalised(), material.Difffuse()),		// L_TR
-			Vertex3D(Vector3D(-halfWidth, -halfHeight, halfDepth), Vector2D(0.24, 0.65), Vector3D(-1, 0, 0).Normalised(), material.Difffuse()),		// L_BR
-			Vertex3D(Vector3D(-halfWidth, -halfHeight, -halfDepth), Vector2D(0.01, 0.65), Vector3D(-1, 0, 0).Normalised(), material.Difffuse()),	// L_BL
+			Vertex3D(Vector3D(-halfWidth, halfHeight, -halfDepth), Vector2D(0.01, 0.34), Vector3D(-1, 1, -1).Normalised(), material.Difffuse()),	// L_TL
+			Vertex3D(Vector3D(-halfWidth, halfHeight, halfDepth), Vector2D(0.24, 0.34), Vector3D(-1, 1, 1).Normalised(), material.Difffuse()),		// L_TR
+			Vertex3D(Vector3D(-halfWidth, -halfHeight, halfDepth), Vector2D(0.24, 0.65), Vector3D(-1, -1, 1).Normalised(), material.Difffuse()),	// L_BR
+			Vertex3D(Vector3D(-halfWidth, -halfHeight, -halfDepth), Vector2D(0.01, 0.65), Vector3D(-1, -1, -1).Normalised(), material.Difffuse()),	// L_BL
 
 			// Right Verts
-			Vertex3D(Vector3D(halfWidth, halfHeight, halfDepth), Vector2D(0.51, 0.34), Vector3D(1, 0, 0).Normalised(), material.Difffuse()),		// R_TL
-			Vertex3D(Vector3D(halfWidth, halfHeight, -halfDepth), Vector2D(0.74, 0.34), Vector3D(1, 0, 0).Normalised(), material.Difffuse()),		// R_TR
-			Vertex3D(Vector3D(halfWidth, -halfHeight, -halfDepth), Vector2D(0.74, 0.65), Vector3D(1, 0, 0).Normalised(), material.Difffuse()),		// R_BR
-			Vertex3D(Vector3D(halfWidth, -halfHeight, halfDepth), Vector2D(0.51, 0.65), Vector3D(1, 0, 0).Normalised(), material.Difffuse()),		// R_BL
+			Vertex3D(Vector3D(halfWidth, halfHeight, halfDepth), Vector2D(0.51, 0.34), Vector3D(1, 1, 1).Normalised(), material.Difffuse()),		// R_TL
+			Vertex3D(Vector3D(halfWidth, halfHeight, -halfDepth), Vector2D(0.74, 0.34), Vector3D(1, 1, -1).Normalised(), material.Difffuse()),		// R_TR
+			Vertex3D(Vector3D(halfWidth, -halfHeight, -halfDepth), Vector2D(0.74, 0.65), Vector3D(1, -1, -1).Normalised(), material.Difffuse()),	// R_BR
+			Vertex3D(Vector3D(halfWidth, -halfHeight, halfDepth), Vector2D(0.51, 0.65), Vector3D(1, -1, 1).Normalised(), material.Difffuse()),		// R_BL
 
 			// Bottom Verts
-			Vertex3D(Vector3D(-halfWidth, -halfHeight, halfDepth), Vector2D(0.26, 0.67), Vector3D(0, -1, 0).Normalised(), material.Difffuse()),		// Bo_TL
-			Vertex3D(Vector3D(halfWidth, -halfHeight, halfDepth), Vector2D(0.49, 0.67), Vector3D(0, -1, 0).Normalised(), material.Difffuse()),		// Bo_TR
-			Vertex3D(Vector3D(halfWidth, -halfHeight, -halfDepth), Vector2D(0.49, 0.99), Vector3D(0, -1, 0).Normalised(), material.Difffuse()),		// Bo_BR
-			Vertex3D(Vector3D(-halfWidth, -halfHeight, -halfDepth), Vector2D(0.26, 0.99), Vector3D(0, -1, 0).Normalised(), material.Difffuse()),	// Bo_BL
+			Vertex3D(Vector3D(-halfWidth, -halfHeight, halfDepth), Vector2D(0.26, 0.67), Vector3D(-1, -1, 1).Normalised(), material.Difffuse()),	// Bo_TL
+			Vertex3D(Vector3D(halfWidth, -halfHeight, halfDepth), Vector2D(0.49, 0.67), Vector3D(1, -1, 1).Normalised(), material.Difffuse()),		// Bo_TR
+			Vertex3D(Vector3D(halfWidth, -halfHeight, -halfDepth), Vector2D(0.49, 0.99), Vector3D(1, -1, 0).Normalised(), material.Difffuse()),		// Bo_BR
+			Vertex3D(Vector3D(-halfWidth, -halfHeight, -halfDepth), Vector2D(0.26, 0.99), Vector3D(-1, -1, 0).Normalised(), material.Difffuse()),	// Bo_BL
 
 			// Top Verts
-			Vertex3D(Vector3D(-halfWidth, halfHeight, -halfDepth), Vector2D(0.26, 0.01), Vector3D(0, 1, 0).Normalised(), material.Difffuse()),		// B_TL
-			Vertex3D(Vector3D(halfWidth, halfHeight, -halfDepth), Vector2D(0.49, 0.01), Vector3D(0, 1, 0).Normalised(), material.Difffuse()),		// B_TR
-			Vertex3D(Vector3D(halfWidth, halfHeight, halfDepth), Vector2D(0.49, 0.32), Vector3D(0, 1, 0).Normalised(), material.Difffuse()),		// T_BR
-			Vertex3D(Vector3D(-halfWidth, halfHeight, halfDepth), Vector2D(0.26, 0.32), Vector3D(0, 1, 0).Normalised(), material.Difffuse()),		// T_BL
+			Vertex3D(Vector3D(-halfWidth, halfHeight, -halfDepth), Vector2D(0.26, 0.01), Vector3D(-1, 1, -1).Normalised(), material.Difffuse()),	// B_TL
+			Vertex3D(Vector3D(halfWidth, halfHeight, -halfDepth), Vector2D(0.49, 0.01), Vector3D(1, 1, -1).Normalised(), material.Difffuse()),		// B_TR
+			Vertex3D(Vector3D(halfWidth, halfHeight, halfDepth), Vector2D(0.49, 0.32), Vector3D(1, 1, 1).Normalised(), material.Difffuse()),		// T_BR
+			Vertex3D(Vector3D(-halfWidth, halfHeight, halfDepth), Vector2D(0.26, 0.32), Vector3D(-1, 1, 1).Normalised(), material.Difffuse()),		// T_BL
 		};
 	}
 	else
@@ -88,40 +88,40 @@ Mesh3D MeshBuilder::BuildCube(
 		verticesSq =
 		{
 			// Front Verts
-			Vertex3D(Vector3D(-halfWidth, halfHeight, halfDepth), Vector2D(0.01, 0.01), Vector3D(0, 0, 1).Normalised(), material.Difffuse()),		// F_TL
-			Vertex3D(Vector3D(halfWidth, halfHeight, halfDepth), Vector2D(0.99, 0.01), Vector3D(0, 0, 1).Normalised(), material.Difffuse()),		// F_TR
-			Vertex3D(Vector3D(halfWidth, -halfHeight, halfDepth), Vector2D(0.99, 0.99), Vector3D(0, 0, 1).Normalised(), material.Difffuse()),		// F_BR
-			Vertex3D(Vector3D(-halfWidth, -halfHeight, halfDepth), Vector2D(0.01, 0.99), Vector3D(0, 0, 1).Normalised(), material.Difffuse()),		// F_BL
+			Vertex3D(Vector3D(-halfWidth, halfHeight, halfDepth), Vector2D(0.01, 0.01), Vector3D(-1, 1, 1).Normalised(), material.Difffuse()),		// F_TL
+			Vertex3D(Vector3D(halfWidth, halfHeight, halfDepth), Vector2D(0.99, 0.01), Vector3D(1, 1, 1).Normalised(), material.Difffuse()),		// F_TR
+			Vertex3D(Vector3D(halfWidth, -halfHeight, halfDepth), Vector2D(0.99, 0.99), Vector3D(1, -1, 1).Normalised(), material.Difffuse()),		// F_BR
+			Vertex3D(Vector3D(-halfWidth, -halfHeight, halfDepth), Vector2D(0.01, 0.99), Vector3D(-1, -1, 1).Normalised(), material.Difffuse()),		// F_BL
 
 			// Back Verts
-			Vertex3D(Vector3D(halfWidth, halfHeight, -halfDepth), Vector2D(0.01, 0.01), Vector3D(0, 0, -1).Normalised(), material.Difffuse()),		// B_TL
-			Vertex3D(Vector3D(-halfWidth, halfHeight, -halfDepth), Vector2D(0.99, 0.01), Vector3D(0, 0, -1).Normalised(), material.Difffuse()),		// B_TR
-			Vertex3D(Vector3D(-halfWidth, -halfHeight, -halfDepth), Vector2D(0.99, 0.99), Vector3D(0, 0, -1).Normalised(), material.Difffuse()),	// B_BR
-			Vertex3D(Vector3D(halfWidth, -halfHeight, -halfDepth), Vector2D(0.01, 0.99), Vector3D(0, 0, -1).Normalised(), material.Difffuse()),		// B_BL
+			Vertex3D(Vector3D(halfWidth, halfHeight, -halfDepth), Vector2D(0.01, 0.01), Vector3D(-1, 1, -1).Normalised(), material.Difffuse()),		// B_TL
+			Vertex3D(Vector3D(-halfWidth, halfHeight, -halfDepth), Vector2D(0.99, 0.01), Vector3D(-1, 1, 1).Normalised(), material.Difffuse()),		// B_TR
+			Vertex3D(Vector3D(-halfWidth, -halfHeight, -halfDepth), Vector2D(0.99, 0.99), Vector3D(-1, -1, 1).Normalised(), material.Difffuse()),	// B_BR
+			Vertex3D(Vector3D(halfWidth, -halfHeight, -halfDepth), Vector2D(0.01, 0.99), Vector3D(-1, -1, -1).Normalised(), material.Difffuse()),		// B_BL
 
 			// Left Verts
-			Vertex3D(Vector3D(-halfWidth, halfHeight, -halfDepth), Vector2D(0.01, 0.01), Vector3D(-1, 0, 0).Normalised(), material.Difffuse()),		// L_TL
-			Vertex3D(Vector3D(-halfWidth, halfHeight, halfDepth), Vector2D(0.99, 0.01), Vector3D(-1, 0, 0).Normalised(), material.Difffuse()),		// L_TR
-			Vertex3D(Vector3D(-halfWidth, -halfHeight, halfDepth), Vector2D(0.99, 0.99), Vector3D(-1, 0, 0).Normalised(), material.Difffuse()),		// L_BR
-			Vertex3D(Vector3D(-halfWidth, -halfHeight, -halfDepth), Vector2D(0.01, 0.99), Vector3D(-1, 0, 0).Normalised(), material.Difffuse()),	// L_BL
+			Vertex3D(Vector3D(-halfWidth, halfHeight, -halfDepth), Vector2D(0.01, 0.01), Vector3D(-1, 1, -1).Normalised(), material.Difffuse()),		// L_TL
+			Vertex3D(Vector3D(-halfWidth, halfHeight, halfDepth), Vector2D(0.99, 0.01), Vector3D(-1, 1, 1).Normalised(), material.Difffuse()),		// L_TR
+			Vertex3D(Vector3D(-halfWidth, -halfHeight, halfDepth), Vector2D(0.99, 0.99), Vector3D(-1, -1, 1).Normalised(), material.Difffuse()),		// L_BR
+			Vertex3D(Vector3D(-halfWidth, -halfHeight, -halfDepth), Vector2D(0.01, 0.99), Vector3D(-1, -1, -1).Normalised(), material.Difffuse()),	// L_BL
 
 			// Right Verts
-			Vertex3D(Vector3D(halfWidth, halfHeight, halfDepth), Vector2D(0.01, 0.01), Vector3D(1, 0, 0).Normalised(), material.Difffuse()),		// R_TL
-			Vertex3D(Vector3D(halfWidth, halfHeight, -halfDepth), Vector2D(0.99, 0.01), Vector3D(1, 0, 0).Normalised(), material.Difffuse()),		// R_TR
-			Vertex3D(Vector3D(halfWidth, -halfHeight, -halfDepth), Vector2D(0.99, 0.99), Vector3D(1, 0, 0).Normalised(), material.Difffuse()),		// R_BR
-			Vertex3D(Vector3D(halfWidth, -halfHeight, halfDepth), Vector2D(0.01, 0.99), Vector3D(1, 0, 0).Normalised(), material.Difffuse()),		// R_BL
+			Vertex3D(Vector3D(halfWidth, halfHeight, halfDepth), Vector2D(0.01, 0.01), Vector3D(1, 1, 1).Normalised(), material.Difffuse()),		// R_TL
+			Vertex3D(Vector3D(halfWidth, halfHeight, -halfDepth), Vector2D(0.99, 0.01), Vector3D(1, 1, -1).Normalised(), material.Difffuse()),		// R_TR
+			Vertex3D(Vector3D(halfWidth, -halfHeight, -halfDepth), Vector2D(0.99, 0.99), Vector3D(1, -1, -1).Normalised(), material.Difffuse()),		// R_BR
+			Vertex3D(Vector3D(halfWidth, -halfHeight, halfDepth), Vector2D(0.01, 0.99), Vector3D(1, -1, 1).Normalised(), material.Difffuse()),		// R_BL
 
 			// Bottom Verts
-			Vertex3D(Vector3D(-halfWidth, -halfHeight, halfDepth), Vector2D(0.01, 0.01), Vector3D(0, -1, 0).Normalised(), material.Difffuse()),		// Bo_TL
-			Vertex3D(Vector3D(halfWidth, -halfHeight, halfDepth), Vector2D(0.99, 0.01), Vector3D(0, -1, 0).Normalised(), material.Difffuse()),		// Bo_TR
-			Vertex3D(Vector3D(halfWidth, -halfHeight, -halfDepth), Vector2D(0.99, 0.99), Vector3D(0, -1, 0).Normalised(), material.Difffuse()),		// Bo_BR
-			Vertex3D(Vector3D(-halfWidth, -halfHeight, -halfDepth), Vector2D(0.01, 0.99), Vector3D(0, -1, 0).Normalised(), material.Difffuse()),	// Bo_BL
+			Vertex3D(Vector3D(-halfWidth, -halfHeight, halfDepth), Vector2D(0.01, 0.01), Vector3D(-1, -1, 1).Normalised(), material.Difffuse()),		// Bo_TL
+			Vertex3D(Vector3D(halfWidth, -halfHeight, halfDepth), Vector2D(0.99, 0.01), Vector3D(1, -1, 1).Normalised(), material.Difffuse()),		// Bo_TR
+			Vertex3D(Vector3D(halfWidth, -halfHeight, -halfDepth), Vector2D(0.99, 0.99), Vector3D(1, -1, 0).Normalised(), material.Difffuse()),		// Bo_BR
+			Vertex3D(Vector3D(-halfWidth, -halfHeight, -halfDepth), Vector2D(0.01, 0.99), Vector3D(-1, -1, 0).Normalised(), material.Difffuse()),	// Bo_BL
 
 			// Top Verts
-			Vertex3D(Vector3D(-halfWidth, halfHeight, -halfDepth), Vector2D(0.01, 0.01), Vector3D(0, 1, 0).Normalised(), material.Difffuse()),		// B_TL
-			Vertex3D(Vector3D(halfWidth, halfHeight, -halfDepth), Vector2D(0.99, 0.01), Vector3D(0, 1, 0).Normalised(), material.Difffuse()),		// B_TR
-			Vertex3D(Vector3D(halfWidth, halfHeight, halfDepth), Vector2D(0.99, 0.99), Vector3D(0, 1, 0).Normalised(), material.Difffuse()),		// T_BR
-			Vertex3D(Vector3D(-halfWidth, halfHeight, halfDepth), Vector2D(0.01, 0.99), Vector3D(0, 1, 0).Normalised(), material.Difffuse()),		// T_BL
+			Vertex3D(Vector3D(-halfWidth, halfHeight, -halfDepth), Vector2D(0.01, 0.01), Vector3D(-1, 1, -1).Normalised(), material.Difffuse()),		// B_TL
+			Vertex3D(Vector3D(halfWidth, halfHeight, -halfDepth), Vector2D(0.99, 0.01), Vector3D(1, 1, -1).Normalised(), material.Difffuse()),		// B_TR
+			Vertex3D(Vector3D(halfWidth, halfHeight, halfDepth), Vector2D(0.99, 0.99), Vector3D(1, 1, 1).Normalised(), material.Difffuse()),		// T_BR
+			Vertex3D(Vector3D(-halfWidth, halfHeight, halfDepth), Vector2D(0.01, 0.99), Vector3D(-1, 1, 1).Normalised(), material.Difffuse()),		// T_BL
 		};
 	}
 
