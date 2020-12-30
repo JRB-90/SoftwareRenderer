@@ -62,12 +62,13 @@ void Profiler::PrintTimings()
 			}
 		}
 		std::printf(
-			"%s\t\t\t%i\t\t%.3f\t\t%.3f\t\t%.3f\n", 
+			"%s\t\t\t%i\t\t%.3f\t\t%.3f\t\t%.3f\t\t%.3f\n", 
 			pair.first.c_str(),
 			pair.second.size(),
 			sum / (double)pair.second.size(),
 			min,
-			max
+			max,
+			sum
 		);
 	}
 }

@@ -117,6 +117,18 @@ void ShaderTools::PixelShader(
 			interpolatedColor
 		);
 		break;
+	case ShadingType::Normal:
+		PixelShaderNormal(
+			surface,
+			camera,
+			fragment,
+			normal,
+			faceNormal,
+			interpolatedColor,
+			material,
+			lights
+		);
+		break;
 	case ShadingType::Flat:
 		PixelShaderFlat(
 			surface,
@@ -145,6 +157,28 @@ void ShaderTools::PixelShader(
 	}
 }
 
+void ShaderTools::PixelShaderNormal(RenderSurface& surface,
+	Camera& camera,
+	Vector4D& fragment,
+	Vector4D& normal,
+	Vector4D& faceNormal,
+	Color& interpolatedColor,
+	Material& material,
+	SceneLighting& lights)
+{
+
+	surface.SetPixelValue(
+		fragment.X(),
+		fragment.Y(),
+		Color(
+			(normal.X() + 1.0) / 2.0,
+			(normal.Y() + 1.0) / 2.0,
+			(normal.Z() + 1.0) / 2.0,
+			1.0
+		)
+	);
+}
+
 void ShaderTools::PixelShaderFlat(
 	RenderSurface& surface,
 	Camera& camera,
@@ -155,6 +189,16 @@ void ShaderTools::PixelShaderFlat(
 	Material& material,
 	SceneLighting& lights)
 {
+	Color matAmbient = material.Ambient();
+	Color matDiffuse = material.Difffuse();
+
+	if (material.GetTexture().Height() > 0 &&
+		material.GetTexture().Width() > 0)
+	{
+		matAmbient = interpolatedColor * 0.4;
+		matDiffuse = interpolatedColor;
+	}
+
 	Color ambientLight = lights.GetAmbientLight().GetColor() * lights.GetAmbientLight().Strength();
 	Vector3D norm = Vector3D(normal.X(), normal.Y(), normal.Z());
 	Vector3D flatNormal = Vector3D(faceNormal.X(), faceNormal.Y(), faceNormal.Z()).Normalised();
@@ -172,9 +216,9 @@ void ShaderTools::PixelShaderFlat(
 	}
 
 	Color diffuseLight = lights.GetDirectionalLights()[0].GetColor() * intensity;
-	Color ambient = material.Ambient() * ambientLight;
-	Color diffuse = material.Difffuse() * diffuseLight;
 
+	Color ambient = matAmbient * ambientLight;
+	Color diffuse = matDiffuse * diffuseLight;
 	Color finalColor = ambient + diffuse;
 
 	surface.SetPixelValue(
@@ -182,17 +226,6 @@ void ShaderTools::PixelShaderFlat(
 		fragment.Y(),
 		finalColor
 	);
-
-	//surface.SetPixelValue(
-	//	fragment.X(),
-	//	fragment.Y(),
-	//	Color(
-	//		(normal.X() + 1.0) / 2.0,
-	//		(normal.Y() + 1.0) / 2.0,
-	//		(normal.Z() + 1.0) / 2.0,
-	//		1.0
-	//	)
-	//);
 }
 
 void ShaderTools::PixelShaderPhong(

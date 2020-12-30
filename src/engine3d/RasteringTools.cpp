@@ -13,6 +13,7 @@
 #include "PipelineConfiguration3D.h"
 #include "ShaderTools.h"
 #include "InterpolationTools.h"
+#include "Profiler.h"
 
 using namespace softengine;
 
@@ -216,6 +217,8 @@ void RasteringTools::TriangleRasteriser(
 	Material& material,
 	SceneLighting& lights)
 {
+	Profiler profiler;
+
 	Vector3D vec3_1 = Vector3D(vertex1.Position.X(), vertex1.Position.Y(), vertex1.Position.Z());
 	Vector3D vec3_2 = Vector3D(vertex2.Position.X(), vertex2.Position.Y(), vertex2.Position.Z());
 	Vector3D vec3_3 = Vector3D(vertex3.Position.X(), vertex3.Position.Y(), vertex3.Position.Z());
@@ -352,6 +355,8 @@ void RasteringTools::TriangleRasteriser(
 				);
 			}
 
+			profiler.ResetTimer();
+
 			ShaderTools::PixelShader(
 				surface,
 				camera,
@@ -370,6 +375,10 @@ void RasteringTools::TriangleRasteriser(
 				lights,
 				pipelineConfiguration.depthCheckMode
 			);
+
+			profiler.AddTiming("Pixel Shader");
 		}
 	}
+
+	profiler.PrintTimings();
 }

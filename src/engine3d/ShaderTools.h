@@ -89,6 +89,17 @@ namespace softengine
 			DepthCheckMode depthCheckMode
 		);
 
+		static void PixelShaderNormal(
+			RenderSurface& surface,
+			Camera& camera,
+			Vector4D& fragment,
+			Vector4D& normal,
+			Vector4D& faceNormal,
+			Color& interpolatedColor,
+			Material& material,
+			SceneLighting& lights
+		);
+
 		static void PixelShaderFlat(
 			RenderSurface& surface,
 			Camera& camera,

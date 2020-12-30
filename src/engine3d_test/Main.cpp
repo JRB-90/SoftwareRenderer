@@ -115,8 +115,8 @@ void SetupScene()
 			100.0,
 			100.0,
 			100.0,
-			Material(skyboxTexture, ShadingType::Flat)
-			//Material(Color(Color::Red))
+			//Material(skyboxTexture, ShadingType::Normal)
+			Material(Color(Color::Red), ShadingType::Flat)
 		)
 	);
 
