@@ -7,6 +7,7 @@
 #include "Light.h"
 #include "AmbientLight.h"
 #include "DirectionalLight.h"
+#include "ModelImporter.h"
 
 #include <iostream>
 #include <random>
@@ -46,7 +47,7 @@ int main(int argc, const char* argv[])
 			0.1,
 			10000.0
 		);
-	camera->Position(Frame3D(Vector3D(0, 0, 350.0)));
+	camera->Position(Frame3D(Vector3D(0, 0, 10.0)));
 
 	renderingEngine =
 		std::make_shared<RenderingEngine3D>(
@@ -85,16 +86,20 @@ void SetupScene()
 	Texture nullTexture;
 
 	scene->Meshes().push_back(
-		MeshBuilder::BuildCube(
-			100.0,
-			100.0,
-			100.0,
-			//Material(brickTexture, ShadingType::Flat),
-			//false
-			Material(Color(Color::Red), ShadingType::Phong),
-			true
-		)
+		ModelImporter::LoadModelResource("models/suzanne.stl", true, false)
 	);
+
+	//scene->Meshes().push_back(
+	//	MeshBuilder::BuildCube(
+	//		100.0,
+	//		100.0,
+	//		100.0,
+	//		//Material(brickTexture, ShadingType::Flat),
+	//		//false
+	//		Material(Color(Color::Red), ShadingType::Phong),
+	//		true
+	//	)
+	//);
 
 	//scene->Meshes().push_back(
 	//	MeshBuilder::BuildFrame(
@@ -117,7 +122,7 @@ void SetupScene()
 }
 
 double modelSpeed = 3.0;
-double speed = 10.0;
+double speed = 0.1;
 
 void Update(
 	InputState inputState,
@@ -160,10 +165,11 @@ void Update(
 	}
 
 	camera->Position(camera->Position() * camMove);
+	camera->LookAt(Vector3D(0, 0, 0), Vector3D(0, 1, 0));
 
-	scene->Meshes()[0].Transform(
-		scene->Meshes()[0].Transform() * Rotation3D((-modelSpeed * delta) / 3.0, (modelSpeed * delta) / 3.0, 0.0)
-	);
+	//scene->Meshes()[0].Transform(
+	//	scene->Meshes()[0].Transform() * Rotation3D((-modelSpeed * delta) / 3.0, (modelSpeed * delta) / 3.0, 0.0)
+	//);
 
 	//scene->Meshes()[0].Transform(
 	//	scene->Meshes()[0].Transform() * Frame3D(Vector3D(0.0, 0.0, speed))

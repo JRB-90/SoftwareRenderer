@@ -30,8 +30,25 @@ namespace softengine
 		Mesh3D(
 			std::vector<size_t> indices,
 			std::vector<Vertex3D> vertices,
+			Material& material
+		);
+		Mesh3D(
+			std::vector<size_t> indices,
+			std::vector<Vertex3D> vertices,
 			Frame3D& transform,
 			DrawType drawType
+		);
+		Mesh3D(
+			std::vector<size_t> indices,
+			std::vector<Vertex3D> vertices,
+			DrawType drawType,
+			Material& material
+		);
+		Mesh3D(
+			std::vector<size_t> indices,
+			std::vector<Vertex3D> vertices,
+			Frame3D& transform,
+			Material& material
 		);
 		Mesh3D(
 			std::vector<size_t> indices,

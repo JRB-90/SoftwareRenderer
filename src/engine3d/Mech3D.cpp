@@ -66,6 +66,22 @@ Mesh3D::Mesh3D(
 }
 
 Mesh3D::Mesh3D(
+	std::vector<size_t> indices, 
+	std::vector<Vertex3D> vertices, 
+	Material& material)
+  :
+	vbo(
+		VBO3D(
+			indices,
+			vertices
+		)
+	),
+	material(material),
+	drawType(DrawType::Triangles)
+{
+}
+
+Mesh3D::Mesh3D(
 	std::vector<size_t> indices,
 	std::vector<Vertex3D> vertices,
 	Frame3D& transform,
@@ -79,6 +95,41 @@ Mesh3D::Mesh3D(
 	),
 	transform(transform),
 	drawType(drawType)
+{
+}
+
+Mesh3D::Mesh3D(
+	std::vector<size_t> indices, 
+	std::vector<Vertex3D> vertices, 
+	DrawType drawType, 
+	Material& material)
+  :
+	vbo(
+		VBO3D(
+			indices,
+			vertices
+		)
+	),
+	drawType(drawType),
+	material(material)
+{
+}
+
+Mesh3D::Mesh3D(
+	std::vector<size_t> indices, 
+	std::vector<Vertex3D> vertices, 
+	Frame3D& transform, 
+	Material& material)
+  :
+	vbo(
+		VBO3D(
+			indices,
+			vertices
+		)
+	),
+	transform(transform),
+	material(material),
+	drawType(DrawType::Triangles)
 {
 }
 

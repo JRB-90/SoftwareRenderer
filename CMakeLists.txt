@@ -9,6 +9,7 @@ add_subdirectory("src/math")
 add_subdirectory("src/engine")
 add_subdirectory("src/engine2d")
 add_subdirectory("src/engine3d")
+add_subdirectory("src/model_importer")
 
 add_subdirectory("src/sdl_test")
 add_subdirectory("src/engine2d_test")
