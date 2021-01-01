@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Profiler.h"
 #include <vector>
 
 namespace softengine
@@ -149,7 +150,7 @@ namespace softengine
 
 		static bool PassesDepthCheck(
 			RenderSurface& surface,
-			Vector4D& fragment,
+			Vector3D& fragment,
 			DepthCheckMode depthCheckMode
 		);
 
@@ -158,10 +159,14 @@ namespace softengine
 			PipelineConfiguration& pipelineConfiguration,
 			Camera& camera,
 			Vertex4D& vertex,
-			SceneLighting& lights
+			SceneLighting& lights,
+			Profiler& profiler
 		);
 
-		static void PointRasteriser(PointRasteriserIn in);
+		static void PointRasteriser(
+			PointRasteriserIn in,
+			Profiler& profiler
+		);
 
 		static void LineRasteriser(
 			RenderSurface& surface,
@@ -169,7 +174,8 @@ namespace softengine
 			Camera& camera,
 			Vertex4D& vertex1,
 			Vertex4D& vertex2,
-			SceneLighting& lights
+			SceneLighting& lights,
+			Profiler& profiler
 		);
 
 		static void TriangleRasteriser(
@@ -183,7 +189,8 @@ namespace softengine
 			Vertex4D& oV2,
 			Vertex4D& oV3,
 			Material& material,
-			SceneLighting& lights
+			SceneLighting& lights,
+			Profiler& profiler
 		);
 	};
 }

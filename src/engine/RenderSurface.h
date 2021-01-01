@@ -38,10 +38,14 @@ namespace softengine
 			int pixelY,
 			Color& color
 		);
-		bool PassesZCheck(
+		double GetZBufferVal(
+			int pixelX,
+			int pixelY
+		);
+		void SetZBufferVal(
 			int pixelX,
 			int pixelY,
-			double zVal
+			double val
 		);
 		SDL_Texture* CreateSDLTexture(SDL_Surface* surface);
 		void RenderTexture(

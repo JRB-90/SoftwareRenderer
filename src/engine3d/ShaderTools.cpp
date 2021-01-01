@@ -17,8 +17,7 @@ using namespace softengine;
 Vertex4D ShaderTools::SimpleVertexShader(
 	RenderSurface& surface, 
 	Vertex3D& vertex, 
-	Matrix4& model, 
-	Camera& camera)
+	Matrix4& mvp)
 {
 	Vector4D vertPosition(
 		vertex.Position.X(),
@@ -34,9 +33,8 @@ Vertex4D ShaderTools::SimpleVertexShader(
 		0.0
 	);
 
-	Matrix4 MVP = camera.ProjectionMatrix() * camera.ViewMatrix() * model;
-	vertPosition = vertPosition * MVP;
-	vertNormal = vertNormal * MVP;
+	vertPosition = vertPosition * mvp;
+	vertNormal = vertNormal * mvp;
 
 	return
 		Vertex4D(
@@ -97,17 +95,10 @@ void ShaderTools::PixelShader(
 	Color& interpolatedColor,
 	Material& material,
 	SceneLighting& lights,
-	DepthCheckMode depthCheckMode)
+	DepthCheckMode depthCheckMode,
+	Profiler& profiler)
 {
-	if (!RasteringTools::PassesDepthCheck(
-		surface,
-		fragment,
-		depthCheckMode)
-		)
-	{
-		return;
-	}
-
+	profiler.ResetTimer();
 	switch (material.GetShadingType())
 	{
 	case ShadingType::None:
@@ -116,6 +107,7 @@ void ShaderTools::PixelShader(
 			fragment.Y(),
 			interpolatedColor
 		);
+		profiler.AddTiming("Shader None");
 		break;
 	case ShadingType::Normal:
 		PixelShaderNormal(
@@ -128,6 +120,7 @@ void ShaderTools::PixelShader(
 			material,
 			lights
 		);
+		profiler.AddTiming("Shader Normal");
 		break;
 	case ShadingType::Flat:
 		PixelShaderFlat(
@@ -140,6 +133,7 @@ void ShaderTools::PixelShader(
 			material,
 			lights
 		);
+		profiler.AddTiming("Shader Flat");
 		break;
 	case ShadingType::Phong:
 		PixelShaderPhong(
@@ -151,6 +145,7 @@ void ShaderTools::PixelShader(
 			material,
 			lights
 		);
+		profiler.AddTiming("Shader Phong");
 		break;
 	default:
 		break;

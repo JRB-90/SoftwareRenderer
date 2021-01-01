@@ -47,7 +47,7 @@ int main(int argc, const char* argv[])
 			0.1,
 			10000.0
 		);
-	camera->Position(Frame3D(Vector3D(0, 0, 10.0)));
+	camera->Position(Frame3D(Vector3D(0, 1, 3.0)));
 
 	renderingEngine =
 		std::make_shared<RenderingEngine3D>(
@@ -105,6 +105,35 @@ void SetupScene()
 	//	MeshBuilder::BuildFrame(
 	//		100.0,
 	//		Frame3D(Vector3D(0, 0, 0))
+	//	)
+	//);
+
+	//std::vector<size_t> planeIndices =
+	//{
+	//	0, 1, 3, 1, 2, 3
+	//};
+
+	//std::vector<Vertex3D> planeVerts =
+	//{
+	//	Vertex3D(Vector3D(-0.5, 0.5, 0.0), Color::White),
+	//	Vertex3D(Vector3D(0.5, 0.5, 0.0), Color::White),
+	//	Vertex3D(Vector3D(0.5, -0.5, 0.0), Color::White),
+	//	Vertex3D(Vector3D(-0.5, -0.5, 0.0), Color::White),
+	//};
+
+	//scene->Meshes().push_back(
+	//	Mesh3D(
+	//		planeIndices,
+	//		planeVerts
+	//	)
+	//);
+
+	//scene->Meshes().push_back(
+	//	Mesh3D(
+	//		planeIndices,
+	//		planeVerts,
+	//		Frame3D(Rotation3D(0, 45, 15)),
+	//		Material(Color(Color::Blue), ShadingType::Flat)
 	//	)
 	//);
 

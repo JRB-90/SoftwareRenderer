@@ -13,7 +13,7 @@
 #include "PipelineConfiguration3D.h"
 #include "ShaderTools.h"
 #include "InterpolationTools.h"
-#include "Profiler.h"
+#include <cmath>
 
 using namespace softengine;
 
@@ -79,19 +79,35 @@ void RasteringTools::TranformToRasterSpace(
 
 bool RasteringTools::PassesDepthCheck(
 	RenderSurface& surface,
-	Vector4D& fragment,
+	Vector3D& fragment,
 	DepthCheckMode depthCheckMode)
 {
+	double zVal = surface.GetZBufferVal(fragment.X(), fragment.Y());
+	if (std::isnan(zVal) ||
+		fragment.Z() < 0)
+	{
+		return false;
+	}
+
 	switch (depthCheckMode)
 	{
 	case DepthCheckMode::NoDepthCheck:
-		return true;
-	case DepthCheckMode::DepthCheckGreaterThan:
-		if (surface.PassesZCheck(
+		surface.SetZBufferVal(
 			fragment.X(),
 			fragment.Y(),
-			fragment.Z()))
+			fragment.Z()
+		);
+
+		return true;
+	case DepthCheckMode::DepthCheckGreaterThan:
+		if (fragment.Z() >= zVal)
 		{
+			surface.SetZBufferVal(
+				fragment.X(),
+				fragment.Y(),
+				fragment.Z()
+			);
+
 			return true;
 		}
 		else
@@ -99,11 +115,14 @@ bool RasteringTools::PassesDepthCheck(
 			return false;
 		}
 	case DepthCheckMode::DepthCheckLessThan:
-		if (!surface.PassesZCheck(
-			fragment.X(),
-			fragment.Y(),
-			fragment.Z()))
+		if (fragment.Z() <= zVal)
 		{
+			surface.SetZBufferVal(
+				fragment.X(),
+				fragment.Y(),
+				fragment.Z()
+			);
+
 			return true;
 		}
 		else
@@ -120,8 +139,22 @@ void RasteringTools::PointRasteriser(
 	PipelineConfiguration& pipelineConfiguration,
 	Camera& camera,
 	Vertex4D& vertex,
-	SceneLighting& lights)
+	SceneLighting& lights,
+	Profiler& profiler)
 {
+	if (!RasteringTools::PassesDepthCheck(
+		surface,
+		Vector3D(
+			vertex.Position.X(),
+			vertex.Position.Y(),
+			vertex.Position.Z()
+		),
+		pipelineConfiguration.depthCheckMode)
+		)
+	{
+		return;
+	}
+
 	ShaderTools::PixelShader(
 		surface,
 		camera,
@@ -131,11 +164,14 @@ void RasteringTools::PointRasteriser(
 		vertex.VertColor,
 		Material(),
 		lights,
-		pipelineConfiguration.depthCheckMode
+		pipelineConfiguration.depthCheckMode,
+		profiler
 	);
 }
 
-void RasteringTools::PointRasteriser(PointRasteriserIn in)
+void RasteringTools::PointRasteriser(
+	PointRasteriserIn in,
+	Profiler& profiler)
 {
 	ShaderTools::PixelShader(
 		*in.surface,
@@ -146,7 +182,8 @@ void RasteringTools::PointRasteriser(PointRasteriserIn in)
 		in.vertex1->VertColor,
 		Material(),
 		*in.lights,
-		in.pipelineConfiguration->depthCheckMode
+		in.pipelineConfiguration->depthCheckMode,
+		profiler
 	);
 }
 
@@ -156,7 +193,8 @@ void RasteringTools::LineRasteriser(
 	Camera& camera,
 	Vertex4D& vertex1,
 	Vertex4D& vertex2,
-	SceneLighting& lights)
+	SceneLighting& lights,
+	Profiler& profiler)
 {
 	double x = vertex1.Position.X();
 	double y = vertex1.Position.Y();
@@ -185,12 +223,26 @@ void RasteringTools::LineRasteriser(
 		y += yInc;
 		z += zInc;
 		double factor = (double)i / (double)steps;
+		Vector4D currentPosition(x, y, z, 1.0);
+
+		if (!RasteringTools::PassesDepthCheck(
+			surface,
+			Vector3D(
+				currentPosition.X(),
+				currentPosition.Y(),
+				currentPosition.Z()
+			),
+			pipelineConfiguration.depthCheckMode)
+			)
+		{
+			continue;
+		}
 
 		ShaderTools::PixelShader(
 			surface,
 			camera,
-			Vector4D(x, y, z, 1.0), // TODO - Should this be 1??
-			vertex1.Normal, //TODO - Interpolate normal
+			currentPosition,
+			Vector4D(),
 			Vector4D(),
 			Color::InterpolateColor(
 				vertex1.VertColor,
@@ -199,7 +251,8 @@ void RasteringTools::LineRasteriser(
 			),
 			Material(),
 			lights,
-			pipelineConfiguration.depthCheckMode
+			pipelineConfiguration.depthCheckMode,
+			profiler
 		);
 	}
 }
@@ -215,10 +268,9 @@ void RasteringTools::TriangleRasteriser(
 	Vertex4D& oV2,
 	Vertex4D& oV3,
 	Material& material,
-	SceneLighting& lights)
+	SceneLighting& lights,
+	Profiler& profiler)
 {
-	Profiler profiler;
-
 	Vector3D vec3_1 = Vector3D(vertex1.Position.X(), vertex1.Position.Y(), vertex1.Position.Z());
 	Vector3D vec3_2 = Vector3D(vertex2.Position.X(), vertex2.Position.Y(), vertex2.Position.Z());
 	Vector3D vec3_3 = Vector3D(vertex3.Position.X(), vertex3.Position.Y(), vertex3.Position.Z());
@@ -355,7 +407,29 @@ void RasteringTools::TriangleRasteriser(
 				);
 			}
 
-			profiler.ResetTimer();
+			Vector4D oPosInterp =
+				(oV1.Position * baryCoords.X()) +
+				(oV2.Position * baryCoords.Y()) +
+				(oV3.Position * baryCoords.Z());
+
+			//double zInterp =
+			//	(1 / oV1.Position.Z()) * baryCoords.X() +
+			//	(1 / oV2.Position.Z()) * baryCoords.Y() +
+			//	(1 / oV3.Position.Z()) * baryCoords.Z();
+			//oPosInterp = oPosInterp / zInterp;
+
+			if (!RasteringTools::PassesDepthCheck(
+				surface,
+				Vector3D(
+					currentPosition.X(),
+					currentPosition.Y(),
+					oPosInterp.Z()  // TODO - Need to find interpolated Z value
+				),
+				pipelineConfiguration.depthCheckMode)
+			)
+			{
+				continue;
+			}
 
 			ShaderTools::PixelShader(
 				surface,
@@ -373,12 +447,9 @@ void RasteringTools::TriangleRasteriser(
 				c,
 				material,
 				lights,
-				pipelineConfiguration.depthCheckMode
+				pipelineConfiguration.depthCheckMode,
+				profiler
 			);
-
-			profiler.AddTiming("Pixel Shader");
 		}
 	}
-
-	profiler.PrintTimings();
 }

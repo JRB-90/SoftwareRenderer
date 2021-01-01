@@ -3,8 +3,7 @@
 #include "Engine.h"
 #include "RenderingWindow.h"
 #include "RenderingMode.h"
-
-#define Z_BUFF_MIN -1000000
+#include <cmath>
 
 using namespace softengine;
 
@@ -141,29 +140,34 @@ void RenderSurface::SetPixelValue(
 	pixels[offset + 3] = color.GetAs4B().a;
 }
 
-bool RenderSurface::PassesZCheck(
-	int pixelX, 
-	int pixelY, 
-	double zVal)
+double RenderSurface::GetZBufferVal(
+	int pixelX,
+	int pixelY)
 {
 	if (pixelX < 0 || pixelX >= pixelsWidth ||
 		pixelY < 0 || pixelY >= pixelsHeight)
 	{
-		return false;
-	}
-
-	const size_t offset = (pixelsWidth * pixelY) + pixelX;
-	double zBufVal = zBuffer[offset];
-
-	if (zVal >= zBuffer[offset])
-	{
-		zBuffer[offset] = zVal;
-
-		return true;
+		return NAN;
 	}
 	else
 	{
-		return false;
+		return zBuffer[(pixelsWidth * pixelY) + pixelX];
+	}
+}
+
+void RenderSurface::SetZBufferVal(
+	int pixelX,
+	int pixelY,
+	double val)
+{
+	if (pixelX < 0 || pixelX >= pixelsWidth ||
+		pixelY < 0 || pixelY >= pixelsHeight)
+	{
+		return;
+	}
+	else
+	{
+		zBuffer[(pixelsWidth * pixelY) + pixelX] = val;
 	}
 }
 
@@ -219,7 +223,7 @@ void RenderSurface::ResetZBuffer()
 {
 	for (size_t i = 0; i < pixelCount; i++)
 	{
-		zBuffer[i] = Z_BUFF_MIN;
+		zBuffer[i] = FLT_MAX;
 	}
 }
 

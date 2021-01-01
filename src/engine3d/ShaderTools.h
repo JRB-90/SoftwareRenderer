@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Profiler.h"
 #include "Vertex4D.h"
 #include <iostream>
 
@@ -60,6 +61,14 @@ namespace softengine
 		}
 	};
 
+	struct Fragment
+	{
+		Vector3D position;
+		Vector3D normal;
+		Vector3D faceNormal;
+		Color color;
+	};
+
 	class ShaderTools
 	{
 	public:
@@ -68,8 +77,7 @@ namespace softengine
 		static Vertex4D SimpleVertexShader(
 			RenderSurface& surface,
 			Vertex3D& vertex,
-			Matrix4& model,
-			Camera& camera
+			Matrix4& mvp
 		);
 
 		static void SimpleVertexShader(
@@ -86,7 +94,16 @@ namespace softengine
 			Color& interpolatedColor,
 			Material& material,
 			SceneLighting& lights,
-			DepthCheckMode depthCheckMode
+			DepthCheckMode depthCheckMode,
+			Profiler& profiler
+		);
+
+		static void PixelShader(
+			RenderSurface& surface,
+			Fragment& fragment,
+			Material& material,
+			SceneLighting& lights,
+			Profiler& profiler
 		);
 
 		static void PixelShaderNormal(

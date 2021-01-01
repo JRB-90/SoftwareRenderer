@@ -35,7 +35,7 @@ RenderingEngine3D::RenderingEngine3D(
 		PipelineConfiguration(
 			false,
 			BackFaceCullingMode::Clockwise,
-			DepthCheckMode::DepthCheckGreaterThan
+			DepthCheckMode::DepthCheckLessThan
 		)
 	);
 }
