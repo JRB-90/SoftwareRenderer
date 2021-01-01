@@ -27,7 +27,7 @@ DirectionalLight::DirectionalLight(
 		true,
 		Vector3D(0.0, 0.0, 0.0),
 		direction,
-		Color::White,
+		color,
 		Attenuation()
 	)
 {

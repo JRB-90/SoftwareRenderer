@@ -235,40 +235,98 @@ void ShaderTools::PixelShaderPhong(
 	Material& material,
 	SceneLighting& lights)
 {
+	//Color matAmbient = material.Ambient();
+	//Color matDiffuse = material.Difffuse();
+
+	//if (material.GetTexture().Height() > 0 &&
+	//	material.GetTexture().Width() > 0)
+	//{
+	//	matAmbient = interpolatedColor * 0.4;
+	//	matDiffuse = interpolatedColor;
+	//}
+
+	//Color ambientLight = lights.GetAmbientLight().GetColor() * lights.GetAmbientLight().Strength();
+	//Vector3D norm = Vector3D(normal.X(), normal.Y(), normal.Z());
+	//Vector3D lightDir = lights.GetDirectionalLights()[0].Direction().Normalised() * -1.0;
+
+	//double intensity =
+	//	std::max(
+	//		norm.Dot(lightDir),
+	//		0.0
+	//	);
+
+	//if (intensity > 0.5)
+	//{
+	//	int test = 0;
+	//}
+
+	//Color diffuseLight = lights.GetDirectionalLights()[0].GetColor() * intensity;
+
+	//Color ambient = matAmbient * ambientLight;
+	//Color diffuse = matDiffuse * diffuseLight;
+	//Color finalColor = ambient + diffuse;
+
+	//surface.SetPixelValue(
+	//	fragment.X(),
+	//	fragment.Y(),
+	//	finalColor
+	//);
+
+
+	Vector3D norm = Vector3D(normal.X(), normal.Y(), normal.Z()).Normalised();
+	Vector3D pos = Vector3D(fragment.X(), fragment.Y(), fragment.Z());
+	Vector3D viewDir = (camera.Position().Translation() - pos).Normalised();
+
 	Color matAmbient = material.Ambient();
 	Color matDiffuse = material.Difffuse();
-
-	if (material.GetTexture().Height() > 0 &&
-		material.GetTexture().Width() > 0)
-	{
-		matAmbient = interpolatedColor * 0.4;
-		matDiffuse = interpolatedColor;
-	}
+	Color matSpecular = material.Specular();
+	double shininess = material.Shininess();
 
 	Color ambientLight = lights.GetAmbientLight().GetColor() * lights.GetAmbientLight().Strength();
-	Vector3D norm = Vector3D(normal.X(), normal.Y(), normal.Z());
-	Vector3D lightDir = lights.GetDirectionalLights()[0].Direction().Normalised() * -1.0;
 
-	double intensity =
-		std::max(
-			norm.Dot(lightDir),
-			0.0
-		);
+	Color finalColor = matAmbient * ambientLight;
 
-	if (intensity > 0.5)
+	for (size_t i = 0; i < lights.GetDirectionalLights().size(); i++)
 	{
-		int test = 0;
+		finalColor = 
+			finalColor + 
+			CalculateLight(
+				lights.GetDirectionalLights()[i],
+				norm,
+				matDiffuse,
+				matSpecular
+			);
 	}
-
-	Color diffuseLight = lights.GetDirectionalLights()[0].GetColor() * intensity;
-
-	Color ambient = matAmbient * ambientLight;
-	Color diffuse = matDiffuse * diffuseLight;
-	Color finalColor = ambient + diffuse;
 
 	surface.SetPixelValue(
 		fragment.X(),
 		fragment.Y(),
 		finalColor
 	);
+}
+
+Color ShaderTools::CalculateLight(
+	Light& light,
+	Vector3D& normal,
+	Color& matDiffuse,
+	Color& matSpecular)
+{
+	double attenuation;
+	Vector3D lightDir;
+
+	if (light.GetLightType() == LightType::Directional)
+	{
+		attenuation = 1.0;
+		lightDir = light.Direction().Normalised() * -1.0;
+	}
+
+	double intensity =
+		std::max(
+			normal.Dot(lightDir),
+			0.0
+		);
+
+	Color diffuse = light.GetColor() * matDiffuse * intensity;
+
+	return diffuse;
 }

@@ -86,7 +86,11 @@ void SetupScene()
 	Texture nullTexture;
 
 	scene->Meshes().push_back(
-		ModelImporter::LoadModelResource("models/suzanne.stl", true, false)
+		ModelImporter::LoadModelResource(
+			"models/suzanne.obj",
+			Material(Color(0.0, 0.0, 0.5, 1.0), ShadingType::Phong),
+			true, false
+		)
 	);
 
 	//scene->Meshes().push_back(
@@ -143,7 +147,7 @@ void SetupScene()
 	);
 	DirectionalLight directional(
 		Vector3D(0, 0, 1),
-		Color::Blue
+		Color(1.0, 1.0, 1.0, 1.0)
 	);
 	
 	scene->Lighting().SetAmbientLight(ambient);

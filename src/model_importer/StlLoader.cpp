@@ -15,6 +15,7 @@ using namespace softengine;
 
 Mesh3D StlLoader::LoadMesh(
 	const std::string& path,
+	Material& material,
 	bool flipVertexOrder,
 	bool flipNormals)
 {
@@ -62,7 +63,7 @@ Mesh3D StlLoader::LoadMesh(
 					position,
 					Vector2D(-1, -1),
 					normal,
-					Color(0.5, 0.5, 0.5, 1.0)
+					material.Difffuse()
 				)
 			);
 		}
@@ -89,6 +90,6 @@ Mesh3D StlLoader::LoadMesh(
 		Mesh3D(
 			indices,
 			vertices,
-			Material(Color(Color::Red), ShadingType::Phong)
+			material
 		);
 }

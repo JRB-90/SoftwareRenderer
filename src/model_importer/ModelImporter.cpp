@@ -1,7 +1,9 @@
 #include "ModelImporter.h"
 
+#include "Material.h"
 #include "Mesh3D.h"
 #include "StlLoader.h"
+#include "AssimpImporter.h"
 #include <iostream>
 #include <filesystem>
 
@@ -9,6 +11,35 @@ using namespace softengine;
 
 Mesh3D ModelImporter::LoadModel(
 	const std::string& path,
+	bool flipVertexOrder,
+	bool flipNormals)
+{
+	return 
+		LoadModel(
+			path,
+			Material(Color(0.5, 0.5, 0.5, 1.0), ShadingType::Phong),
+			flipVertexOrder,
+			flipNormals
+		);
+}
+
+Mesh3D ModelImporter::LoadModelResource(
+	const std::string& name,
+	bool flipVertexOrder,
+	bool flipNormals)
+{
+	return
+		LoadModelResource(
+			name,
+			Material(Color(0.5, 0.5, 0.5, 1.0), ShadingType::Phong),
+			flipVertexOrder,
+			flipNormals
+		);
+}
+
+Mesh3D ModelImporter::LoadModel(
+	const std::string& path,
+	Material& material,
 	bool flipVertexOrder,
 	bool flipNormals)
 {
@@ -28,6 +59,16 @@ Mesh3D ModelImporter::LoadModel(
 	{
 		return StlLoader::LoadMesh(
 			p.u8string(),
+			material,
+			flipVertexOrder,
+			flipNormals
+		);
+	}
+	else if (ext == ".OBJ")
+	{
+		return AssimpImporter::LoadMesh(
+			p.u8string(),
+			material,
 			flipVertexOrder,
 			flipNormals
 		);
@@ -40,10 +81,17 @@ Mesh3D ModelImporter::LoadModel(
 
 Mesh3D ModelImporter::LoadModelResource(
 	const std::string& name,
+	Material& material,
 	bool flipVertexOrder,
 	bool flipNormals)
 {
 	std::string path = "..\\..\\res\\" + name;
-	
-	return LoadModel(path, flipVertexOrder, flipNormals);
+
+	return 
+		LoadModel(
+			path, 
+			material, 
+			flipVertexOrder, 
+			flipNormals
+		);
 }

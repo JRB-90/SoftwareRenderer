@@ -13,6 +13,7 @@ namespace softengine
 	class Vertex3D;
 	class Matrix4;
 	class Camera;
+	class Light;
 	class SceneLighting;
 	enum class DepthCheckMode;
 
@@ -136,6 +137,13 @@ namespace softengine
 			Color& interpolatedColor,
 			Material& material,
 			SceneLighting& lights
+		);
+
+		static Color CalculateLight(
+			Light& light,
+			Vector3D& normal,
+			Color& matDiffuse,
+			Color& matSpecular
 		);
 	};
 }

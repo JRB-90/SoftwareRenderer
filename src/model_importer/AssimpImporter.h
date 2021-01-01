@@ -4,13 +4,13 @@
 
 namespace softengine
 {
-	class Mesh3D;
 	class Material;
+	class Mesh3D;
 
-	class StlLoader
+	class AssimpImporter
 	{
 	public:
-		StlLoader() = delete;
+		AssimpImporter() = delete;
 
 		static Mesh3D LoadMesh(
 			const std::string& path,
