@@ -28,6 +28,7 @@ std::shared_ptr<RenderingEngine3D> renderingEngine;
 
 double speed = 1.0;
 double timeInc = 0;
+bool isSpinning = false;
 Vector3D point1Pos(5, 5, 0);
 Vector3D point2Pos(0, 5, 5);
 Color point1Col(1.0, 0.0, 0.0, 1.0);
@@ -209,6 +210,15 @@ void UpdateInput(
 		camera->Position(camera->Position() * Frame3D(Vector3D(0.0, 0.0, -moveDelta)));
 	}
 
+	if (inputState.stopSpin)
+	{
+		isSpinning = false;
+	}
+	if (inputState.startSpin)
+	{
+		isSpinning = true;
+	}
+
 	if (inputState.noShading)
 	{
 		scene->Meshes()[2].GetMaterial().SetShadingType(ShadingType::None);
@@ -275,6 +285,7 @@ void UpdateModels(
 	InputState inputState,
 	double delta)
 {
+	double moveDelta = speed * delta;
 	double ts = std::sin(timeInc / 180);
 	double tc = std::cos(timeInc / 180);
 
@@ -284,4 +295,9 @@ void UpdateModels(
 	scene->Meshes()[1].Transform().Translation(point2Pos);
 	scene->Lighting().GetPointsLights()[0].Position(point1Pos);
 	scene->Lighting().GetPointsLights()[1].Position(point2Pos);
+
+	if (isSpinning)
+	{
+		scene->Meshes()[2].Transform(scene->Meshes()[2].Transform() * Frame3D(Rotation3D(0, moveDelta, 0)));
+	}
 }

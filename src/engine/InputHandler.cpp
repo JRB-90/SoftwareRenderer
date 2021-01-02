@@ -68,6 +68,12 @@ void InputHandler::Update()
 			case SDL_Scancode::SDL_SCANCODE_E:
 				currentState.rotR = state;
 				break;
+			case SDL_Scancode::SDL_SCANCODE_T:
+				currentState.stopSpin = state;
+				break;
+			case SDL_Scancode::SDL_SCANCODE_Y:
+				currentState.startSpin = state;
+				break;
 			case SDL_Scancode::SDL_SCANCODE_U:
 				currentState.noShading = state;
 				break;

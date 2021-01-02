@@ -23,6 +23,9 @@ namespace softengine
 		bool flatShading = false;
 		bool phongShading = false;
 
+		bool stopSpin = false;
+		bool startSpin = false;
+
 		bool wireFrameModeOff = false;
 		bool wireFrameModeOn = false;
 

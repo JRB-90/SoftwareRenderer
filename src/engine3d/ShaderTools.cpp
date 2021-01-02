@@ -199,7 +199,7 @@ void ShaderTools::PixelShaderPhong(
 	if (material.GetTexture().Width() > 0 &&
 		material.GetTexture().Height() > 0)
 	{
-		matAmbient = interpolatedColor * 0.4;
+		matAmbient = interpolatedColor * 0.5;
 		matDiffuse = interpolatedColor;
 		matSpecular = interpolatedColor * 1.3;
 	}
