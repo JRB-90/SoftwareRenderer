@@ -59,6 +59,29 @@ namespace softengine
 			Vector2D& pos
 		);
 
+		static Vector4D InterpolateVec4(
+			Vector3D& baryCoords,
+			Vector4D& v1,
+			Vector4D& v2,
+			Vector4D& v3
+		);
+
+		static Vector4D InterpolateVec4PerspCorrect(
+			Vector3D& baryCoords,
+			Vector4D& v1,
+			Vector4D& v2,
+			Vector4D& v3,
+			Vector4D& fragment
+		);
+
+		static Vector4D InterpolateNormal(
+			Vector3D& baryCoords,
+			Vertex4D& v1,
+			Vertex4D& v2,
+			Vertex4D& v3,
+			bool perspectiveCorrect = true
+		);
+
 		static Color InterpolateColor(
 			Vector3D& baryCoords,
 			Vertex4D& v1,
@@ -75,15 +98,6 @@ namespace softengine
 			Vertex4D& v3,
 			Vector4D& pos,
 			Texture& texture,
-			bool perspectiveCorrect = true
-		);
-
-		static Vector4D InterpolateNormal(
-			Vector3D& baryCoords,
-			Vertex4D& v1,
-			Vertex4D& v2,
-			Vertex4D& v3,
-			Vector4D& pos,
 			bool perspectiveCorrect = true
 		);
 	};

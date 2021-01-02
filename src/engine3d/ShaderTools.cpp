@@ -90,6 +90,7 @@ void ShaderTools::PixelShader(
 	RenderSurface& surface,
 	Camera& camera,
 	Vector4D& fragment,
+	Vector4D& position,
 	Vector4D& normal,
 	Vector4D& faceNormal,
 	Color& interpolatedColor,
@@ -140,6 +141,7 @@ void ShaderTools::PixelShader(
 			surface,
 			camera,
 			fragment,
+			position,
 			normal,
 			interpolatedColor,
 			material,
@@ -230,20 +232,16 @@ void ShaderTools::PixelShaderPhong(
 	RenderSurface& surface,
 	Camera& camera,
 	Vector4D& fragment,
+	Vector4D& position,
 	Vector4D& normal,
 	Color& interpolatedColor,
 	Material& material,
 	SceneLighting& lights)
 {
-	Vector3D norm = Vector3D(normal.X(), normal.Y(), normal.Z()).Normalised();
-
-	// TODO - This doesn't look correct..
-	// I think actually, I need to pass in the interplated position for the fragment,
-	// like I do with the normal and use that instead.
-	Vector3D pos = Vector3D(fragment.X(), fragment.Y(), fragment.Z());
-
+	Vector3D frag = Vector3D(fragment.X(), fragment.Y(), fragment.Z());
+	Vector3D pos = Vector3D(position.X(), position.Y(), position.Z());
 	Vector3D viewDir = (camera.Position().Translation() - pos).Normalised();
-
+	Vector3D norm = Vector3D(normal.X(), normal.Y(), normal.Z()).Normalised();
 	Color matAmbient = material.Ambient();
 	Color matDiffuse = material.Difffuse();
 	Color matSpecular = material.Specular();
@@ -309,7 +307,7 @@ Color ShaderTools::CalculateLight(
 	}
 	else
 	{
-		lightDir = (light.Position() - pos).Normalised() * -1.0;
+		lightDir = (light.Position() - pos).Normalised();
 		double distance = lightDir.Length();
 		attenuation = 
 			1.0 / 

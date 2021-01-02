@@ -89,7 +89,7 @@ void SetupScene()
 	scene->Meshes().push_back(
 		ModelImporter::LoadModelResource(
 			"models/suzanne.obj",
-			Material(Color(1.0, 1.0, 1.0, 1.0), ShadingType::Flat),
+			Material(Color(1.0, 1.0, 1.0, 1.0), ShadingType::Phong),
 			true, false
 		)
 	);
@@ -156,14 +156,14 @@ void SetupScene()
 		Attenuation()
 	);
 	PointLight point2(
-		Vector3D(0, -5, 3),
+		Vector3D(0, -5, 0),
 		Color::Blue,
 		Attenuation()
 	);
 	
 	scene->Lighting().SetAmbientLight(ambient);
 	scene->Lighting().GetDirectionalLights().push_back(directional);
-	//scene->Lighting().GetPointsLights().push_back(point1);
+	scene->Lighting().GetPointsLights().push_back(point1);
 	scene->Lighting().GetPointsLights().push_back(point2);
 }
 
@@ -222,9 +222,8 @@ void Update(
 	//	scene->Meshes()[0].Transform() * Frame3D(Vector3D(0.0, 0.0, speed))
 	//);
 
-	double t = std::sin(timeInc / 360) * 10.0;
-	//scene->Lighting().GetPointsLights()[1].Position().X(t);
-	std::printf("\n\n#### %.3f ####\n\n", t);
+	double t = std::sin(timeInc / 180) * 10.0;
+	scene->Lighting().GetPointsLights()[1].Position().X(t);
 
 	timeInc += 10.0;
 }

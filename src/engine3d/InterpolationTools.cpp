@@ -122,6 +122,74 @@ Vector3D InterpolationTools::FindBaryCentricFactors(
 		);
 }
 
+Vector4D InterpolationTools::InterpolateVec4(
+	Vector3D& baryCoords,
+	Vector4D& v1,
+	Vector4D& v2,
+	Vector4D& v3)
+{
+	Vector4D posInterp =
+		v1 * baryCoords.X() +
+		v2 * baryCoords.Y() +
+		v3 * baryCoords.Z();
+
+	return posInterp;
+}
+
+Vector4D InterpolationTools::InterpolateVec4PerspCorrect(
+	Vector3D& baryCoords,
+	Vector4D& v1,
+	Vector4D& v2,
+	Vector4D& v3,
+	Vector4D& fragment)
+{
+	Vector4D posInterp =
+		(v1 * baryCoords.X()) / fragment.Z() +
+		(v2 * baryCoords.Y()) / fragment.Z() +
+		(v3 * baryCoords.Z()) / fragment.Z();
+
+	double zInterp =
+		(1 / fragment.Z()) * baryCoords.X() +
+		(1 / fragment.Z()) * baryCoords.Y() +
+		(1 / fragment.Z()) * baryCoords.Z();
+	posInterp = posInterp / zInterp;
+
+	return posInterp;
+}
+
+Vector4D InterpolationTools::InterpolateNormal(
+	Vector3D& baryCoords,
+	Vertex4D& v1,
+	Vertex4D& v2,
+	Vertex4D& v3,
+	bool perspectiveCorrect)
+{
+	if (!perspectiveCorrect)
+	{
+		Vector4D normInterp =
+			v1.Normal * baryCoords.X() +
+			v2.Normal * baryCoords.Y() +
+			v3.Normal * baryCoords.Z();
+
+		return normInterp;
+	}
+	else
+	{
+		Vector4D normInterp =
+			(v1.Normal * baryCoords.X()) / v1.Position.Z() +
+			(v2.Normal * baryCoords.Y()) / v2.Position.Z() +
+			(v3.Normal * baryCoords.Z()) / v3.Position.Z();
+
+		double zInterp =
+			(1 / v1.Position.Z()) * baryCoords.X() +
+			(1 / v2.Position.Z()) * baryCoords.Y() +
+			(1 / v3.Position.Z()) * baryCoords.Z();
+		normInterp = normInterp / zInterp;
+
+		return normInterp;
+	}
+}
+
 Color InterpolationTools::InterpolateColor(
 	Vector3D& baryCoords,
 	Vertex4D& v1,
@@ -215,39 +283,5 @@ Color InterpolationTools::InterpolateTexture(
 				texInterp.X() * (double)texture.Width(),
 				texInterp.Y() * (double)texture.Height()
 			);
-	}
-}
-
-Vector4D InterpolationTools::InterpolateNormal(
-	Vector3D& baryCoords,
-	Vertex4D& v1,
-	Vertex4D& v2,
-	Vertex4D& v3,
-	Vector4D& pos,
-	bool perspectiveCorrect)
-{
-	if (!perspectiveCorrect)
-	{
-		Vector4D normInterp =
-			v1.Normal * baryCoords.X() +
-			v2.Normal * baryCoords.Y() +
-			v3.Normal * baryCoords.Z();
-
-		return normInterp;
-	}
-	else
-	{
-		Vector4D normInterp =
-			(v1.Normal * baryCoords.X()) / v1.Position.Z() +
-			(v2.Normal * baryCoords.Y()) / v2.Position.Z() +
-			(v3.Normal * baryCoords.Z()) / v3.Position.Z();
-
-		double zInterp =
-			(1 / v1.Position.Z()) * baryCoords.X() +
-			(1 / v2.Position.Z()) * baryCoords.Y() +
-			(1 / v3.Position.Z()) * baryCoords.Z();
-		normInterp = normInterp / zInterp;
-
-		return normInterp;
 	}
 }

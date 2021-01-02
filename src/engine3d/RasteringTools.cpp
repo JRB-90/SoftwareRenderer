@@ -159,6 +159,7 @@ void RasteringTools::PointRasteriser(
 		surface,
 		camera,
 		vertex.Position,
+		vertex.Position,
 		vertex.Normal,
 		Vector4D(),
 		vertex.VertColor,
@@ -176,6 +177,7 @@ void RasteringTools::PointRasteriser(
 	ShaderTools::PixelShader(
 		*in.surface,
 		*in.camera,
+		in.vertex1->Position,
 		in.vertex1->Position,
 		in.vertex1->Normal,
 		Vector4D(),
@@ -241,6 +243,7 @@ void RasteringTools::LineRasteriser(
 		ShaderTools::PixelShader(
 			surface,
 			camera,
+			currentPosition,
 			currentPosition,
 			Vector4D(),
 			Vector4D(),
@@ -381,8 +384,25 @@ void RasteringTools::TriangleRasteriser(
 					Vector4D(x, y, 0.0, 1.0)
 				);
 
-			Vector4D currentPosition(x, y, 0.0, 1.0);
+			Vector4D fragmentPosition(x, y, 0.0, 1.0);
 			Color c = Color::Black;
+
+			Vector4D interpPosition =
+				InterpolationTools::InterpolateVec4(
+					baryCoords,
+					oV1.Position,
+					oV2.Position,
+					oV3.Position
+				);
+
+			Vector4D interpNormal =
+				InterpolationTools::InterpolateNormal(
+					baryCoords,
+					vertex1,
+					vertex2,
+					vertex3,
+					true
+				);
 
 			if (material.GetTexture().Height() > 0 &&
 				material.GetTexture().Width() > 0)
@@ -392,16 +412,10 @@ void RasteringTools::TriangleRasteriser(
 					oV1,
 					oV2,
 					oV3,
-					currentPosition,
+					fragmentPosition,
 					material.GetTexture(),
 					true
 				);
-
-				// TODO
-				//if (!IsValidSpritePixel(c))
-				//{
-				//	continue;
-				//}
 			}
 			else
 			{
@@ -410,28 +424,17 @@ void RasteringTools::TriangleRasteriser(
 					vertex1,
 					vertex2,
 					vertex3,
-					currentPosition,
+					fragmentPosition,
 					true
 				);
 			}
 
-			Vector4D oPosInterp =
-				(oV1.Position * baryCoords.X()) +
-				(oV2.Position * baryCoords.Y()) +
-				(oV3.Position * baryCoords.Z());
-
-			//double zInterp =
-			//	(1 / oV1.Position.Z()) * baryCoords.X() +
-			//	(1 / oV2.Position.Z()) * baryCoords.Y() +
-			//	(1 / oV3.Position.Z()) * baryCoords.Z();
-			//oPosInterp = oPosInterp / zInterp;
-
 			if (!RasteringTools::PassesDepthCheck(
 				surface,
 				Vector3D(
-					currentPosition.X(),
-					currentPosition.Y(),
-					oPosInterp.Z()  // TODO - Need to find interpolated Z value
+					fragmentPosition.X(),
+					fragmentPosition.Y(),
+					interpPosition.Z()
 				),
 				pipelineConfiguration.depthCheckMode)
 			)
@@ -442,15 +445,9 @@ void RasteringTools::TriangleRasteriser(
 			ShaderTools::PixelShader(
 				surface,
 				camera,
-				currentPosition,
-				InterpolationTools::InterpolateNormal(
-					baryCoords,
-					vertex1,
-					vertex2,
-					vertex3,
-					currentPosition,
-					true
-				),
+				fragmentPosition,
+				interpPosition,
+				interpNormal,
 				faceNormal,
 				c,
 				material,
