@@ -7,6 +7,7 @@
 #include "Light.h"
 #include "AmbientLight.h"
 #include "DirectionalLight.h"
+#include "PointLight.h"
 #include "ModelImporter.h"
 
 #include <iostream>
@@ -88,7 +89,7 @@ void SetupScene()
 	scene->Meshes().push_back(
 		ModelImporter::LoadModelResource(
 			"models/suzanne.obj",
-			Material(Color(0.0, 0.0, 0.5, 1.0), ShadingType::Phong),
+			Material(Color(1.0, 1.0, 1.0, 1.0), ShadingType::Flat),
 			true, false
 		)
 	);
@@ -149,13 +150,26 @@ void SetupScene()
 		Vector3D(0, 0, 1),
 		Color(1.0, 1.0, 1.0, 1.0)
 	);
+	PointLight point1(
+		Vector3D(2, 2, 0),
+		Color::Red,
+		Attenuation()
+	);
+	PointLight point2(
+		Vector3D(0, -5, 3),
+		Color::Blue,
+		Attenuation()
+	);
 	
 	scene->Lighting().SetAmbientLight(ambient);
 	scene->Lighting().GetDirectionalLights().push_back(directional);
+	//scene->Lighting().GetPointsLights().push_back(point1);
+	scene->Lighting().GetPointsLights().push_back(point2);
 }
 
 double modelSpeed = 3.0;
 double speed = 0.1;
+double timeInc = 0;
 
 void Update(
 	InputState inputState,
@@ -207,4 +221,10 @@ void Update(
 	//scene->Meshes()[0].Transform(
 	//	scene->Meshes()[0].Transform() * Frame3D(Vector3D(0.0, 0.0, speed))
 	//);
+
+	double t = std::sin(timeInc / 360) * 10.0;
+	//scene->Lighting().GetPointsLights()[1].Position().X(t);
+	std::printf("\n\n#### %.3f ####\n\n", t);
+
+	timeInc += 10.0;
 }

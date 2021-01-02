@@ -235,46 +235,13 @@ void ShaderTools::PixelShaderPhong(
 	Material& material,
 	SceneLighting& lights)
 {
-	//Color matAmbient = material.Ambient();
-	//Color matDiffuse = material.Difffuse();
-
-	//if (material.GetTexture().Height() > 0 &&
-	//	material.GetTexture().Width() > 0)
-	//{
-	//	matAmbient = interpolatedColor * 0.4;
-	//	matDiffuse = interpolatedColor;
-	//}
-
-	//Color ambientLight = lights.GetAmbientLight().GetColor() * lights.GetAmbientLight().Strength();
-	//Vector3D norm = Vector3D(normal.X(), normal.Y(), normal.Z());
-	//Vector3D lightDir = lights.GetDirectionalLights()[0].Direction().Normalised() * -1.0;
-
-	//double intensity =
-	//	std::max(
-	//		norm.Dot(lightDir),
-	//		0.0
-	//	);
-
-	//if (intensity > 0.5)
-	//{
-	//	int test = 0;
-	//}
-
-	//Color diffuseLight = lights.GetDirectionalLights()[0].GetColor() * intensity;
-
-	//Color ambient = matAmbient * ambientLight;
-	//Color diffuse = matDiffuse * diffuseLight;
-	//Color finalColor = ambient + diffuse;
-
-	//surface.SetPixelValue(
-	//	fragment.X(),
-	//	fragment.Y(),
-	//	finalColor
-	//);
-
-
 	Vector3D norm = Vector3D(normal.X(), normal.Y(), normal.Z()).Normalised();
+
+	// TODO - This doesn't look correct..
+	// I think actually, I need to pass in the interplated position for the fragment,
+	// like I do with the normal and use that instead.
 	Vector3D pos = Vector3D(fragment.X(), fragment.Y(), fragment.Z());
+
 	Vector3D viewDir = (camera.Position().Translation() - pos).Normalised();
 
 	Color matAmbient = material.Ambient();
@@ -292,9 +259,27 @@ void ShaderTools::PixelShaderPhong(
 			finalColor + 
 			CalculateLight(
 				lights.GetDirectionalLights()[i],
+				pos,
 				norm,
+				viewDir,
 				matDiffuse,
-				matSpecular
+				matSpecular,
+				shininess
+			);
+	}
+
+	for (size_t i = 0; i < lights.GetPointsLights().size(); i++)
+	{
+		finalColor =
+			finalColor +
+			CalculateLight(
+				lights.GetPointsLights()[i],
+				pos,
+				norm,
+				viewDir,
+				matDiffuse,
+				matSpecular,
+				shininess
 			);
 	}
 
@@ -307,9 +292,12 @@ void ShaderTools::PixelShaderPhong(
 
 Color ShaderTools::CalculateLight(
 	Light& light,
+	Vector3D& pos,
 	Vector3D& normal,
+	Vector3D viewDir,
 	Color& matDiffuse,
-	Color& matSpecular)
+	Color& matSpecular,
+	double shininess)
 {
 	double attenuation;
 	Vector3D lightDir;
@@ -319,6 +307,18 @@ Color ShaderTools::CalculateLight(
 		attenuation = 1.0;
 		lightDir = light.Direction().Normalised() * -1.0;
 	}
+	else
+	{
+		lightDir = (light.Position() - pos).Normalised() * -1.0;
+		double distance = lightDir.Length();
+		attenuation = 
+			1.0 / 
+			(
+				light.GetAttenuation().Constant +
+				light.GetAttenuation().Linear * distance +
+				light.GetAttenuation().Quadratic * distance * distance
+			);
+	}
 
 	double intensity =
 		std::max(
@@ -326,7 +326,28 @@ Color ShaderTools::CalculateLight(
 			0.0
 		);
 
-	Color diffuse = light.GetColor() * matDiffuse * intensity;
+	Color diffuse = light.GetColor() * matDiffuse * attenuation * intensity;
+	Color specular;
 
-	return diffuse;
+	if (normal.Dot(lightDir) < 0.0)
+	{
+		specular = Color(0.0, 0.0, 0.0, 1.0);
+	}
+	else
+	{
+		specular =
+			light.GetColor() *
+			matSpecular *
+			attenuation*
+			std::pow(std::max(0.0, Reflect(lightDir, normal).Dot(viewDir)), shininess);
+	}
+
+	return diffuse + specular;
+}
+
+Vector3D ShaderTools::Reflect(
+	Vector3D v1, 
+	Vector3D v2)
+{
+	return v1 - (v2 * 2.0 * v2.Dot(v1));
 }

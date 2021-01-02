@@ -42,6 +42,8 @@ add_library(engine3d STATIC
 	ShaderTools.cpp
     InterpolationTools.h
 	InterpolationTools.cpp
+    PointLight.h
+	PointLight.cpp
 )
 
 target_link_libraries(engine3d PUBLIC

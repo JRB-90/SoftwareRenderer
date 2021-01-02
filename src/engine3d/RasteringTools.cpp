@@ -278,6 +278,14 @@ void RasteringTools::TriangleRasteriser(
 	Vector3D v13 = (vec3_3 - vec3_1).Normalised();
 	Vector3D cross = v12.Cross(v13).Normalised();
 
+	Vector3D oVec3_1 = Vector3D(oV1.Position.X(), oV1.Position.Y(), oV1.Position.Z());
+	Vector3D oVec3_2 = Vector3D(oV2.Position.X(), oV2.Position.Y(), oV2.Position.Z());
+	Vector3D oVec3_3 = Vector3D(oV3.Position.X(), oV3.Position.Y(), oV3.Position.Z());
+	Vector3D oV12 = (oVec3_2 - oVec3_1).Normalised();
+	Vector3D oV13 = (oVec3_3 - oVec3_1).Normalised();
+	Vector3D oCross = oV12.Cross(oV13).Normalised();
+	Vector4D faceNormal(oCross.X(), oCross.Y(), oCross.Z(), 1.0);
+
 	if ((pipelineConfiguration.backFaceCullingMode == BackFaceCullingMode::Clockwise) &&
 		cross.Z() < 0.0)
 	{
@@ -443,7 +451,7 @@ void RasteringTools::TriangleRasteriser(
 					currentPosition,
 					true
 				),
-				Vector4D(), // TODO - Figure out flat normal here,
+				faceNormal,
 				c,
 				material,
 				lights,

@@ -141,9 +141,17 @@ namespace softengine
 
 		static Color CalculateLight(
 			Light& light,
+			Vector3D& pos,
 			Vector3D& normal,
+			Vector3D viewDir,
 			Color& matDiffuse,
-			Color& matSpecular
+			Color& matSpecular,
+			double shininess
+		);
+
+		static Vector3D Reflect(
+			Vector3D v1,
+			Vector3D v2
 		);
 	};
 }

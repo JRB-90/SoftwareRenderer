@@ -8,7 +8,8 @@ namespace softengine
 	enum class LightType
 	{
 		Ambient,
-		Directional
+		Directional,
+		Point
 	};
 
 	struct Attenuation
@@ -66,5 +67,7 @@ namespace softengine
 		Vector3D direction;
 		Color color;
 		Attenuation attenuation;
+		double spotCutoff;
+		double spotExponent;
 	};
 }
