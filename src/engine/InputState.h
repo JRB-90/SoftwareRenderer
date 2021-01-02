@@ -33,5 +33,8 @@ namespace softengine
 		bool noDepthCheck = false;
 		bool lessThanDepthCheck = false;
 		bool moreThanDepthCheck = false;
+
+		bool noTexture = false;
+		bool texture = false;
 	};
 }

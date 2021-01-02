@@ -104,6 +104,12 @@ void InputHandler::Update()
 			case SDL_Scancode::SDL_SCANCODE_M:
 				currentState.lessThanDepthCheck = state;
 				break;
+			case SDL_Scancode::SDL_SCANCODE_C:
+				currentState.noTexture = state;
+				break;
+			case SDL_Scancode::SDL_SCANCODE_V:
+				currentState.texture = state;
+				break;
 			default:
 				break;
 			}

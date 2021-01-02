@@ -32,6 +32,7 @@ Vector3D point1Pos(5, 5, 0);
 Vector3D point2Pos(0, 5, 5);
 Color point1Col(1.0, 0.0, 0.0, 1.0);
 Color point2Col(0.0, 0.0, 1.0, 1.0);
+std::shared_ptr<Texture> brickTexture;
 
 void SetupScene();
 void Update(
@@ -53,6 +54,10 @@ int main(int argc, const char* argv[])
 
 	std::srand(std::time(nullptr));
 	scene = std::make_shared<Scene3D>();
+	ResourceLoader imageLoader;
+	brickTexture = std::make_shared<Texture>(
+		imageLoader.LoadImageResource("textures\\brick.png")
+	);
 	SetupScene();
 
 	camera =
@@ -94,9 +99,6 @@ int main(int argc, const char* argv[])
 
 void SetupScene()
 {
-	ResourceLoader imageLoader;
-	Texture brickTexture = imageLoader.LoadImageResource("textures\\brick.png");
-
 	Mesh3D point1Mesh = ModelImporter::LoadModelResource(
 		"models/sphere.obj",
 		Material(point1Col, ShadingType::None),
@@ -112,9 +114,14 @@ void SetupScene()
 	scene->Meshes().push_back(point1Mesh);
 	scene->Meshes().push_back(point2Mesh);
 
+	//Mesh3D monkeyMesh = ModelImporter::LoadModelResource(
+	//	"models/suzanne.obj",
+	//	Material(Color(0.5, 0.5, 0.5, 1.0), ShadingType::Phong),
+	//	true, false
+	//);
 	Mesh3D monkeyMesh = ModelImporter::LoadModelResource(
 		"models/suzanne.obj",
-		Material(Color(0.5, 0.5, 0.5, 1.0), ShadingType::Phong),
+		Material(*brickTexture, ShadingType::Phong),
 		true, false
 	);
 	monkeyMesh.Transform().Translation(Vector3D(0, 0, 0));
@@ -252,6 +259,15 @@ void UpdateInput(
 	if (inputState.moreThanDepthCheck)
 	{
 		renderingEngine->GetPipelineConfiguration().depthCheckMode = DepthCheckMode::DepthCheckGreaterThan;
+	}
+
+	if (inputState.noTexture)
+	{
+		scene->Meshes()[2].GetMaterial().SetTexture(Texture());
+	}
+	if (inputState.texture)
+	{
+		scene->Meshes()[2].GetMaterial().SetTexture(*brickTexture);
 	}
 }
 

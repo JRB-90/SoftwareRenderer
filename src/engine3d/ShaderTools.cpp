@@ -190,10 +190,19 @@ void ShaderTools::PixelShaderPhong(
 	Vector3D pos = Vector3D(position.X(), position.Y(), position.Z());
 	Vector3D viewDir = (camera.Position().Translation() - pos).Normalised();
 	Vector3D norm = Vector3D(normal.X(), normal.Y(), normal.Z()).Normalised();
+
 	Color matAmbient = material.Ambient();
 	Color matDiffuse = material.Difffuse();
 	Color matSpecular = material.Specular();
 	double shininess = material.Shininess();
+
+	if (material.GetTexture().Width() > 0 &&
+		material.GetTexture().Height() > 0)
+	{
+		matAmbient = interpolatedColor * 0.4;
+		matDiffuse = interpolatedColor;
+		matSpecular = interpolatedColor * 1.3;
+	}
 
 	Color ambientLight = lights.GetAmbientLight().GetColor() * lights.GetAmbientLight().Strength();
 
