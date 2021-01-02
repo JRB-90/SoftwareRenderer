@@ -68,6 +68,42 @@ void InputHandler::Update()
 			case SDL_Scancode::SDL_SCANCODE_E:
 				currentState.rotR = state;
 				break;
+			case SDL_Scancode::SDL_SCANCODE_U:
+				currentState.noShading = state;
+				break;
+			case SDL_Scancode::SDL_SCANCODE_I:
+				currentState.normalShading = state;
+				break;
+			case SDL_Scancode::SDL_SCANCODE_O:
+				currentState.flatShading = state;
+				break;
+			case SDL_Scancode::SDL_SCANCODE_P:
+				currentState.phongShading = state;
+				break;
+			case SDL_Scancode::SDL_SCANCODE_K:
+				currentState.wireFrameModeOff = state;
+				break;
+			case SDL_Scancode::SDL_SCANCODE_L:
+				currentState.wireFrameModeOn = state;
+				break;
+			case SDL_Scancode::SDL_SCANCODE_G:
+				currentState.noCulling = state;
+				break;
+			case SDL_Scancode::SDL_SCANCODE_H:
+				currentState.acwCulling = state;
+				break;
+			case SDL_Scancode::SDL_SCANCODE_J:
+				currentState.cwCulling = state;
+				break;
+			case SDL_Scancode::SDL_SCANCODE_B:
+				currentState.noDepthCheck = state;
+				break;
+			case SDL_Scancode::SDL_SCANCODE_N:
+				currentState.moreThanDepthCheck = state;
+				break;
+			case SDL_Scancode::SDL_SCANCODE_M:
+				currentState.lessThanDepthCheck = state;
+				break;
 			default:
 				break;
 			}

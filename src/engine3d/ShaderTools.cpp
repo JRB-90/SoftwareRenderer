@@ -124,11 +124,11 @@ void ShaderTools::PixelShader(
 		profiler.AddTiming("Shader Normal");
 		break;
 	case ShadingType::Flat:
-		PixelShaderFlat(
+		PixelShaderPhong(
 			surface,
 			camera,
 			fragment,
-			normal,
+			position,
 			faceNormal,
 			interpolatedColor,
 			material,
@@ -173,58 +173,6 @@ void ShaderTools::PixelShaderNormal(RenderSurface& surface,
 			(normal.Z() + 1.0) / 2.0,
 			1.0
 		)
-	);
-}
-
-// TODO - Change these to only have a normal attribute and get the calling function to calc the
-//        flat normal and pass it in as the normal, that I don't have to duplicate the flat
-//        and phong?
-
-void ShaderTools::PixelShaderFlat(
-	RenderSurface& surface,
-	Camera& camera,
-	Vector4D& fragment,
-	Vector4D& normal,
-	Vector4D& faceNormal,
-	Color& interpolatedColor,
-	Material& material,
-	SceneLighting& lights)
-{
-	Color matAmbient = material.Ambient();
-	Color matDiffuse = material.Difffuse();
-
-	if (material.GetTexture().Height() > 0 &&
-		material.GetTexture().Width() > 0)
-	{
-		matAmbient = interpolatedColor * 0.4;
-		matDiffuse = interpolatedColor;
-	}
-
-	Color ambientLight = lights.GetAmbientLight().GetColor() * lights.GetAmbientLight().Strength();
-	Vector3D flatNormal = Vector3D(faceNormal.X(), faceNormal.Y(), faceNormal.Z()).Normalised();
-	Vector3D lightDir = lights.GetDirectionalLights()[0].Direction().Normalised() * -1.0;
-
-	double intensity =
-		std::max(
-			flatNormal.Dot(lightDir),
-			0.0
-		);
-
-	if (intensity > 0.5)
-	{
-		int test = 0;
-	}
-
-	Color diffuseLight = lights.GetDirectionalLights()[0].GetColor() * intensity;
-
-	Color ambient = matAmbient * ambientLight;
-	Color diffuse = matDiffuse * diffuseLight;
-	Color finalColor = ambient + diffuse;
-
-	surface.SetPixelValue(
-		fragment.X(),
-		fragment.Y(),
-		finalColor
 	);
 }
 

@@ -39,6 +39,19 @@ void RenderPipeline3D::Run(
 	Material& material,
 	SceneLighting& lights)
 {
+	if (pipelineConfiguration.wireframeModeEnabled)
+	{
+		RunLines(
+			surface,
+			vbo,
+			model,
+			camera,
+			lights
+		);
+
+		return;
+	}
+
 	switch (drawType)
 	{
 	case DrawType::Points:

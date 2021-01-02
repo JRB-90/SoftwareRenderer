@@ -15,6 +15,12 @@ namespace softengine
 	public:
 		MeshBuilder() = delete;
 
+		static Mesh3D BuildPlane(
+			double width,
+			double depth,
+			Material& material
+		);
+
 		static Mesh3D BuildCube(
 			double width,
 			double height,

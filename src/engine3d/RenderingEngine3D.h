@@ -4,13 +4,13 @@
 #include "TextOverlay.h"
 #include "PipelineConfiguration3D.h"
 #include "Color.h"
+#include "RenderPipeline3D.h"
 #include <memory>
 
 namespace softengine
 {
 	class Scene3D;
 	class Camera;
-	class RenderPipeline3D;
 	class RenderSurface;
 	class RenderingWindow;
 	enum class RenderingMode;
@@ -33,6 +33,7 @@ namespace softengine
 		);
 		~RenderingEngine3D();
 
+		PipelineConfiguration& GetPipelineConfiguration() { return pipeline->Configuration(); }
 		TextOverlay& GetTextOverLay() { return textOverlay; }
 		Color& RefreshColor() { return refreshColor; }
 		void RefreshColor(Color& refreshColor) { this->refreshColor = refreshColor; }

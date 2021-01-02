@@ -26,8 +26,8 @@ Camera::Camera(
 }
 
 void Camera::LookAt(
-	Vector3D lookAtPoint,
-	Vector3D up)
+	Vector3D& lookAtPoint,
+	Vector3D& up)
 {
 	Vector3D zAxis = (lookAtPoint - position.Translation()).Normalised();
 	Vector3D xAxis = zAxis.Cross(up.Normalised()).Normalised();
@@ -40,6 +40,18 @@ void Camera::LookAt(
 			zAxis * -1
 		)
 	);
+}
+
+void Camera::RotateAboutPoint(
+	Vector3D& point, 
+	Rotation3D& rotation, 
+	Vector3D& up)
+{
+	Vector3D currentPos = position.Translation();
+	position = position * Frame3D(point * -1.0);
+	position.Translation(position.Translation() * rotation);
+	position = position * Frame3D(point);
+	LookAt(point, up);
 }
 
 void Camera::CalculateProjection()

@@ -17,5 +17,21 @@ namespace softengine
 		bool out = false;
 		bool rotL = false;
 		bool rotR = false;
+
+		bool noShading = false;
+		bool normalShading = false;
+		bool flatShading = false;
+		bool phongShading = false;
+
+		bool wireFrameModeOff = false;
+		bool wireFrameModeOn = false;
+
+		bool noCulling = false;
+		bool cwCulling = false;
+		bool acwCulling = false;
+
+		bool noDepthCheck = false;
+		bool lessThanDepthCheck = false;
+		bool moreThanDepthCheck = false;
 	};
 }

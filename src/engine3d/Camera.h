@@ -23,8 +23,13 @@ namespace softengine
 		Matrix4 ProjectionMatrix() { CalculateProjection(); return projection; }
 		Matrix4 ViewMatrix() { CalculateView(); return view; }
 		void LookAt(
-			Vector3D lookAtPoint,
-			Vector3D up
+			Vector3D& lookAtPoint,
+			Vector3D& up
+		);
+		void RotateAboutPoint(
+			Vector3D& point,
+			Rotation3D& rotation,
+			Vector3D& up
 		);
 
 		double Width() const { return width; }

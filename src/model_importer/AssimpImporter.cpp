@@ -58,7 +58,8 @@ Mesh3D AssimpImporter::LoadMesh(
 			Vertex3D(
 				Vector3D(position.x, position.y, position.z),
 				texCoords,
-				Vector3D(normal.x, normal.y, normal.z)
+				Vector3D(normal.x, normal.y, normal.z),
+				material.Difffuse()
 			)
 		);
 	}

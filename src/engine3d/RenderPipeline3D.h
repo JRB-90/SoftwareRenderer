@@ -25,6 +25,9 @@ namespace softengine
 			PipelineConfiguration pipelineConfiguration
 		);
 
+		PipelineConfiguration& Configuration() { return pipelineConfiguration; }
+		void Configuration(PipelineConfiguration& pipelineConfiguration) { this->pipelineConfiguration = pipelineConfiguration; }
+
 		void Run(
 			RenderSurface& surface,
 			DrawType drawType,

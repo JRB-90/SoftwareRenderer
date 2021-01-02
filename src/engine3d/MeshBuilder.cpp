@@ -8,6 +8,37 @@
 
 using namespace softengine;
 
+Mesh3D MeshBuilder::BuildPlane(
+	double width,
+	double depth,
+	Material& material)
+{
+	std::vector<size_t> indices =
+	{
+		0, 1, 3, 1, 2, 3,
+	};
+
+	double halfWidth = width / 2.0;
+	double halfDepth = depth / 2.0;
+
+	std::vector<Vertex3D> vertices
+	{
+		Vertex3D(Vector3D(-halfWidth, 0.0, -halfDepth), Vector2D(0.01, 0.01), Vector3D(0, 1, 0).Normalised(), material.Difffuse()),	// F_TL
+		Vertex3D(Vector3D(halfWidth, 0.0, -halfDepth), Vector2D(0.99, 0.01), Vector3D(0, 1, 0).Normalised(), material.Difffuse()),	// F_TR
+		Vertex3D(Vector3D(halfWidth, 0.0, halfDepth), Vector2D(0.99, 0.99), Vector3D(0, 1, 0).Normalised(), material.Difffuse()),	// F_BR
+		Vertex3D(Vector3D(-halfWidth, 0.0, halfDepth), Vector2D(0.01, 0.99), Vector3D(0, 1, 0).Normalised(), material.Difffuse()),	// F_BL
+	};
+
+	return
+		Mesh3D(
+			indices,
+			vertices,
+			Frame3D(),
+			DrawType::Triangles,
+			material
+		);
+}
+
 Mesh3D MeshBuilder::BuildCube(
 	double width, 
 	double height, 
