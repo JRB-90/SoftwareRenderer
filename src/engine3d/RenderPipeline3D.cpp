@@ -319,7 +319,7 @@ void RenderPipeline3D::RunTriangles(
 
 		pipelineProfiler.AddTiming("Raster Space");
 
-		RasteringTools::TriangleRasteriser(
+		RasteringTools::TriangleRasteriser3(
 			surface,
 			pipelineConfiguration,
 			camera,

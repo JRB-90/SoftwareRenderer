@@ -178,7 +178,7 @@ namespace softengine
 			Profiler& profiler
 		);
 
-		static void TriangleRasteriser(
+		static void TriangleRasteriser1(
 			RenderSurface& surface,
 			PipelineConfiguration& pipelineConfiguration,
 			Camera& camera,
@@ -212,6 +212,21 @@ namespace softengine
 			Vector3D a,
 			Vector3D b,
 			Vector3D c
+		);
+
+		static void TriangleRasteriser3(
+			RenderSurface& surface,
+			PipelineConfiguration& pipelineConfiguration,
+			Camera& camera,
+			Vertex4D& vertex1,
+			Vertex4D& vertex2,
+			Vertex4D& vertex3,
+			Vertex4D& oV1,
+			Vertex4D& oV2,
+			Vertex4D& oV3,
+			Material& material,
+			SceneLighting& lights,
+			Profiler& profiler
 		);
 	};
 }

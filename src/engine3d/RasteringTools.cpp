@@ -253,7 +253,7 @@ void RasteringTools::LineRasteriser(
 	}
 }
 
-void RasteringTools::TriangleRasteriser(
+void RasteringTools::TriangleRasteriser1(
 	RenderSurface& surface,
 	PipelineConfiguration& pipelineConfiguration,
 	Camera& camera,
@@ -466,6 +466,24 @@ void RasteringTools::TriangleRasteriser2(
 	SceneLighting& lights,
 	Profiler& profiler)
 {
+	Vector3D v0 = Vector3D(vertex0.Position.X(), vertex0.Position.Y(), vertex0.Position.Z());
+	Vector3D v1 = Vector3D(vertex1.Position.X(), vertex1.Position.Y(), vertex1.Position.Z());
+	Vector3D v2 = Vector3D(vertex2.Position.X(), vertex2.Position.Y(), vertex2.Position.Z());
+	Vector3D v01 = (v1 - v0).Normalised();
+	Vector3D v02 = (v2 - v0).Normalised();
+	Vector3D cross = v01.Cross(v02).Normalised();
+
+	if ((pipelineConfiguration.backFaceCullingMode == BackFaceCullingMode::Clockwise) &&
+		cross.Z() < 0.0)
+	{
+		return;
+	}
+	else if ((pipelineConfiguration.backFaceCullingMode == BackFaceCullingMode::AntiClockwise) &&
+		cross.Z() > 0.0)
+	{
+		return;
+	}
+
 	bool hasTexture = 
 		material.GetTexture().Height() > 0 &&
 		material.GetTexture().Width() > 0;
@@ -487,15 +505,7 @@ void RasteringTools::TriangleRasteriser2(
 	Color4D c2d = vertex2.VertColor.GetAs4D();
 	Vector4D vc2(c2d.r, c2d.g, c2d.b, c2d.a);
 
-	// Triangle setup
-	Vector3D v0 = Vector3D(vertex0.Position.X(), vertex0.Position.Y(), vertex0.Position.Z());
-	Vector3D v1 = Vector3D(vertex1.Position.X(), vertex1.Position.Y(), vertex1.Position.Z());
-	Vector3D v2 = Vector3D(vertex2.Position.X(), vertex2.Position.Y(), vertex2.Position.Z());
-	
-	double invV0 = 1.0 / v0.Z();
-	double invV1 = 1.0 / v1.Z();
-	double invV2 = 1.0 / v2.Z();
-
+	// Triangle setup	
 	double A01 = v0.Y() - v1.Y();
 	double A12 = v1.Y() - v2.Y();
 	double A20 = v2.Y() - v0.Y();
@@ -504,9 +514,9 @@ void RasteringTools::TriangleRasteriser2(
 	double B12 = v2.X() - v1.X();
 	double B20 = v0.X() - v2.X();
 
-	double C01 = v0.X() * v1.Y() - v0.Y() * v1.X();
-	double C12 = v1.X() * v2.Y() - v1.Y() * v2.X();
-	double C20 = v2.X() * v0.Y() - v2.Y() * v0.X();
+	//double C01 = v0.X() * v1.Y() - v0.Y() * v1.X();
+	//double C12 = v1.X() * v2.Y() - v1.Y() * v2.X();
+	//double C20 = v2.X() * v0.Y() - v2.Y() * v0.X();
 
 	// Barycentric coordinates at minX/minY corner
 	double minX = std::min(std::min(v0.X(), v1.X()), v2.X());
@@ -599,13 +609,6 @@ void RasteringTools::TriangleRasteriser2(
 					pipelineConfiguration.depthCheckMode,
 					profiler
 				);
-
-				// Render pixel
-				//surface.SetPixelValue(
-				//	px,
-				//	py,
-				//	Color(1.0, 0.0, 0.0, 1.0)
-				//);
 			}
 
 			// One step to the right
@@ -633,4 +636,205 @@ double RasteringTools::Orient(
 	);
 
 	return m.Determinant();
+}
+
+void RasteringTools::TriangleRasteriser3(
+	RenderSurface& surface,
+	PipelineConfiguration& pipelineConfiguration,
+	Camera& camera,
+	Vertex4D& vertex0,
+	Vertex4D& vertex1,
+	Vertex4D& vertex2,
+	Vertex4D& oV0,
+	Vertex4D& oV1,
+	Vertex4D& oV2,
+	Material& material,
+	SceneLighting& lights,
+	Profiler& profiler)
+{
+	// Check if face needs culling
+	Vector3D vec3_0 = Vector3D(vertex0.Position.X(), vertex0.Position.Y(), vertex0.Position.Z());
+	Vector3D vec3_1 = Vector3D(vertex1.Position.X(), vertex1.Position.Y(), vertex1.Position.Z());
+	Vector3D vec3_2 = Vector3D(vertex2.Position.X(), vertex2.Position.Y(), vertex2.Position.Z());
+	Vector3D v01 = (vec3_1 - vec3_0).Normalised();
+	Vector3D v02 = (vec3_2 - vec3_0).Normalised();
+	Vector3D cross = v01.Cross(v02).Normalised();
+
+	if ((pipelineConfiguration.backFaceCullingMode == BackFaceCullingMode::Clockwise) &&
+		cross.Z() < 0.0)
+	{
+		return;
+	}
+	else if ((pipelineConfiguration.backFaceCullingMode == BackFaceCullingMode::AntiClockwise) &&
+		cross.Z() > 0.0)
+	{
+		return;
+	}
+
+	// Setup some conveinence objects
+	Vector2D p0 = Vector2D(vertex0.Position.X(), vertex0.Position.Y());
+	Vector2D p1 = Vector2D(vertex1.Position.X(), vertex1.Position.Y());
+	Vector2D p2 = Vector2D(vertex2.Position.X(), vertex2.Position.Y());
+
+	Vector3D oVec3_0 = Vector3D(oV0.Position.X(), oV0.Position.Y(), oV0.Position.Z());
+	Vector3D oVec3_1 = Vector3D(oV1.Position.X(), oV1.Position.Y(), oV1.Position.Z());
+	Vector3D oVec3_2 = Vector3D(oV2.Position.X(), oV2.Position.Y(), oV2.Position.Z());
+	Vector3D oV01 = (oVec3_1 - oVec3_0).Normalised();
+	Vector3D oV02 = (oVec3_2 - oVec3_0).Normalised();
+	Vector3D oCross = oV01.Cross(oV02).Normalised();
+	Vector4D faceNormal(oCross.X(), oCross.Y(), oCross.Z(), 1.0);
+
+	Color4D c0d = vertex0.VertColor.GetAs4D();
+	Vector4D vc0(c0d.r, c0d.g, c0d.b, c0d.a);
+	Color4D c1d = vertex1.VertColor.GetAs4D();
+	Vector4D vc1(c1d.r, c1d.g, c1d.b, c1d.a);
+	Color4D c2d = vertex2.VertColor.GetAs4D();
+	Vector4D vc2(c2d.r, c2d.g, c2d.b, c2d.a);
+
+	bool hasTexture =
+		material.GetTexture().Height() > 0 &&
+		material.GetTexture().Width() > 0;
+
+	if (p1.Y() < p0.Y())
+	{
+		Vector2D temp = p1;
+		p1 = p0;
+		p0 = temp;
+	}
+	if (p2.Y() < p0.Y())
+	{
+		Vector2D temp = p2;
+		p2 = p0;
+		p0 = temp;
+	}
+	if (p2.Y() < p1.Y())
+	{
+		Vector2D temp = p2;
+		p2 = p1;
+		p1 = temp;
+	}
+
+	std::vector<int> x01 =
+		InterpolationTools::InterpolateXPixelValues(
+			p0.X(),
+			p0.Y(),
+			p1.X(),
+			p1.Y()
+		);
+
+	std::vector<int> x12 =
+		InterpolationTools::InterpolateXPixelValues(
+			p1.X(),
+			p1.Y(),
+			p2.X(),
+			p2.Y()
+		);
+
+	std::vector<int> x02 =
+		InterpolationTools::InterpolateXPixelValues(
+			p0.X(),
+			p0.Y(),
+			p2.X(),
+			p2.Y()
+		);
+
+	x01.pop_back();
+	std::vector<int> x012;
+	for (auto x : x01)
+	{
+		x012.push_back(x);
+	}
+	for (auto x : x12)
+	{
+		x012.push_back(x);
+	}
+
+	std::vector<int> xLeft;
+	std::vector<int> xRight;
+	int m = x02.size() / 2;
+	if (x02[m] < x012[m])
+	{
+		xLeft = x02;
+		xRight = x012;
+	}
+	else
+	{
+		xLeft = x012;
+		xRight = x02;
+	}
+
+	for (int y = p0.Y(); y < p2.Y(); y++)
+	{
+		for (int x = xLeft[y - p0.Y()]; x < xRight[y - p0.Y()]; x++)
+		{
+			Vector3D baryCoords =
+				InterpolationTools::FindBaryCentricFactors(
+					vertex0.Position,
+					vertex1.Position,
+					vertex2.Position,
+					Vector4D(x, y, 0.0, 1.0)
+				);
+
+			double w0 = baryCoords.X();
+			double w1 = baryCoords.Y();
+			double w2 = baryCoords.Z();
+
+			double denom = 1.0 / ((double)w0 + (double)w1 + (double)w2);
+			double _w0 = (double)w0 * denom;
+			double _w1 = (double)w1 * denom;
+			double _w2 = (double)w2 * denom;
+
+			double persCorrector = 1.0 / (_w0 * vertex0.Position.W() + _w1 * vertex1.Position.W() + _w2 * vertex2.Position.W());
+			_w0 = _w0 * vertex0.Position.W() * persCorrector;
+			_w1 = _w1 * vertex1.Position.W() * persCorrector;
+			_w2 = _w2 * vertex2.Position.W() * persCorrector;
+
+			Vector4D fragmentPos(x, y, 0.0, 1.0);
+			Vector4D interpPos = (oV0.Position * w0 + oV1.Position * w1 + oV2.Position * w2) * denom;
+			Vector4D interpNorm = (vertex0.Normal * _w0 + vertex1.Normal * _w1 + vertex2.Normal * _w2);
+			Vector4D interpTex = (vertex0.UVCoord * _w0 + vertex1.UVCoord * _w1 + vertex2.UVCoord * _w2);
+			Color interpColor;
+
+			if (hasTexture)
+			{
+				interpColor = material.GetTexture().GetPixel(
+					interpTex.X() * (double)material.GetTexture().Width(),
+					interpTex.Y() * (double)material.GetTexture().Height()
+				);
+			}
+			else
+			{
+				Vector4D interpColorVec = (vc0 * _w0 + vc1 * _w1 + vc2 * _w2);
+				interpColor = Color(interpColorVec.X(), interpColorVec.Y(), interpColorVec.Z(), interpColorVec.W());
+			}
+
+			if (!RasteringTools::PassesDepthCheck(
+					surface,
+					Vector3D(
+						fragmentPos.X(),
+						fragmentPos.Y(),
+						interpPos.Z()
+					),
+					pipelineConfiguration.depthCheckMode
+				)
+			)
+			{
+				continue;
+			}
+
+			ShaderTools::PixelShader(
+				surface,
+				camera,
+				fragmentPos,
+				interpPos,
+				interpNorm,
+				faceNormal,
+				interpColor,
+				material,
+				lights,
+				pipelineConfiguration.depthCheckMode,
+				profiler
+			);
+		}
+	}
 }
