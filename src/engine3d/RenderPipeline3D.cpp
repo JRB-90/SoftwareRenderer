@@ -264,9 +264,10 @@ void RenderPipeline3D::RunTriangles(
 	Profiler pipelineProfiler;
 	Profiler pixelProfiler;
 
-	for (size_t i = 0; i < vbo.IndicesSize() - 2; i += 3)
+	#pragma omp parallel for shared(pipelineProfiler, pixelProfiler)
+	for (int i = 0; i < vbo.IndicesSize() - 2; i += 3)
 	{
-		pipelineProfiler.ResetTimer();
+		//pipelineProfiler.ResetTimer();
 
 		Matrix4 MVP = camera.ProjectionMatrix() * camera.ViewMatrix() * model;
 
@@ -289,7 +290,7 @@ void RenderPipeline3D::RunTriangles(
 				MVP
 			);
 
-		pipelineProfiler.AddTiming("Vertex Shader");
+		//pipelineProfiler.AddTiming("Vertex Shader");
 
 		if (!RasteringTools::PassesClipTest(vert1) &&
 			!RasteringTools::PassesClipTest(vert2) &&
@@ -298,7 +299,7 @@ void RenderPipeline3D::RunTriangles(
 			continue;
 		}
 
-		pipelineProfiler.AddTiming("Clip Test");
+		//pipelineProfiler.AddTiming("Clip Test");
 
 		Vertex4D screenSpaceV1(vert1);
 		Vertex4D screenSpaceV2(vert2);
@@ -317,7 +318,7 @@ void RenderPipeline3D::RunTriangles(
 			camera
 		);
 
-		pipelineProfiler.AddTiming("Raster Space");
+		//pipelineProfiler.AddTiming("Raster Space");
 
 		RasteringTools::TriangleRasteriser3(
 			surface,
@@ -334,7 +335,7 @@ void RenderPipeline3D::RunTriangles(
 			pixelProfiler
 		);
 
-		pipelineProfiler.AddTiming("Tri Raster");
+		//pipelineProfiler.AddTiming("Tri Raster");
 	}
 
 	pixelProfiler.PrintTimings();

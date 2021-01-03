@@ -1,5 +1,7 @@
 cmake_minimum_required (VERSION 3.8)
 
+add_compile_options("/openmp:experimental")
+
 find_library(engine NAMES engine)
 find_library(engine3d NAMES engine3d)
 find_library(model_importer NAMES model_importer)
