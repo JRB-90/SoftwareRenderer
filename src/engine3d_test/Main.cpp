@@ -48,7 +48,7 @@ int main(int argc, const char* argv[])
 			0.1,
 			10000.0
 		);
-	camera->Position(Frame3D(Vector3D(0, 1, 3.0)));
+	camera->Position(Frame3D(Vector3D(0.0, 0.0, 3.0)));
 
 	renderingEngine =
 		std::make_shared<RenderingEngine3D>(
@@ -86,13 +86,13 @@ void SetupScene()
 	Texture checkerboardTexture = imageLoader.LoadImageResource("textures\\checkerboard.png");
 	Texture nullTexture;
 
-	scene->Meshes().push_back(
-		ModelImporter::LoadModelResource(
-			"models/suzanne.obj",
-			Material(Color(1.0, 1.0, 1.0, 1.0), ShadingType::Phong),
-			true, false
-		)
-	);
+	//scene->Meshes().push_back(
+	//	ModelImporter::LoadModelResource(
+	//		"models/suzanne.obj",
+	//		Material(Color(1.0, 1.0, 1.0, 1.0), ShadingType::Phong),
+	//		true, false
+	//	)
+	//);
 
 	//scene->Meshes().push_back(
 	//	MeshBuilder::BuildCube(
@@ -113,25 +113,14 @@ void SetupScene()
 	//	)
 	//);
 
-	//std::vector<size_t> planeIndices =
-	//{
-	//	0, 1, 3, 1, 2, 3
-	//};
-
-	//std::vector<Vertex3D> planeVerts =
-	//{
-	//	Vertex3D(Vector3D(-0.5, 0.5, 0.0), Color::White),
-	//	Vertex3D(Vector3D(0.5, 0.5, 0.0), Color::White),
-	//	Vertex3D(Vector3D(0.5, -0.5, 0.0), Color::White),
-	//	Vertex3D(Vector3D(-0.5, -0.5, 0.0), Color::White),
-	//};
-
-	//scene->Meshes().push_back(
-	//	Mesh3D(
-	//		planeIndices,
-	//		planeVerts
-	//	)
-	//);
+	Mesh3D plane =
+		MeshBuilder::BuildPlane(
+			1.0,
+			1.0,
+			Material(Color(1.0, 0.0, 0.0, 1.0), ShadingType::None)
+		);
+	plane.Transform(Frame3D(Rotation3D(90.0, 0.0, 0.0)));
+	scene->Meshes().push_back(plane);
 
 	//scene->Meshes().push_back(
 	//	Mesh3D(
@@ -142,29 +131,29 @@ void SetupScene()
 	//	)
 	//);
 
-	AmbientLight ambient(
-		Color::White,
-		0.25
-	);
-	DirectionalLight directional(
-		Vector3D(0, 0, 1),
-		Color(1.0, 1.0, 1.0, 1.0)
-	);
-	PointLight point1(
-		Vector3D(2, 2, 0),
-		Color::Red,
-		Attenuation()
-	);
-	PointLight point2(
-		Vector3D(0, -5, 0),
-		Color::Blue,
-		Attenuation()
-	);
-	
-	scene->Lighting().SetAmbientLight(ambient);
-	scene->Lighting().GetDirectionalLights().push_back(directional);
-	scene->Lighting().GetPointsLights().push_back(point1);
-	scene->Lighting().GetPointsLights().push_back(point2);
+	//AmbientLight ambient(
+	//	Color::White,
+	//	0.25
+	//);
+	//DirectionalLight directional(
+	//	Vector3D(0, 0, 1),
+	//	Color(1.0, 1.0, 1.0, 1.0)
+	//);
+	//PointLight point1(
+	//	Vector3D(2, 2, 0),
+	//	Color::Red,
+	//	Attenuation()
+	//);
+	//PointLight point2(
+	//	Vector3D(0, -5, 0),
+	//	Color::Blue,
+	//	Attenuation()
+	//);
+	//
+	//scene->Lighting().SetAmbientLight(ambient);
+	//scene->Lighting().GetDirectionalLights().push_back(directional);
+	//scene->Lighting().GetPointsLights().push_back(point1);
+	//scene->Lighting().GetPointsLights().push_back(point2);
 }
 
 double modelSpeed = 3.0;
@@ -223,7 +212,7 @@ void Update(
 	//);
 
 	double t = std::sin(timeInc / 180) * 10.0;
-	scene->Lighting().GetPointsLights()[1].Position().X(t);
+	//scene->Lighting().GetPointsLights()[1].Position().X(t);
 
 	timeInc += 10.0;
 }

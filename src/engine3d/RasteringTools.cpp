@@ -5,6 +5,7 @@
 #include "Vector4D.h"
 #include "Vertex3D.h"
 #include "Vertex4D.h"
+#include "Matrix3.h"
 #include "Color.h"
 #include "Texture.h"
 #include "Material.h"
@@ -449,4 +450,187 @@ void RasteringTools::TriangleRasteriser(
 			);
 		}
 	}
+}
+
+void RasteringTools::TriangleRasteriser2(
+	RenderSurface& surface,
+	PipelineConfiguration& pipelineConfiguration,
+	Camera& camera,
+	Vertex4D& vertex0,
+	Vertex4D& vertex1,
+	Vertex4D& vertex2,
+	Vertex4D& oV0,
+	Vertex4D& oV1,
+	Vertex4D& oV2,
+	Material& material,
+	SceneLighting& lights,
+	Profiler& profiler)
+{
+	bool hasTexture = 
+		material.GetTexture().Height() > 0 &&
+		material.GetTexture().Width() > 0;
+
+	// Find face normal
+	Vector3D oVec3_0 = Vector3D(oV0.Position.X(), oV0.Position.Y(), oV0.Position.Z());
+	Vector3D oVec3_1 = Vector3D(oV1.Position.X(), oV1.Position.Y(), oV1.Position.Z());
+	Vector3D oVec3_2 = Vector3D(oV2.Position.X(), oV2.Position.Y(), oV2.Position.Z());
+	Vector3D oV01 = (oVec3_1 - oVec3_0).Normalised();
+	Vector3D oV02 = (oVec3_2 - oVec3_0).Normalised();
+	Vector3D oCross = oV01.Cross(oV02).Normalised();
+	Vector4D faceNormal(oCross.X(), oCross.Y(), oCross.Z(), 1.0);
+
+	// Setup some conveinence objects
+	Color4D c0d = vertex0.VertColor.GetAs4D();
+	Vector4D vc0(c0d.r, c0d.g, c0d.b, c0d.a);
+	Color4D c1d = vertex1.VertColor.GetAs4D();
+	Vector4D vc1(c1d.r, c1d.g, c1d.b, c1d.a);
+	Color4D c2d = vertex2.VertColor.GetAs4D();
+	Vector4D vc2(c2d.r, c2d.g, c2d.b, c2d.a);
+
+	// Triangle setup
+	Vector3D v0 = Vector3D(vertex0.Position.X(), vertex0.Position.Y(), vertex0.Position.Z());
+	Vector3D v1 = Vector3D(vertex1.Position.X(), vertex1.Position.Y(), vertex1.Position.Z());
+	Vector3D v2 = Vector3D(vertex2.Position.X(), vertex2.Position.Y(), vertex2.Position.Z());
+	
+	double invV0 = 1.0 / v0.Z();
+	double invV1 = 1.0 / v1.Z();
+	double invV2 = 1.0 / v2.Z();
+
+	double A01 = v0.Y() - v1.Y();
+	double A12 = v1.Y() - v2.Y();
+	double A20 = v2.Y() - v0.Y();
+
+	double B01 = v1.X() - v0.X();
+	double B12 = v2.X() - v1.X();
+	double B20 = v0.X() - v2.X();
+
+	double C01 = v0.X() * v1.Y() - v0.Y() * v1.X();
+	double C12 = v1.X() * v2.Y() - v1.Y() * v2.X();
+	double C20 = v2.X() * v0.Y() - v2.Y() * v0.X();
+
+	// Barycentric coordinates at minX/minY corner
+	double minX = std::min(std::min(v0.X(), v1.X()), v2.X());
+	double minY = std::min(std::min(v0.Y(), v1.Y()), v2.Y());
+	double maxX = std::max(std::max(v0.X(), v1.X()), v2.X());
+	double maxY = std::max(std::max(v0.Y(), v1.Y()), v2.Y());
+
+	Vector3D p(minX, minY, 0.0);
+	int w0Row = Orient(v1, v2, p);
+	int w1Row = Orient(v2, v0, p);
+	int w2Row = Orient(v0, v1, p);
+
+	int px = p.X();
+	int py = p.Y();
+
+	// Rasterize
+	for (py = minY; py <= maxY; py++)
+	{
+		// Barycentric coordinates at start of row
+		int w0 = w0Row;
+		int w1 = w1Row;
+		int w2 = w2Row;
+
+		for (px = minX; px <= maxX; px++)
+		{
+			// If p is on or inside all edges, render pixel
+			if ((w0 | w1 | w2) >= 0)
+			{
+				// TODO - For future optimisations, I could figure out how to step the perspective
+				//        correct barycentric coords (_w0, _w1, _w2) with the none perspective correct
+				//        ones (w0, w1, w2).
+				//        This would negate the need for the calculations below, saving a small amount
+				//        of time per fragment process.
+				//        This is important as it might also be able to be extended to step all of the
+				//        other attributes too along with it, which will save a lot of time.
+
+				double denom = 1.0 / ((double)w0 + (double)w1 + (double)w2);
+				double _w0 = (double)w0 * denom;
+				double _w1 = (double)w1 * denom;
+				double _w2 = (double)w2 * denom;
+
+				double persCorrector = 1.0 / (_w0 * vertex0.Position.W() + _w1 * vertex1.Position.W() + _w2 * vertex2.Position.W());
+				_w0 = _w0 * vertex0.Position.W() * persCorrector;
+				_w1 = _w1 * vertex1.Position.W() * persCorrector;
+				_w2 = _w2 * vertex2.Position.W() * persCorrector;
+
+				Vector4D fragmentPos(px, py, 0.0, 1.0);
+				Vector4D interpPos = (oV0.Position * w0 + oV1.Position * w1 + oV2.Position * w2) * denom;
+				Vector4D interpNorm = (vertex0.Normal * _w0 + vertex1.Normal * _w1 + vertex2.Normal * _w2);
+				Vector4D interpTex = (vertex0.UVCoord * _w0 + vertex1.UVCoord * _w1 + vertex2.UVCoord * _w2);
+				Color interpColor;
+
+				if (hasTexture)
+				{
+					interpColor = material.GetTexture().GetPixel(
+						interpTex.X() * (double)material.GetTexture().Width(),
+						interpTex.Y() * (double)material.GetTexture().Height()
+					);
+				}
+				else
+				{
+					Vector4D interpColorVec = (vc0 * _w0 + vc1 * _w1 + vc2 * _w2);
+					interpColor = Color(interpColorVec.X(), interpColorVec.Y(), interpColorVec.Z(), interpColorVec.W());
+				}
+
+				if (!RasteringTools::PassesDepthCheck(
+						surface,
+						Vector3D(
+							fragmentPos.X(),
+							fragmentPos.Y(),
+							interpPos.Z()
+						),
+						pipelineConfiguration.depthCheckMode
+					)
+				)
+				{
+					continue;
+				}
+
+				ShaderTools::PixelShader(
+					surface,
+					camera,
+					fragmentPos,
+					interpPos,
+					interpNorm,
+					faceNormal,
+					interpColor,
+					material,
+					lights,
+					pipelineConfiguration.depthCheckMode,
+					profiler
+				);
+
+				// Render pixel
+				//surface.SetPixelValue(
+				//	px,
+				//	py,
+				//	Color(1.0, 0.0, 0.0, 1.0)
+				//);
+			}
+
+			// One step to the right
+			w0 += A12;
+			w1 += A20;
+			w2 += A01;
+		}
+
+		// One row step
+		w0Row += B12;
+		w1Row += B20;
+		w2Row += B01;
+	}
+}
+
+double RasteringTools::Orient(
+	Vector3D a, 
+	Vector3D b, 
+	Vector3D c)
+{
+	Matrix3 m(
+		a.X(), b.X(), c.X(),
+		a.Y(), b.Y(), c.Y(),
+		    1,     1,     1
+	);
+
+	return m.Determinant();
 }

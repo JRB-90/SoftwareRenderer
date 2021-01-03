@@ -192,5 +192,26 @@ namespace softengine
 			SceneLighting& lights,
 			Profiler& profiler
 		);
+
+		static void TriangleRasteriser2(
+			RenderSurface& surface,
+			PipelineConfiguration& pipelineConfiguration,
+			Camera& camera,
+			Vertex4D& vertex1,
+			Vertex4D& vertex2,
+			Vertex4D& vertex3,
+			Vertex4D& oV1,
+			Vertex4D& oV2,
+			Vertex4D& oV3,
+			Material& material,
+			SceneLighting& lights,
+			Profiler& profiler
+		);
+
+		static double Orient(
+			Vector3D a,
+			Vector3D b,
+			Vector3D c
+		);
 	};
 }
