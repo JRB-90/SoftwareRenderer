@@ -3,6 +3,7 @@
 #include "Engine.h"
 #include "RenderingWindow.h"
 #include "RenderingMode.h"
+#include <memory>
 #include <cmath>
 
 using namespace softengine;
@@ -56,6 +57,8 @@ void RenderSurface::Resize(
 	size_t windowWidth, 
 	size_t windowHeight)
 {
+	std::unique_lock<std::mutex> lock(surfaceMutex);
+
 	// TODO - Handle window resize
 	//	      Potentially try to maintain aspect ratio with pixels?
 	//pixelsWidth = windowWidth;
@@ -66,6 +69,8 @@ void RenderSurface::Resize(
 
 Color RenderSurface::GetPixelValue(int pixel) const
 {
+	std::unique_lock<std::mutex> lock(surfaceMutex);
+
 	if (pixel < 0 ||
 		pixel >= pixelCount)
 	{
@@ -87,6 +92,8 @@ Color RenderSurface::GetPixelValue(
 	int pixelX,
 	int pixelY) const
 {
+	std::unique_lock<std::mutex> lock(surfaceMutex);
+
 	if (pixelX < 0 || pixelX >= pixelsWidth ||
 		pixelY < 0 || pixelY >= pixelsHeight)
 	{
@@ -108,6 +115,8 @@ void RenderSurface::SetPixelValue(
 	int pixel,
 	Color& color)
 {
+	std::unique_lock<std::mutex> lock(surfaceMutex);
+
 	if (pixel < 0 ||
 		pixel >= pixelCount)
 	{
@@ -126,6 +135,7 @@ void RenderSurface::SetPixelValue(
 	int pixelY,
 	Color& color)
 {
+	std::unique_lock<std::mutex> lock(surfaceMutex);
 
 	if (pixelX < 0 || pixelX >= pixelsWidth ||
 		pixelY < 0 || pixelY >= pixelsHeight)
@@ -144,6 +154,8 @@ double RenderSurface::GetZBufferVal(
 	int pixelX,
 	int pixelY)
 {
+	std::unique_lock<std::mutex> lock(surfaceMutex);
+
 	if (pixelX < 0 || pixelX >= pixelsWidth ||
 		pixelY < 0 || pixelY >= pixelsHeight)
 	{
@@ -160,6 +172,8 @@ void RenderSurface::SetZBufferVal(
 	int pixelY,
 	double val)
 {
+	std::unique_lock<std::mutex> lock(surfaceMutex);
+
 	if (pixelX < 0 || pixelX >= pixelsWidth ||
 		pixelY < 0 || pixelY >= pixelsHeight)
 	{
@@ -184,6 +198,8 @@ void RenderSurface::RenderTexture(
 	SDL_Rect& position, 
 	SDL_Texture* texture)
 {
+	std::unique_lock<std::mutex> lock(surfaceMutex);
+
 	SDL_RenderCopy(
 		renderer,
 		texture,
@@ -195,6 +211,8 @@ void RenderSurface::RenderTexture(
 
 void RenderSurface::Clear(Color color)
 {
+	std::unique_lock<std::mutex> lock(surfaceMutex);
+
 	Color4B c = color.GetAs4B();
 	SDL_SetRenderDrawColor(
 		renderer,
@@ -208,6 +226,8 @@ void RenderSurface::Clear(Color color)
 
 void RenderSurface::FillWithColor(Color color)
 {
+	std::unique_lock<std::mutex> lock(surfaceMutex);
+
 	Color4B c = color.GetAs4B();
 	for (size_t i = 0; i < screenBufSize; i += 4)
 	{
@@ -221,6 +241,8 @@ void RenderSurface::FillWithColor(Color color)
 
 void RenderSurface::ResetZBuffer()
 {
+	std::unique_lock<std::mutex> lock(surfaceMutex);
+
 	for (size_t i = 0; i < pixelCount; i++)
 	{
 		zBuffer[i] = FLT_MAX;
@@ -229,6 +251,8 @@ void RenderSurface::ResetZBuffer()
 
 void RenderSurface::RenderPixels()
 {
+	std::unique_lock<std::mutex> lock(surfaceMutex);
+
 	Uint8* lockedPixels = nullptr;
 	int pitch = 0;
 	SDL_LockTexture(

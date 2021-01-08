@@ -3,7 +3,7 @@
 #include "Color.h"
 #include "SDL.h"
 
-#include <memory>
+#include <mutex>
 
 namespace softengine
 {
@@ -71,5 +71,6 @@ namespace softengine
 		SDL_Texture* texture;
 		Uint8* pixels;
 		double* zBuffer;
+		mutable std::mutex surfaceMutex;
 	};
 }
