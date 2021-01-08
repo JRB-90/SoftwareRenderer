@@ -34,6 +34,20 @@ void RenderingWindow::Show()
 	);
 }
 
+void RenderingWindow::Update()
+{
+	int w;
+	int h;
+	SDL_GetWindowSize(
+		window,
+		&w,
+		&h
+	);
+
+	width = (size_t)w;
+	height = (size_t)h;
+}
+
 void RenderingWindow::Close()
 {
 	if (window != NULL)

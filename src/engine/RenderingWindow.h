@@ -15,6 +15,7 @@ namespace softengine
 		~RenderingWindow();
 
 		void Show();
+		void Update();
 		void Close();
 
 		SDL_Window* WindowHandle() { return window; }
@@ -24,7 +25,7 @@ namespace softengine
 	private:
 		SDL_Window* window;
 		const std::string title;
-		const size_t width;
-		const size_t height;
+		size_t width;
+		size_t height;
 	};
 }

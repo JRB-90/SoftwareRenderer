@@ -18,8 +18,6 @@ using namespace softengine;
 
 const size_t WINDOW_WIDTH = 640;
 const size_t WINDOW_HEIGHT = 480;
-const size_t PIXELS_WIDTH = 640;
-const size_t PIXELS_HEIGHT = 480;
 const int UPDATE_RATE = 30;
 
 std::shared_ptr<Scene3D> scene;
@@ -63,8 +61,8 @@ int main(int argc, const char* argv[])
 
 	camera =
 		std::make_shared<Camera>(
-			PIXELS_WIDTH,
-			PIXELS_HEIGHT,
+			WINDOW_WIDTH,
+			WINDOW_HEIGHT,
 			60.0,
 			0.1,
 			10000.0
@@ -75,8 +73,8 @@ int main(int argc, const char* argv[])
 		std::make_shared<RenderingEngine3D>(
 			scene,
 			camera,
-			PIXELS_WIDTH,
-			PIXELS_HEIGHT
+			WINDOW_WIDTH,
+			WINDOW_HEIGHT
 			);
 	renderingEngine->RefreshColor(Color(0.1, 0.1, 0.1, 1.0));
 

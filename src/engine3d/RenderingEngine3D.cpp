@@ -80,18 +80,15 @@ void RenderingEngine3D::InitialiseToWindow(
 	isInitialised = true;
 }
 
-void RenderingEngine3D::WindowResized(
-	size_t windowWidth, 
-	size_t windowHeight)
+void RenderingEngine3D::WindowResized(RenderingWindow& window)
 {
-	surface->Resize(
-		windowWidth,
-		windowHeight
-	);
+	surface->Resize(window);
 	pixelsWidth = surface->Width();
 	pixelsHeight = surface->Height();
 	pixelCount = surface->PixelCount();
 	screenBufSize = surface->ScreenBufSize();
+	camera->Width(pixelsWidth);
+	camera->Height(pixelsHeight);
 }
 
 void RenderingEngine3D::Render()

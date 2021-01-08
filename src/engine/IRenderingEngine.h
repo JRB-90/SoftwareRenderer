@@ -17,10 +17,7 @@ namespace softengine
 			RenderingWindow& window,
 			RenderingMode renderingMode
 		) = 0;
-		virtual void WindowResized(
-			size_t windowWidth,
-			size_t windowHeight
-		) = 0;
+		virtual void WindowResized(RenderingWindow& window) = 0;
 
 		virtual TextOverlay& GetTextOverLay() = 0;
 		virtual Color& RefreshColor() = 0;

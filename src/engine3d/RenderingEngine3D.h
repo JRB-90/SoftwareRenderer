@@ -42,10 +42,7 @@ namespace softengine
 			RenderingWindow& window,
 			RenderingMode renderingMode
 		);
-		void WindowResized(
-			size_t windowWidth,
-			size_t windowHeight
-		);
+		void WindowResized(RenderingWindow& window);
 		void Render() override;
 
 	private:

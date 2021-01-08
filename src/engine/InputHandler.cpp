@@ -22,19 +22,18 @@ void InputHandler::Update()
 			break;
 		}
 
-		currentState.windowResizeRequested = false;
-
 		switch (windowEvent.window.event)
 		{
 		case SDL_WINDOWEVENT_RESIZED:
-			currentState.windowResizeRequested = true;
 			currentState.windowSizeWidth = windowEvent.window.data1;
 			currentState.windowSizeHeight = windowEvent.window.data2;
-			break;
+			currentState.windowResizeRequested = true;
+
+			return;
 		default:
-			currentState.windowResizeRequested = false;
 			currentState.windowSizeWidth = 0;
 			currentState.windowSizeHeight = 0;
+			currentState.windowResizeRequested = false;
 			break;
 		}
 

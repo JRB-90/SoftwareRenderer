@@ -120,10 +120,8 @@ InputState Engine::PollInput()
 	
 	if (inputState.windowResizeRequested)
 	{
-		renderingEngine->WindowResized(
-			inputState.windowSizeWidth,
-			inputState.windowSizeHeight
-		);
+		renderingWindow.Update();
+		renderingEngine->WindowResized(renderingWindow);
 	}
 
 	return inputState;

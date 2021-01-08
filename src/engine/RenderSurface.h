@@ -4,6 +4,7 @@
 #include "SDL.h"
 
 #include <mutex>
+#include <memory>
 
 namespace softengine
 {
@@ -21,10 +22,7 @@ namespace softengine
 		);
 		~RenderSurface();
 
-		void Resize(
-			size_t windowWidth,
-			size_t windowHeight
-		);
+		void Resize(RenderingWindow& window);
 		Color GetPixelValue(int pixel) const;
 		Color GetPixelValue(
 			int pixelX,
@@ -67,10 +65,13 @@ namespace softengine
 		size_t pixelsHeight;
 		size_t pixelCount;
 		size_t screenBufSize;
+		RenderingMode renderingMode;
 		SDL_Renderer* renderer;
 		SDL_Texture* texture;
 		Uint8* pixels;
 		double* zBuffer;
-		mutable std::mutex surfaceMutex;
+		mutable std::recursive_mutex surfaceMutex;
+
+		void Initialise(RenderingWindow& window);
 	};
 }

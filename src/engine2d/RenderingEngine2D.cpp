@@ -42,14 +42,9 @@ void RenderingEngine2D::InitialiseToWindow(
 	isInitialised = true;
 }
 
-void RenderingEngine2D::WindowResized(
-	size_t windowWidth, 
-	size_t windowHeight)
+void RenderingEngine2D::WindowResized(RenderingWindow& window)
 {
-	surface->Resize(
-		windowWidth,
-		windowHeight
-	);
+	surface->Resize(window);
 	pixelsWidth = surface->Width();
 	pixelsHeight = surface->Height();
 	pixelCount = surface->PixelCount();

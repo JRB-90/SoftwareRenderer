@@ -3,7 +3,6 @@
 #include "Engine.h"
 #include "RenderingWindow.h"
 #include "RenderingMode.h"
-#include <memory>
 #include <cmath>
 
 using namespace softengine;
@@ -20,27 +19,10 @@ RenderSurface::RenderSurface(
 	screenBufSize(pixelCount * 4),
 	renderer(NULL),
 	texture(NULL),
-	pixels(NULL)
+	pixels(NULL),
+	renderingMode(renderingMode)
 {
-	renderer =
-		SDL_CreateRenderer(
-			window.WindowHandle(),
-			-1,
-			Engine::ToSDLRenderingFlag(renderingMode)
-		);
-
-	texture =
-		SDL_CreateTexture(
-			renderer,
-			SDL_PIXELFORMAT_ARGB8888,
-			SDL_TEXTUREACCESS_STREAMING,
-			pixelsWidth,
-			pixelsHeight
-		);
-
-	pixels = new Uint8[screenBufSize];
-	zBuffer = new double[pixelCount];
-	ResetZBuffer();
+	Initialise(window);
 }
 
 RenderSurface::~RenderSurface()
@@ -53,23 +35,28 @@ RenderSurface::~RenderSurface()
 	SDL_DestroyTexture(texture);
 }
 
-void RenderSurface::Resize(
-	size_t windowWidth, 
-	size_t windowHeight)
+void RenderSurface::Resize(RenderingWindow& window)
 {
-	std::unique_lock<std::mutex> lock(surfaceMutex);
+	std::unique_lock<std::recursive_mutex> lock(surfaceMutex);
 
-	// TODO - Handle window resize
-	//	      Potentially try to maintain aspect ratio with pixels?
-	//pixelsWidth = windowWidth;
-	//pixelsHeight = windowHeight;
-	//pixelCount = pixelsWidth * pixelsHeight;
-	//screenBufSize = pixelCount * 4;
+	delete[] pixels;
+	delete[] zBuffer;
+	pixels = NULL;
+	zBuffer = NULL;
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyTexture(texture);
+
+	pixelsWidth = window.Width();
+	pixelsHeight = window.Height();
+	pixelCount = pixelsWidth * pixelsHeight;
+	screenBufSize = pixelCount * 4;
+
+	Initialise(window);
 }
 
 Color RenderSurface::GetPixelValue(int pixel) const
 {
-	std::unique_lock<std::mutex> lock(surfaceMutex);
+	std::unique_lock<std::recursive_mutex> lock(surfaceMutex);
 
 	if (pixel < 0 ||
 		pixel >= pixelCount)
@@ -92,7 +79,7 @@ Color RenderSurface::GetPixelValue(
 	int pixelX,
 	int pixelY) const
 {
-	std::unique_lock<std::mutex> lock(surfaceMutex);
+	std::unique_lock<std::recursive_mutex> lock(surfaceMutex);
 
 	if (pixelX < 0 || pixelX >= pixelsWidth ||
 		pixelY < 0 || pixelY >= pixelsHeight)
@@ -115,7 +102,7 @@ void RenderSurface::SetPixelValue(
 	int pixel,
 	Color& color)
 {
-	std::unique_lock<std::mutex> lock(surfaceMutex);
+	std::unique_lock<std::recursive_mutex> lock(surfaceMutex);
 
 	if (pixel < 0 ||
 		pixel >= pixelCount)
@@ -135,7 +122,7 @@ void RenderSurface::SetPixelValue(
 	int pixelY,
 	Color& color)
 {
-	std::unique_lock<std::mutex> lock(surfaceMutex);
+	std::unique_lock<std::recursive_mutex> lock(surfaceMutex);
 
 	if (pixelX < 0 || pixelX >= pixelsWidth ||
 		pixelY < 0 || pixelY >= pixelsHeight)
@@ -154,7 +141,7 @@ double RenderSurface::GetZBufferVal(
 	int pixelX,
 	int pixelY)
 {
-	std::unique_lock<std::mutex> lock(surfaceMutex);
+	std::unique_lock<std::recursive_mutex> lock(surfaceMutex);
 
 	if (pixelX < 0 || pixelX >= pixelsWidth ||
 		pixelY < 0 || pixelY >= pixelsHeight)
@@ -172,7 +159,7 @@ void RenderSurface::SetZBufferVal(
 	int pixelY,
 	double val)
 {
-	std::unique_lock<std::mutex> lock(surfaceMutex);
+	std::unique_lock<std::recursive_mutex> lock(surfaceMutex);
 
 	if (pixelX < 0 || pixelX >= pixelsWidth ||
 		pixelY < 0 || pixelY >= pixelsHeight)
@@ -198,7 +185,7 @@ void RenderSurface::RenderTexture(
 	SDL_Rect& position, 
 	SDL_Texture* texture)
 {
-	std::unique_lock<std::mutex> lock(surfaceMutex);
+	std::unique_lock<std::recursive_mutex> lock(surfaceMutex);
 
 	SDL_RenderCopy(
 		renderer,
@@ -211,7 +198,7 @@ void RenderSurface::RenderTexture(
 
 void RenderSurface::Clear(Color color)
 {
-	std::unique_lock<std::mutex> lock(surfaceMutex);
+	std::unique_lock<std::recursive_mutex> lock(surfaceMutex);
 
 	Color4B c = color.GetAs4B();
 	SDL_SetRenderDrawColor(
@@ -226,7 +213,7 @@ void RenderSurface::Clear(Color color)
 
 void RenderSurface::FillWithColor(Color color)
 {
-	std::unique_lock<std::mutex> lock(surfaceMutex);
+	std::unique_lock<std::recursive_mutex> lock(surfaceMutex);
 
 	Color4B c = color.GetAs4B();
 	for (size_t i = 0; i < screenBufSize; i += 4)
@@ -241,7 +228,7 @@ void RenderSurface::FillWithColor(Color color)
 
 void RenderSurface::ResetZBuffer()
 {
-	std::unique_lock<std::mutex> lock(surfaceMutex);
+	std::unique_lock<std::recursive_mutex> lock(surfaceMutex);
 
 	for (size_t i = 0; i < pixelCount; i++)
 	{
@@ -251,7 +238,7 @@ void RenderSurface::ResetZBuffer()
 
 void RenderSurface::RenderPixels()
 {
-	std::unique_lock<std::mutex> lock(surfaceMutex);
+	std::unique_lock<std::recursive_mutex> lock(surfaceMutex);
 
 	Uint8* lockedPixels = nullptr;
 	int pitch = 0;
@@ -274,4 +261,27 @@ void RenderSurface::RenderPixels()
 		NULL
 	);
 	SDL_RenderPresent(renderer);
+}
+
+void RenderSurface::Initialise(RenderingWindow& window)
+{
+	renderer =
+		SDL_CreateRenderer(
+			window.WindowHandle(),
+			-1,
+			Engine::ToSDLRenderingFlag(renderingMode)
+		);
+
+	texture =
+		SDL_CreateTexture(
+			renderer,
+			SDL_PIXELFORMAT_ARGB8888,
+			SDL_TEXTUREACCESS_STREAMING,
+			pixelsWidth,
+			pixelsHeight
+		);
+
+	pixels = new Uint8[screenBufSize];
+	zBuffer = new double[pixelCount];
+	ResetZBuffer();
 }
