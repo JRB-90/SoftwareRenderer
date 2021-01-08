@@ -15,8 +15,7 @@
 using namespace softengine;
 
 Vertex4D ShaderTools::SimpleVertexShader(
-	RenderSurface& surface, 
-	Vertex3D& vertex, 
+	Vertex3D& vertex,
 	Matrix4& mvp)
 {
 	Vector4D vertPosition(

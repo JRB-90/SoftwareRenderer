@@ -130,5 +130,5 @@ void RenderingEngine3D::Render()
 	textOverlay.RenderToSurface(*surface);
 	profiler.AddTiming("Text Overlay");
 
-	profiler.PrintTimings();
+	//profiler.PrintTimings();
 }

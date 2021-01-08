@@ -21,6 +21,8 @@
 #include <iostream>
 #include <cmath>
 
+#include <omp.h>
+
 using namespace softengine;
 
 RenderPipeline3D::RenderPipeline3D(
@@ -115,7 +117,6 @@ void RenderPipeline3D::RunPoints(
 
 		Vertex4D vert = 
 			ShaderTools::SimpleVertexShader(
-				surface,
 				vbo.Vertices(vbo.Indices(i)),
 				MVP
 			);
@@ -203,13 +204,11 @@ void RenderPipeline3D::RunLines(
 
 		Vertex4D vert1 =
 			ShaderTools::SimpleVertexShader(
-				surface,
 				vbo.Vertices(vbo.Indices(i)),
 				MVP
 			);
 		Vertex4D vert2 =
 			ShaderTools::SimpleVertexShader(
-				surface,
 				vbo.Vertices(vbo.Indices(i + 1)),
 				MVP
 			);
@@ -253,6 +252,13 @@ void RenderPipeline3D::RunLines(
 	pipelineProfiler.PrintTimings();
 }
 
+struct Triangle
+{
+	Vertex3D v1;
+	Vertex3D v2;
+	Vertex3D v3;
+};
+
 void RenderPipeline3D::RunTriangles(
 	RenderSurface& surface,
 	VBO3D& vbo,
@@ -264,81 +270,95 @@ void RenderPipeline3D::RunTriangles(
 	Profiler pipelineProfiler;
 	Profiler pixelProfiler;
 
-	#pragma omp parallel for shared(pipelineProfiler, pixelProfiler)
+	std::vector<Triangle> triangles;
 	for (int i = 0; i < vbo.IndicesSize() - 2; i += 3)
 	{
-		//pipelineProfiler.ResetTimer();
-
-		Matrix4 MVP = camera.ProjectionMatrix() * camera.ViewMatrix() * model;
-
-		Vertex4D vert1 =
-			ShaderTools::SimpleVertexShader(
-				surface,
-				vbo.Vertices(vbo.Indices(i)),
-				MVP
-			);
-		Vertex4D vert2 =
-			ShaderTools::SimpleVertexShader(
-				surface,
-				vbo.Vertices(vbo.Indices(i + 1)),
-				MVP
-			);
-		Vertex4D vert3 =
-			ShaderTools::SimpleVertexShader(
-				surface,
-				vbo.Vertices(vbo.Indices(i + 2)),
-				MVP
-			);
-
-		//pipelineProfiler.AddTiming("Vertex Shader");
-
-		if (!RasteringTools::PassesClipTest(vert1) &&
-			!RasteringTools::PassesClipTest(vert2) &&
-			!RasteringTools::PassesClipTest(vert3))
-		{
-			continue;
-		}
-
-		//pipelineProfiler.AddTiming("Clip Test");
-
-		Vertex4D screenSpaceV1(vert1);
-		Vertex4D screenSpaceV2(vert2);
-		Vertex4D screenSpaceV3(vert3);
-
-		RasteringTools::TranformToRasterSpace(
-			vert1,
-			camera
-		);
-		RasteringTools::TranformToRasterSpace(
-			vert2,
-			camera
-		);
-		RasteringTools::TranformToRasterSpace(
-			vert3,
-			camera
-		);
-
-		//pipelineProfiler.AddTiming("Raster Space");
-
-		RasteringTools::TriangleRasteriser3(
-			surface,
-			pipelineConfiguration,
-			camera,
-			vert1,
-			vert2,
-			vert3,
-			screenSpaceV1,
-			screenSpaceV2,
-			screenSpaceV3,
-			material,
-			lights,
-			pixelProfiler
-		);
-
-		//pipelineProfiler.AddTiming("Tri Raster");
+		Triangle t;
+		t.v1 = vbo.Vertices(vbo.Indices(i));
+		t.v2 = vbo.Vertices(vbo.Indices(i + 1));
+		t.v3 = vbo.Vertices(vbo.Indices(i + 2));
+		triangles.push_back(t);
 	}
 
-	pixelProfiler.PrintTimings();
+	#pragma omp parallel num_threads(4) shared(surface, triangles) default(none)
+	{
+		#pragma omp for
+		for (int j = 0; j < triangles.size(); j++)
+		{
+			int threadID = omp_get_thread_num();
+
+			//pipelineProfiler.ResetTimer();
+
+			Matrix4 MVP = camera.ProjectionMatrix() * camera.ViewMatrix() * model;
+
+			Vertex4D vert1 =
+				ShaderTools::SimpleVertexShader(
+					triangles[j].v1,
+					MVP
+				);
+			Vertex4D vert2 =
+				ShaderTools::SimpleVertexShader(
+					triangles[j].v2,
+					MVP
+				);
+			Vertex4D vert3 =
+				ShaderTools::SimpleVertexShader(
+					triangles[j].v3,
+					MVP
+				);
+
+			//pipelineProfiler.AddTiming("Vertex Shader");
+
+			if (!RasteringTools::PassesClipTest(vert1) &&
+				!RasteringTools::PassesClipTest(vert2) &&
+				!RasteringTools::PassesClipTest(vert3))
+			{
+				continue;
+			}
+
+			//pipelineProfiler.AddTiming("Clip Test");
+
+			Vertex4D screenSpaceV1(vert1);
+			Vertex4D screenSpaceV2(vert2);
+			Vertex4D screenSpaceV3(vert3);
+
+			RasteringTools::TranformToRasterSpace(
+				vert1,
+				camera
+			);
+			RasteringTools::TranformToRasterSpace(
+				vert2,
+				camera
+			);
+			RasteringTools::TranformToRasterSpace(
+				vert3,
+				camera
+			);
+
+			//pipelineProfiler.AddTiming("Raster Space");
+
+			RasteringTools::TriangleRasteriser3(
+				surface,
+				pipelineConfiguration,
+				camera,
+				vert1,
+				vert2,
+				vert3,
+				screenSpaceV1,
+				screenSpaceV2,
+				screenSpaceV3,
+				material,
+				lights,
+				pixelProfiler
+			);
+
+			//pipelineProfiler.AddTiming("Tri Raster");
+		}
+	}
+
+	//pixelProfiler.PrintTimings();
+
+	pipelineProfiler.AddTiming("Render");
 	pipelineProfiler.PrintTimings();
 }
 

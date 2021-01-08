@@ -19,14 +19,12 @@ namespace softengine
 
 	struct VertexShaderIn
 	{
-		RenderSurface* surface;
 		Vertex3D* vertex;
 		Matrix4* model;
 		Camera* camera;
 
 		VertexShaderIn()
 	      :
-			surface(NULL),
 			vertex(NULL),
 			model(NULL),
 			camera(NULL)
@@ -34,12 +32,10 @@ namespace softengine
 		}
 
 		VertexShaderIn(
-			RenderSurface* surface,
 			Vertex3D* vertex,
 			Matrix4* model,
 			Camera* camera)
 	      :
-			surface(surface),
 			vertex(vertex),
 			model(model),
 			camera(camera)
@@ -76,7 +72,6 @@ namespace softengine
 		ShaderTools() = delete;
 
 		static Vertex4D SimpleVertexShader(
-			RenderSurface& surface,
 			Vertex3D& vertex,
 			Matrix4& mvp
 		);

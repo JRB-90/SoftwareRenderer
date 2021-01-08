@@ -60,7 +60,7 @@ void Engine::Run()
 			double timeTaken = (double)delta / (double)SDL_GetPerformanceFrequency();
 			previous = current;
 
-			std::printf("======================================================================================\n");
+			//std::printf("======================================================================================\n");
 			profiler.ResetProfileRun();
 			InputState inputState = PollInput();
 			profiler.AddTiming("Input Handling");
@@ -78,7 +78,7 @@ void Engine::Run()
 				//std::cout << "\033[2J" << "" << "\033[H";
 				//std::cout << ss.str();
 				renderingEngine->GetTextOverLay().SetText(ss.str());
-				profiler.PrintTimings();
+				//profiler.PrintTimings();
 				std::printf("\n");
 			}
 		}

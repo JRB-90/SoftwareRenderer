@@ -16,6 +16,8 @@
 #include "InterpolationTools.h"
 #include <cmath>
 
+#include <omp.h>
+
 using namespace softengine;
 
 bool RasteringTools::PassesClipTest(Vertex4D& v1)
@@ -822,6 +824,7 @@ void RasteringTools::TriangleRasteriser3(
 				continue;
 			}
 
+			#pragma omp critical
 			ShaderTools::PixelShader(
 				surface,
 				camera,

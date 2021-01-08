@@ -53,6 +53,11 @@ int main(int argc, const char* argv[])
 {
 	std::cout << "Starting..." << std::endl;
 
+	//if (putenv("OMP_WAIT_POLICY=passive"))
+	//{
+	//	std::cerr << "Failed to set OMP_WAIT_POLICY to passive" << std::endl;
+	//}
+
 	std::srand(std::time(nullptr));
 	scene = std::make_shared<Scene3D>();
 	ResourceLoader imageLoader;
@@ -112,8 +117,8 @@ void SetupScene()
 		true, false
 	);
 
-	scene->Meshes().push_back(point1Mesh);
-	scene->Meshes().push_back(point2Mesh);
+	//scene->Meshes().push_back(point1Mesh);
+	//scene->Meshes().push_back(point2Mesh);
 
 	//Mesh3D monkeyMesh = ModelImporter::LoadModelResource(
 	//	"models/suzanne.obj",
@@ -291,13 +296,13 @@ void UpdateModels(
 
 	point1Pos = Vector3D(ts * 3.0, point1Pos.Y(), point1Pos.Z());
 	point2Pos = Vector3D(point2Pos.X(), point2Pos.Y(), tc * 5.0);
-	scene->Meshes()[0].Transform().Translation(point1Pos);
-	scene->Meshes()[1].Transform().Translation(point2Pos);
+	//scene->Meshes()[0].Transform().Translation(point1Pos);
+	//scene->Meshes()[1].Transform().Translation(point2Pos);
 	scene->Lighting().GetPointsLights()[0].Position(point1Pos);
 	scene->Lighting().GetPointsLights()[1].Position(point2Pos);
 
 	if (isSpinning)
 	{
-		scene->Meshes()[2].Transform(scene->Meshes()[2].Transform() * Frame3D(Rotation3D(0, moveDelta, 0)));
+		//scene->Meshes()[2].Transform(scene->Meshes()[2].Transform() * Frame3D(Rotation3D(0, moveDelta, 0)));
 	}
 }

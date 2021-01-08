@@ -36,6 +36,11 @@ int main(int argc, const char* argv[])
 {
 	std::cout << "Starting..." << std::endl;
 
+	if (putenv("OMP_WAIT_POLICY=passive"))
+	{
+		std::cerr << "Failed to set OMP_WAIT_POLICY to passive" << std::endl;
+	}
+
 	std::srand(std::time(nullptr));
 	scene = std::make_shared<Scene3D>();
 	SetupScene();
