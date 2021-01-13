@@ -1,17 +1,41 @@
 #pragma once
 
+#include "Vector4D.h"
+#include "Color.h"
 #include <vector>
 
 namespace softengine
 {
 	class Vector2D;
 	class Vector3D;
-	class Vector4D;
 	class Vertex3D;
 	class Vertex4D;
-	class Color;
 	class Texture;
+	class Material;
 	struct RasterFragment;
+
+	struct InterpolatedFragment
+	{
+		Vector4D Fragment;
+		Vector4D Position;
+		Vector4D Normal;
+		Vector4D TexCoords;
+		Color FragColor;
+
+		InterpolatedFragment(
+			Vector4D& fragment,
+			Vector4D& position,
+			Vector4D& normal,
+			Vector4D& texCoords,
+			Color& fragColor)
+		{
+			this->Fragment = fragment;
+			this->Position = position;
+			this->Normal = normal;
+			this->TexCoords = texCoords;
+			this->FragColor = fragColor;
+		}
+	};
 
 	class InterpolationTools
 	{
@@ -102,7 +126,7 @@ namespace softengine
 			bool perspectiveCorrect = true
 		);
 
-		static void InterpolateFragment(
+		static InterpolatedFragment InterpolateFragment(
 			RasterFragment fragment,
 			Vertex4D& vertex0,
 			Vertex4D& vertex1,
@@ -114,6 +138,12 @@ namespace softengine
 			Vector4D& vc1,
 			Vector4D& vc2,
 			Material& material
+		);
+
+		static Vector4D CalculateFaceNormal(
+			Vector4D v0,
+			Vector4D v1,
+			Vector4D v2
 		);
 	};
 }

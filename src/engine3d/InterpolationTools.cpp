@@ -2,10 +2,8 @@
 
 #include "Vector2D.h"
 #include "Vector3D.h"
-#include "Vector4D.h"
 #include "Vertex3D.h"
 #include "Vertex4D.h"
-#include "Color.h"
 #include "Texture.h"
 #include "Material.h"
 #include "RasteringTools.h"
@@ -288,7 +286,7 @@ Color InterpolationTools::InterpolateTexture(
 	}
 }
 
-void InterpolationTools::InterpolateFragment(
+InterpolatedFragment InterpolationTools::InterpolateFragment(
 	RasterFragment fragment,
 	Vertex4D& vertex0,
 	Vertex4D& vertex1,
@@ -349,4 +347,29 @@ void InterpolationTools::InterpolateFragment(
 				interpColorVec.W()
 			);
 	}
+
+	return
+		InterpolatedFragment(
+			fragment.Fragment,
+			interpPos,
+			interpNorm,
+			interpTex,
+			interpColor
+		);
+}
+
+Vector4D InterpolationTools::CalculateFaceNormal(
+	Vector4D v0, 
+	Vector4D v1, 
+	Vector4D v2)
+{
+	Vector3D oVec3_0 = Vector3D(v0.X(), v0.Y(), v0.Z());
+	Vector3D oVec3_1 = Vector3D(v1.X(), v1.Y(), v1.Z());
+	Vector3D oVec3_2 = Vector3D(v2.X(), v2.Y(), v2.Z());
+	Vector3D oV01 = (oVec3_1 - oVec3_0).Normalised();
+	Vector3D oV02 = (oVec3_2 - oVec3_0).Normalised();
+	Vector3D oCross = oV01.Cross(oV02).Normalised();
+	Vector4D faceNormal(oCross.X(), oCross.Y(), oCross.Z(), 1.0);
+
+	return faceNormal;
 }
