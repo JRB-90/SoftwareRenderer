@@ -188,3 +188,10 @@ Color Color::InterpolateColor(
 			MathUtils::Interpolate(c1d.a, c2d.a, factor)
 		);
 }
+
+Vector4D Color::ToVec4()
+{
+	Color4D c = this->GetAs4D();
+	
+	return Vector4D(c.r, c.g, c.b, c.a);
+}

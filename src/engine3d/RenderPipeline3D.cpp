@@ -105,7 +105,6 @@ void RenderPipeline3D::RunPoints(
 	SceneLighting& lights)
 {
 	Profiler pipelineProfiler;
-	Profiler pixelProfiler;
 
 	for (size_t i = 0; i < vbo.IndicesSize(); i++)
 	{
@@ -160,8 +159,7 @@ void RenderPipeline3D::RunPoints(
 			pipelineConfiguration,
 			camera,
 			vert,
-			lights,
-			pixelProfiler
+			lights
 		);
 
 		//Vertex4D oV1(
@@ -181,7 +179,6 @@ void RenderPipeline3D::RunPoints(
 		pipelineProfiler.AddTiming("Point Raster");
 	}
 
-	pixelProfiler.PrintTimings();
 	pipelineProfiler.PrintTimings();
 }
 
@@ -193,7 +190,6 @@ void RenderPipeline3D::RunLines(
 	SceneLighting& lights)
 {
 	Profiler pipelineProfiler;
-	Profiler pixelProfiler;
 
 	for (size_t i = 0; i < vbo.IndicesSize() - 1; i += 2)
 	{
@@ -242,14 +238,12 @@ void RenderPipeline3D::RunLines(
 			camera,
 			vert1,
 			vert2,
-			lights,
-			pixelProfiler
+			lights
 		);
 
 		pipelineProfiler.AddTiming("Line Raster");
 	}
 
-	pixelProfiler.PrintTimings();
 	pipelineProfiler.PrintTimings();
 }
 
@@ -262,13 +256,12 @@ void RenderPipeline3D::RunTriangles(
 	SceneLighting& lights)
 {
 	Profiler pipelineProfiler;
-	Profiler pixelProfiler;
+
+	Matrix4 MVP = camera.ProjectionMatrix() * camera.ViewMatrix() * model;
 
 	for (size_t i = 0; i < vbo.IndicesSize() - 2; i += 3)
 	{
 		pipelineProfiler.ResetTimer();
-
-		Matrix4 MVP = camera.ProjectionMatrix() * camera.ViewMatrix() * model;
 
 		Vertex4D vert1 =
 			ShaderTools::SimpleVertexShader(
@@ -319,25 +312,85 @@ void RenderPipeline3D::RunTriangles(
 
 		pipelineProfiler.AddTiming("Raster Space");
 
-		RasteringTools::TriangleRasteriser3(
-			surface,
-			pipelineConfiguration,
-			camera,
-			vert1,
-			vert2,
-			vert3,
-			screenSpaceV1,
-			screenSpaceV2,
-			screenSpaceV3,
-			material,
-			lights,
-			pixelProfiler
-		);
+		std::vector<RasterFragment> fragments =
+			RasteringTools::TriangleRasteriser(
+				pipelineConfiguration,
+				vert1,
+				vert2,
+				vert3,
+				screenSpaceV1,
+				screenSpaceV2,
+				screenSpaceV3
+			);
 
 		pipelineProfiler.AddTiming("Tri Raster");
+
+		Vector4D vc1 = vert1.VertColor.ToVec4();
+		Vector4D vc2 = vert1.VertColor.ToVec4();
+		Vector4D vc3 = vert1.VertColor.ToVec4();
+
+		Vector4D faceNormal =
+			InterpolationTools::CalculateFaceNormal(
+				screenSpaceV1.Position,
+				screenSpaceV2.Position,
+				screenSpaceV3.Position
+			);
+
+		std::vector<InterpolatedFragment> interpolatedFragments;
+
+		for (RasterFragment& fragment : fragments)
+		{
+			InterpolatedFragment interpolatedFragment =
+				InterpolationTools::InterpolateFragment(
+					fragment,
+					vert1,
+					vert2,
+					vert3,
+					screenSpaceV1,
+					screenSpaceV2,
+					screenSpaceV3,
+					vc1,
+					vc2,
+					vc3,
+					material
+				);
+
+			if (RasteringTools::PassesDepthCheck(
+					surface,
+					Vector3D(
+						fragment.Fragment.X(),
+						fragment.Fragment.Y(),
+						interpolatedFragment.Position.Z()
+					),
+					pipelineConfiguration.depthCheckMode
+				)
+			)
+			{
+				interpolatedFragments.push_back(interpolatedFragment);
+			}
+		}
+
+		pipelineProfiler.AddTiming("Frag Interp");
+
+		for (InterpolatedFragment& interpolatedFragment : interpolatedFragments)
+		{
+			ShaderTools::PixelShader(
+				surface,
+				camera,
+				interpolatedFragment.Fragment,
+				interpolatedFragment.Position,
+				interpolatedFragment.Normal,
+				faceNormal,
+				interpolatedFragment.FragColor,
+				material,
+				lights,
+				pipelineConfiguration.depthCheckMode
+			);
+		}
+
+		pipelineProfiler.AddTiming("Pixel Shader");
 	}
 
-	pixelProfiler.PrintTimings();
 	pipelineProfiler.PrintTimings();
 }
 

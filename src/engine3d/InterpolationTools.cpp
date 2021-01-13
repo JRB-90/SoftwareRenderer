@@ -2,11 +2,11 @@
 
 #include "Vector2D.h"
 #include "Vector3D.h"
-#include "Vector4D.h"
 #include "Vertex3D.h"
 #include "Vertex4D.h"
-#include "Color.h"
 #include "Texture.h"
+#include "Material.h"
+#include "RasteringTools.h"
 
 using namespace softengine;
 
@@ -284,4 +284,92 @@ Color InterpolationTools::InterpolateTexture(
 				texInterp.Y() * (double)texture.Height()
 			);
 	}
+}
+
+InterpolatedFragment InterpolationTools::InterpolateFragment(
+	RasterFragment fragment,
+	Vertex4D& vertex0,
+	Vertex4D& vertex1,
+	Vertex4D& vertex2,
+	Vertex4D& oV0,
+	Vertex4D& oV1,
+	Vertex4D& oV2,
+	Vector4D& vc0,
+	Vector4D& vc1,
+	Vector4D& vc2,
+	Material& material)
+{
+	double w0 = fragment.BaryCoords.X();
+	double w1 = fragment.BaryCoords.Y();
+	double w2 = fragment.BaryCoords.Z();
+
+	double denom = 1.0 / ((double)w0 + (double)w1 + (double)w2);
+	double _w0 = (double)w0 * denom;
+	double _w1 = (double)w1 * denom;
+	double _w2 = (double)w2 * denom;
+
+	double persCorrector = 
+		1.0 / 
+		(
+			_w0 * vertex0.Position.W() +
+			_w1 * vertex1.Position.W() + 
+			_w2 * vertex2.Position.W()
+		);
+
+	_w0 = _w0 * vertex0.Position.W() * persCorrector;
+	_w1 = _w1 * vertex1.Position.W() * persCorrector;
+	_w2 = _w2 * vertex2.Position.W() * persCorrector;
+
+	Vector4D interpPos = (oV0.Position * w0 + oV1.Position * w1 + oV2.Position * w2) * denom;
+	Vector4D interpNorm = (vertex0.Normal * _w0 + vertex1.Normal * _w1 + vertex2.Normal * _w2);
+	Vector4D interpTex = (vertex0.UVCoord * _w0 + vertex1.UVCoord * _w1 + vertex2.UVCoord * _w2);
+	Color interpColor;
+
+	bool hasTexture =
+		material.GetTexture().Height() > 0 &&
+		material.GetTexture().Width() > 0;
+
+	if (hasTexture)
+	{
+		interpColor = material.GetTexture().GetPixel(
+			interpTex.X() * (double)material.GetTexture().Width(),
+			interpTex.Y() * (double)material.GetTexture().Height()
+		);
+	}
+	else
+	{
+		Vector4D interpColorVec = (vc0 * _w0 + vc1 * _w1 + vc2 * _w2);
+		interpColor = 
+			Color(
+				interpColorVec.X(), 
+				interpColorVec.Y(), 
+				interpColorVec.Z(),
+				interpColorVec.W()
+			);
+	}
+
+	return
+		InterpolatedFragment(
+			fragment.Fragment,
+			interpPos,
+			interpNorm,
+			interpTex,
+			interpColor
+		);
+}
+
+Vector4D InterpolationTools::CalculateFaceNormal(
+	Vector4D v0, 
+	Vector4D v1, 
+	Vector4D v2)
+{
+	Vector3D oVec3_0 = Vector3D(v0.X(), v0.Y(), v0.Z());
+	Vector3D oVec3_1 = Vector3D(v1.X(), v1.Y(), v1.Z());
+	Vector3D oVec3_2 = Vector3D(v2.X(), v2.Y(), v2.Z());
+	Vector3D oV01 = (oVec3_1 - oVec3_0).Normalised();
+	Vector3D oV02 = (oVec3_2 - oVec3_0).Normalised();
+	Vector3D oCross = oV01.Cross(oV02).Normalised();
+	Vector4D faceNormal(oCross.X(), oCross.Y(), oCross.Z(), 1.0);
+
+	return faceNormal;
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Vector4D.h"
 #include <cinttypes>
 
 namespace softengine
@@ -88,6 +89,8 @@ namespace softengine
 			Color& c2,
 			double factor
 		);
+
+		Vector4D ToVec4();
 
 	private:
 		Color4D color;

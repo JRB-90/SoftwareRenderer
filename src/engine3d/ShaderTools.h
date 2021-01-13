@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Profiler.h"
 #include "Vertex4D.h"
 #include <iostream>
 
@@ -96,16 +95,14 @@ namespace softengine
 			Color& interpolatedColor,
 			Material& material,
 			SceneLighting& lights,
-			DepthCheckMode depthCheckMode,
-			Profiler& profiler
+			DepthCheckMode depthCheckMode
 		);
 
 		static void PixelShader(
 			RenderSurface& surface,
 			Fragment& fragment,
 			Material& material,
-			SceneLighting& lights,
-			Profiler& profiler
+			SceneLighting& lights
 		);
 
 		static void PixelShaderNormal(

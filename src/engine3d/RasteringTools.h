@@ -1,13 +1,12 @@
 #pragma once
 
-#include "Profiler.h"
+#include "Vector3D.h"
+#include "Vector4D.h"
 #include <vector>
 
 namespace softengine
 {
 	class Vector2D;
-	class Vector3D;
-	class Vector4D;
 	class Vertex3D;
 	class Vertex4D;
 	class Material;
@@ -129,6 +128,20 @@ namespace softengine
 		}
 	};
 
+	struct RasterFragment
+	{
+		Vector3D BaryCoords;
+		Vector4D Fragment;
+
+		RasterFragment(
+			Vector3D& baryCoords,
+			Vector4D& fragment)
+		{
+			this->BaryCoords = baryCoords;
+			this->Fragment = fragment;
+		}
+	};
+
 	class RasteringTools
 	{
 	public:
@@ -159,13 +172,11 @@ namespace softengine
 			PipelineConfiguration& pipelineConfiguration,
 			Camera& camera,
 			Vertex4D& vertex,
-			SceneLighting& lights,
-			Profiler& profiler
+			SceneLighting& lights
 		);
 
 		static void PointRasteriser(
-			PointRasteriserIn in,
-			Profiler& profiler
+			PointRasteriserIn in
 		);
 
 		static void LineRasteriser(
@@ -174,59 +185,17 @@ namespace softengine
 			Camera& camera,
 			Vertex4D& vertex1,
 			Vertex4D& vertex2,
-			SceneLighting& lights,
-			Profiler& profiler
+			SceneLighting& lights
 		);
 
-		static void TriangleRasteriser1(
-			RenderSurface& surface,
+		static std::vector<RasterFragment> TriangleRasteriser(
 			PipelineConfiguration& pipelineConfiguration,
-			Camera& camera,
+			Vertex4D& vertex0,
 			Vertex4D& vertex1,
 			Vertex4D& vertex2,
-			Vertex4D& vertex3,
+			Vertex4D& oV0,
 			Vertex4D& oV1,
-			Vertex4D& oV2,
-			Vertex4D& oV3,
-			Material& material,
-			SceneLighting& lights,
-			Profiler& profiler
-		);
-
-		static void TriangleRasteriser2(
-			RenderSurface& surface,
-			PipelineConfiguration& pipelineConfiguration,
-			Camera& camera,
-			Vertex4D& vertex1,
-			Vertex4D& vertex2,
-			Vertex4D& vertex3,
-			Vertex4D& oV1,
-			Vertex4D& oV2,
-			Vertex4D& oV3,
-			Material& material,
-			SceneLighting& lights,
-			Profiler& profiler
-		);
-
-		static double Orient(
-			Vector3D a,
-			Vector3D b,
-			Vector3D c
-		);
-
-		static void TriangleRasteriser3(
-			RenderSurface& surface,
-			PipelineConfiguration& pipelineConfiguration,
-			Camera& camera,
-			Vertex4D& vertex1,
-			Vertex4D& vertex2,
-			Vertex4D& vertex3,
-			Vertex4D& oV1,
-			Vertex4D& oV2,
-			Vertex4D& oV3,
-			Material& material,
-			SceneLighting& lights,
-			Profiler& profiler
+			Vertex4D& oV2
 		);
 	};
 }
