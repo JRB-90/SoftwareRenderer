@@ -8,18 +8,6 @@
 
 using namespace softengine;
 
-Camera::Camera()
-	:
-	width(0.0),
-	height(0.0),
-	fov(0.0),
-	nearClip(0.0),
-	farClip(0.0),
-	projection(Matrix4::Identity()),
-	view(Matrix4::Identity())
-{
-}
-
 Camera::Camera(
 	double width,
 	double height,

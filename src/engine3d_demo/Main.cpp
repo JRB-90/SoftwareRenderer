@@ -98,6 +98,21 @@ int main(int argc, const char* argv[])
 
 void SetupScene()
 {
+	Mesh3D point1Mesh = ModelImporter::LoadModelResource(
+		"models/sphere.obj",
+		Material(point1Col, ShadingType::None),
+		true, false
+	);
+
+	Mesh3D point2Mesh = ModelImporter::LoadModelResource(
+		"models/sphere.obj",
+		Material(point2Col, ShadingType::None),
+		true, false
+	);
+
+	scene->Meshes().push_back(point1Mesh);
+	scene->Meshes().push_back(point2Mesh);
+
 	//Mesh3D monkeyMesh = ModelImporter::LoadModelResource(
 	//	"models/suzanne.obj",
 	//	Material(Color(0.5, 0.5, 0.5, 1.0), ShadingType::Phong),
@@ -111,20 +126,13 @@ void SetupScene()
 	monkeyMesh.Transform().Translation(Vector3D(0, 0, 0));
 	scene->Meshes().push_back(monkeyMesh);
 
-	//Mesh3D point1Mesh = ModelImporter::LoadModelResource(
-	//	"models/sphere.obj",
-	//	Material(point1Col, ShadingType::None),
-	//	true, false
+	//scene->Meshes().push_back(
+	//	MeshBuilder::BuildPlane(
+	//		2.0,
+	//		2.0,
+	//		Material(brickTexture, ShadingType::None)
+	//	)
 	//);
-
-	//Mesh3D point2Mesh = ModelImporter::LoadModelResource(
-	//	"models/sphere.obj",
-	//	Material(point2Col, ShadingType::None),
-	//	true, false
-	//);
-
-	//scene->Meshes().push_back(point1Mesh);
-	//scene->Meshes().push_back(point2Mesh);
 
 	AmbientLight ambient(
 		Color::White,
@@ -281,13 +289,13 @@ void UpdateModels(
 
 	point1Pos = Vector3D(ts * 3.0, point1Pos.Y(), point1Pos.Z());
 	point2Pos = Vector3D(point2Pos.X(), point2Pos.Y(), tc * 5.0);
-	//scene->Meshes()[1].Transform().Translation(point1Pos);
-	//scene->Meshes()[2].Transform().Translation(point2Pos);
+	scene->Meshes()[0].Transform().Translation(point1Pos);
+	scene->Meshes()[1].Transform().Translation(point2Pos);
 	scene->Lighting().GetPointsLights()[0].Position(point1Pos);
 	scene->Lighting().GetPointsLights()[1].Position(point2Pos);
 
 	if (isSpinning)
 	{
-		scene->Meshes()[0].Transform(scene->Meshes()[0].Transform() * Frame3D(Rotation3D(0, moveDelta, 0)));
+		scene->Meshes()[2].Transform(scene->Meshes()[2].Transform() * Frame3D(Rotation3D(0, moveDelta, 0)));
 	}
 }

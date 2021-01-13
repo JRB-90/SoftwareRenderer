@@ -15,27 +15,34 @@ namespace softengine
 	class Camera;
 	class Light;
 	class SceneLighting;
-	struct OutputFragment;
 	enum class DepthCheckMode;
 
 	struct VertexShaderIn
 	{
+		RenderSurface* surface;
 		Vertex3D* vertex;
-		Matrix4* mvp;
+		Matrix4* model;
+		Camera* camera;
 
 		VertexShaderIn()
 	      :
+			surface(NULL),
 			vertex(NULL),
-			mvp(NULL)
+			model(NULL),
+			camera(NULL)
 		{
 		}
 
 		VertexShaderIn(
+			RenderSurface* surface,
 			Vertex3D* vertex,
-			Matrix4* mvp)
+			Matrix4* model,
+			Camera* camera)
 	      :
+			surface(surface),
 			vertex(vertex),
-			mvp(mvp)
+			model(model),
+			camera(camera)
 		{
 		}
 	};
@@ -69,6 +76,7 @@ namespace softengine
 		ShaderTools() = delete;
 
 		static Vertex4D SimpleVertexShader(
+			RenderSurface& surface,
 			Vertex3D& vertex,
 			Matrix4& mvp
 		);
@@ -94,7 +102,7 @@ namespace softengine
 
 		static void PixelShader(
 			RenderSurface& surface,
-			OutputFragment& fragment,
+			Fragment& fragment,
 			Material& material,
 			SceneLighting& lights,
 			Profiler& profiler

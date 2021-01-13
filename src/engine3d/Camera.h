@@ -10,7 +10,6 @@ namespace softengine
 	class Camera
 	{
 	public:
-		Camera();
 		Camera(
 			double width,
 			double height,

@@ -16,17 +16,6 @@ Matrix4::Matrix4(const Matrix4& matrix)
 	}
 }
 
-Matrix4::Matrix4()
-{
-	for (size_t i = 0; i < 4; i++)
-	{
-		for (size_t j = 0; j < 4; j++)
-		{
-			m[i][j] = 0.0;
-		}
-	}
-}
-
 Matrix4::Matrix4(
 	double m00, double m01, double m02, double m03,
 	double m10, double m11, double m12, double m13,

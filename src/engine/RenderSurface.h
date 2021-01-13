@@ -60,8 +60,6 @@ namespace softengine
 		size_t PixelCount() const { return pixelCount; }
 		size_t ScreenBufSize() const { return screenBufSize; }
 
-		static int PixelCallCount;
-
 	private:
 		size_t pixelsWidth;
 		size_t pixelsHeight;

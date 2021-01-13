@@ -15,7 +15,8 @@
 using namespace softengine;
 
 Vertex4D ShaderTools::SimpleVertexShader(
-	Vertex3D& vertex,
+	RenderSurface& surface, 
+	Vertex3D& vertex, 
 	Matrix4& mvp)
 {
 	Vector4D vertPosition(
@@ -67,8 +68,9 @@ void ShaderTools::SimpleVertexShader(
 		0.0
 	);
 
-	vertPosition = vertPosition * (*in.mvp);
-	vertNormal = vertNormal * (*in.mvp);
+	Matrix4 MVP = in.camera->ProjectionMatrix() * in.camera->ViewMatrix() * (*in.model);
+	vertPosition = vertPosition * MVP;
+	vertNormal = vertNormal * MVP;
 
 	out.vertex =
 		Vertex4D(

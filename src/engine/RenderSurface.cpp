@@ -98,8 +98,6 @@ Color RenderSurface::GetPixelValue(
 		);
 }
 
-int RenderSurface::PixelCallCount = 0;
-
 void RenderSurface::SetPixelValue(
 	int pixel,
 	Color& color)
@@ -117,8 +115,6 @@ void RenderSurface::SetPixelValue(
 	pixels[offset + 1] = color.GetAs4B().g;
 	pixels[offset + 2] = color.GetAs4B().r;
 	pixels[offset + 3] = color.GetAs4B().a;
-
-	RenderSurface::PixelCallCount++;
 }
 
 void RenderSurface::SetPixelValue(
@@ -139,8 +135,6 @@ void RenderSurface::SetPixelValue(
 	pixels[offset + 1] = color.GetAs4B().g;
 	pixels[offset + 2] = color.GetAs4B().r;
 	pixels[offset + 3] = color.GetAs4B().a;
-
-	RenderSurface::PixelCallCount++;
 }
 
 double RenderSurface::GetZBufferVal(
