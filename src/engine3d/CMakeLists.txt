@@ -44,6 +44,8 @@ add_library(engine3d STATIC
 	InterpolationTools.cpp
     PointLight.h
 	PointLight.cpp
+    TriangleRasterizer.h
+	TriangleRasterizer.cpp
 )
 
 target_link_libraries(engine3d PUBLIC

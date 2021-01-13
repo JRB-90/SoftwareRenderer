@@ -1,13 +1,14 @@
 #pragma once
 
 #include "Profiler.h"
+#include "Vector4D.h"
+#include "Color.h"
 #include <vector>
 
 namespace softengine
 {
 	class Vector2D;
 	class Vector3D;
-	class Vector4D;
 	class Vertex3D;
 	class Vertex4D;
 	class Material;
@@ -129,10 +130,38 @@ namespace softengine
 		}
 	};
 
+	struct OutputFragment
+	{
+		Vector4D Fragment;
+		Vector4D Position;
+		Vector4D Normal;
+		Vector4D FaceNormal;
+		Vector4D TexCoords;
+		Color FragmentColor;
+
+		OutputFragment(
+			Vector4D& fragment,
+			Vector4D& position,
+			Vector4D& normal,
+			Vector4D& faceNormal,
+			Vector4D& texCoords,
+			Color& fragmentColor)
+		{
+			this->Fragment = fragment;
+			this->Position = position;
+			this->Normal = normal;
+			this->FaceNormal = faceNormal;
+			this->TexCoords = texCoords;
+			this->FragmentColor = fragmentColor;
+		}
+	};
+
 	class RasteringTools
 	{
 	public:
 		RasteringTools() = delete;
+
+		static int RasterCallCount;
 
 		static bool PassesClipTest(Vertex4D& v1);
 
@@ -218,14 +247,26 @@ namespace softengine
 			RenderSurface& surface,
 			PipelineConfiguration& pipelineConfiguration,
 			Camera& camera,
+			Vertex4D& vertex0,
 			Vertex4D& vertex1,
 			Vertex4D& vertex2,
-			Vertex4D& vertex3,
+			Vertex4D& oV0,
 			Vertex4D& oV1,
 			Vertex4D& oV2,
-			Vertex4D& oV3,
 			Material& material,
 			SceneLighting& lights,
+			Profiler& profiler
+		);
+
+		static std::vector<OutputFragment> TriangleRasteriser4(
+			PipelineConfiguration& pipelineConfiguration,
+			Vertex4D& vertex0,
+			Vertex4D& vertex1,
+			Vertex4D& vertex2,
+			Vertex4D& oV0,
+			Vertex4D& oV1,
+			Vertex4D& oV2,
+			Material& material,
 			Profiler& profiler
 		);
 	};
