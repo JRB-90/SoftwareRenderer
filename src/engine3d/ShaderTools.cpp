@@ -96,10 +96,8 @@ void ShaderTools::PixelShader(
 	Color& interpolatedColor,
 	Material& material,
 	SceneLighting& lights,
-	DepthCheckMode depthCheckMode,
-	Profiler& profiler)
+	DepthCheckMode depthCheckMode)
 {
-	profiler.ResetTimer();
 	switch (material.GetShadingType())
 	{
 	case ShadingType::None:
@@ -108,7 +106,6 @@ void ShaderTools::PixelShader(
 			fragment.Y(),
 			interpolatedColor
 		);
-		profiler.AddTiming("Shader None");
 		break;
 	case ShadingType::Normal:
 		PixelShaderNormal(
@@ -121,7 +118,6 @@ void ShaderTools::PixelShader(
 			material,
 			lights
 		);
-		profiler.AddTiming("Shader Normal");
 		break;
 	case ShadingType::Flat:
 		PixelShaderPhong(
@@ -134,7 +130,6 @@ void ShaderTools::PixelShader(
 			material,
 			lights
 		);
-		profiler.AddTiming("Shader Flat");
 		break;
 	case ShadingType::Phong:
 		PixelShaderPhong(
@@ -147,7 +142,6 @@ void ShaderTools::PixelShader(
 			material,
 			lights
 		);
-		profiler.AddTiming("Shader Phong");
 		break;
 	default:
 		break;

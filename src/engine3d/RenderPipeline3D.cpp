@@ -105,7 +105,6 @@ void RenderPipeline3D::RunPoints(
 	SceneLighting& lights)
 {
 	Profiler pipelineProfiler;
-	Profiler pixelProfiler;
 
 	for (size_t i = 0; i < vbo.IndicesSize(); i++)
 	{
@@ -160,8 +159,7 @@ void RenderPipeline3D::RunPoints(
 			pipelineConfiguration,
 			camera,
 			vert,
-			lights,
-			pixelProfiler
+			lights
 		);
 
 		//Vertex4D oV1(
@@ -181,7 +179,6 @@ void RenderPipeline3D::RunPoints(
 		pipelineProfiler.AddTiming("Point Raster");
 	}
 
-	pixelProfiler.PrintTimings();
 	pipelineProfiler.PrintTimings();
 }
 
@@ -193,7 +190,6 @@ void RenderPipeline3D::RunLines(
 	SceneLighting& lights)
 {
 	Profiler pipelineProfiler;
-	Profiler pixelProfiler;
 
 	for (size_t i = 0; i < vbo.IndicesSize() - 1; i += 2)
 	{
@@ -242,14 +238,12 @@ void RenderPipeline3D::RunLines(
 			camera,
 			vert1,
 			vert2,
-			lights,
-			pixelProfiler
+			lights
 		);
 
 		pipelineProfiler.AddTiming("Line Raster");
 	}
 
-	pixelProfiler.PrintTimings();
 	pipelineProfiler.PrintTimings();
 }
 
@@ -262,7 +256,6 @@ void RenderPipeline3D::RunTriangles(
 	SceneLighting& lights)
 {
 	Profiler pipelineProfiler;
-	Profiler pixelProfiler;
 
 	Matrix4 MVP = camera.ProjectionMatrix() * camera.ViewMatrix() * model;
 
@@ -320,7 +313,7 @@ void RenderPipeline3D::RunTriangles(
 		pipelineProfiler.AddTiming("Raster Space");
 
 		std::vector<RasterFragment> fragments =
-			RasteringTools::TriangleRasteriser4(
+			RasteringTools::TriangleRasteriser(
 				pipelineConfiguration,
 				vert1,
 				vert2,
@@ -391,15 +384,13 @@ void RenderPipeline3D::RunTriangles(
 				interpolatedFragment.FragColor,
 				material,
 				lights,
-				pipelineConfiguration.depthCheckMode,
-				pipelineProfiler
+				pipelineConfiguration.depthCheckMode
 			);
 		}
 
 		pipelineProfiler.AddTiming("Pixel Shader");
 	}
 
-	pixelProfiler.PrintTimings();
 	pipelineProfiler.PrintTimings();
 }
 
