@@ -1,13 +1,13 @@
 #pragma once
 
 #include "Profiler.h"
+#include "Vector3D.h"
+#include "Vector4D.h"
 #include <vector>
 
 namespace softengine
 {
 	class Vector2D;
-	class Vector3D;
-	class Vector4D;
 	class Vertex3D;
 	class Vertex4D;
 	class Material;
@@ -129,6 +129,20 @@ namespace softengine
 		}
 	};
 
+	struct RasterFragment
+	{
+		Vector3D BaryCoords;
+		Vector4D Fragment;
+
+		RasterFragment(
+			Vector3D& baryCoords,
+			Vector4D& fragment)
+		{
+			this->BaryCoords = baryCoords;
+			this->Fragment = fragment;
+		}
+	};
+
 	class RasteringTools
 	{
 	public:
@@ -227,6 +241,16 @@ namespace softengine
 			Material& material,
 			SceneLighting& lights,
 			Profiler& profiler
+		);
+
+		static std::vector<RasterFragment> TriangleRasteriser4(
+			PipelineConfiguration& pipelineConfiguration,
+			Vertex4D& vertex0,
+			Vertex4D& vertex1,
+			Vertex4D& vertex2,
+			Vertex4D& oV0,
+			Vertex4D& oV1,
+			Vertex4D& oV2
 		);
 	};
 }

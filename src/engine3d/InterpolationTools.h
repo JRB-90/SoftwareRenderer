@@ -11,6 +11,7 @@ namespace softengine
 	class Vertex4D;
 	class Color;
 	class Texture;
+	struct RasterFragment;
 
 	class InterpolationTools
 	{
@@ -99,6 +100,20 @@ namespace softengine
 			Vector4D& pos,
 			Texture& texture,
 			bool perspectiveCorrect = true
+		);
+
+		static void InterpolateFragment(
+			RasterFragment fragment,
+			Vertex4D& vertex0,
+			Vertex4D& vertex1,
+			Vertex4D& vertex2,
+			Vertex4D& oV0,
+			Vertex4D& oV1,
+			Vertex4D& oV2,
+			Vector4D& vc0,
+			Vector4D& vc1,
+			Vector4D& vc2,
+			Material& material
 		);
 	};
 }
