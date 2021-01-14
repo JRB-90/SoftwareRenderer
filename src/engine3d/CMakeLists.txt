@@ -2,6 +2,8 @@ cmake_minimum_required (VERSION 3.8)
 
 project (Engine3D)
 
+add_compile_options("/openmp:experimental")
+
 find_library(math NAMES math)
 find_library(engine NAMES engine)
 find_library(engine2d NAMES engine2d)

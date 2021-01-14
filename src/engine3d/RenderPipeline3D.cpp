@@ -20,6 +20,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <omp.h>
 
 using namespace softengine;
 
@@ -336,56 +337,54 @@ void RenderPipeline3D::RunTriangles(
 				screenSpaceV3.Position
 			);
 
-		std::vector<InterpolatedFragment> interpolatedFragments;
+		//std::vector<InterpolatedFragment> interpolatedFragments;
 
-		for (RasterFragment& fragment : fragments)
+		#pragma omp parallel num_threads(2)
 		{
-			InterpolatedFragment interpolatedFragment =
-				InterpolationTools::InterpolateFragment(
-					fragment,
-					vert1,
-					vert2,
-					vert3,
-					screenSpaceV1,
-					screenSpaceV2,
-					screenSpaceV3,
-					vc1,
-					vc2,
-					vc3,
-					material
-				);
-
-			if (RasteringTools::PassesDepthCheck(
-					surface,
-					Vector3D(
-						fragment.Fragment.X(),
-						fragment.Fragment.Y(),
-						interpolatedFragment.Position.Z()
-					),
-					pipelineConfiguration.depthCheckMode
-				)
-			)
+			#pragma omp for schedule(static)
+			//#pragma omp single
+			for (int i = 0; i < fragments.size(); i++)
 			{
-				interpolatedFragments.push_back(interpolatedFragment);
+				InterpolatedFragment interpolatedFragment =
+					InterpolationTools::InterpolateFragment(
+						fragments[i],
+						vert1,
+						vert2,
+						vert3,
+						screenSpaceV1,
+						screenSpaceV2,
+						screenSpaceV3,
+						vc1,
+						vc2,
+						vc3,
+						material
+					);
+
+				if (RasteringTools::PassesDepthCheck(
+						surface,
+						Vector3D(
+							fragments[i].Fragment.X(),
+							fragments[i].Fragment.Y(),
+							interpolatedFragment.Position.Z()
+						),
+						pipelineConfiguration.depthCheckMode
+					)
+				)
+				{
+					ShaderTools::PixelShader(
+						surface,
+						camera,
+						interpolatedFragment.Fragment,
+						interpolatedFragment.Position,
+						interpolatedFragment.Normal,
+						faceNormal,
+						interpolatedFragment.FragColor,
+						material,
+						lights,
+						pipelineConfiguration.depthCheckMode
+					);
+				}
 			}
-		}
-
-		pipelineProfiler.AddTiming("Frag Interp");
-
-		for (InterpolatedFragment& interpolatedFragment : interpolatedFragments)
-		{
-			ShaderTools::PixelShader(
-				surface,
-				camera,
-				interpolatedFragment.Fragment,
-				interpolatedFragment.Position,
-				interpolatedFragment.Normal,
-				faceNormal,
-				interpolatedFragment.FragColor,
-				material,
-				lights,
-				pipelineConfiguration.depthCheckMode
-			);
 		}
 
 		pipelineProfiler.AddTiming("Pixel Shader");
