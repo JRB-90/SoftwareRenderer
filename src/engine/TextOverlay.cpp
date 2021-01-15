@@ -8,7 +8,7 @@ using namespace softengine;
 TextOverlay::TextOverlay(
 	int fontSize,
 	Color fontColor)
-	:
+  :
 	fontSize(fontSize),
 	fontColor(fontColor.GetAs4B())
 {
@@ -61,4 +61,6 @@ void TextOverlay::RenderToSurface(RenderSurface& surface)
 		SDL_FreeSurface(textSurface);
 		SDL_DestroyTexture(texture);
 	}
+
+	TTF_CloseFont(font);
 }
