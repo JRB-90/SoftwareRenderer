@@ -250,11 +250,11 @@ void RenderPipeline3D::RunTriangles(
 
 	Matrix4 MVP = camera.ProjectionMatrix() * camera.ViewMatrix() * model;
 
-	#pragma omp parallel num_threads(2) default(none)
+	#pragma omp parallel num_threads(2) default(none) shared(surface, vbo, MVP, camera, material, lights)
 	{
 		//#pragma omp single
 		{
-			#pragma omp for schedule(runtime) nowait
+			#pragma omp for schedule(runtime)
 			for (int i = 0; i < vbo.IndicesSize() - 2; i += 3)
 			{
 				RunTriangle(
