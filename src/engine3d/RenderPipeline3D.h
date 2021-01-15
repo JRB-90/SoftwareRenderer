@@ -63,6 +63,16 @@ namespace softengine
 			SceneLighting& lights
 		);
 
+		void RunTriangle(
+			RenderSurface& surface,
+			VBO3D& vbo,
+			int& index,
+			Matrix4& mvp,
+			Camera& camera,
+			Material& material,
+			SceneLighting& lights
+		);
+
 		void RunQuads(
 			RenderSurface& surface,
 			VBO3D& vbo,
