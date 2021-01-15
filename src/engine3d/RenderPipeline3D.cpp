@@ -260,40 +260,62 @@ void RenderPipeline3D::RunTriangles(
 
 	Matrix4 MVP = camera.ProjectionMatrix() * camera.ViewMatrix() * model;
 
-	for (size_t i = 0; i < vbo.IndicesSize() - 2; i += 3)
+	#pragma omp parallel num_threads(2) default(none)
 	{
-		pipelineProfiler.ResetTimer();
-
-		Vertex4D vert1 =
-			ShaderTools::SimpleVertexShader(
-				surface,
-				vbo.Vertices(vbo.Indices(i)),
-				MVP
-			);
-		Vertex4D vert2 =
-			ShaderTools::SimpleVertexShader(
-				surface,
-				vbo.Vertices(vbo.Indices(i + 1)),
-				MVP
-			);
-		Vertex4D vert3 =
-			ShaderTools::SimpleVertexShader(
-				surface,
-				vbo.Vertices(vbo.Indices(i + 2)),
-				MVP
-			);
-
-		pipelineProfiler.AddTiming("Vertex Shader");
-
-		if (!RasteringTools::PassesClipTest(vert1) &&
-			!RasteringTools::PassesClipTest(vert2) &&
-			!RasteringTools::PassesClipTest(vert3))
+		//#pragma omp single
 		{
-			continue;
+			#pragma omp for schedule(runtime) nowait
+			for (int i = 0; i < vbo.IndicesSize() - 2; i += 3)
+			{
+				RunTriangle(
+					surface,
+					vbo,
+					i,
+					MVP,
+					camera,
+					material,
+					lights
+				);
+			}
 		}
+	}
 
-		pipelineProfiler.AddTiming("Clip Test");
+	pipelineProfiler.AddTiming("Model Total");
+	pipelineProfiler.PrintTimings();
+}
 
+void RenderPipeline3D::RunTriangle(
+	RenderSurface& surface, 
+	VBO3D& vbo,
+	int& index,
+	Matrix4& mvp, 
+	Camera& camera, 
+	Material& material, 
+	SceneLighting& lights)
+{
+	Vertex4D vert1 =
+		ShaderTools::SimpleVertexShader(
+			surface,
+			vbo.Vertices(vbo.Indices(index)),
+			mvp
+		);
+	Vertex4D vert2 =
+		ShaderTools::SimpleVertexShader(
+			surface,
+			vbo.Vertices(vbo.Indices(index + 1)),
+			mvp
+		);
+	Vertex4D vert3 =
+		ShaderTools::SimpleVertexShader(
+			surface,
+			vbo.Vertices(vbo.Indices(index + 2)),
+			mvp
+		);
+
+	if (RasteringTools::PassesClipTest(vert1) &&
+		RasteringTools::PassesClipTest(vert2) &&
+		RasteringTools::PassesClipTest(vert3))
+	{
 		Vertex4D screenSpaceV1(vert1);
 		Vertex4D screenSpaceV2(vert2);
 		Vertex4D screenSpaceV3(vert3);
@@ -311,8 +333,6 @@ void RenderPipeline3D::RunTriangles(
 			camera
 		);
 
-		pipelineProfiler.AddTiming("Raster Space");
-
 		std::vector<RasterFragment> fragments =
 			RasteringTools::TriangleRasteriser(
 				pipelineConfiguration,
@@ -323,8 +343,6 @@ void RenderPipeline3D::RunTriangles(
 				screenSpaceV2,
 				screenSpaceV3
 			);
-
-		pipelineProfiler.AddTiming("Tri Raster");
 
 		Vector4D vc1 = vert1.VertColor.ToVec4();
 		Vector4D vc2 = vert1.VertColor.ToVec4();
@@ -337,60 +355,49 @@ void RenderPipeline3D::RunTriangles(
 				screenSpaceV3.Position
 			);
 
-		//std::vector<InterpolatedFragment> interpolatedFragments;
-
-		#pragma omp parallel num_threads(2)
+		for (int i = 0; i < fragments.size(); i++)
 		{
-			#pragma omp for schedule(static)
-			//#pragma omp single
-			for (int i = 0; i < fragments.size(); i++)
-			{
-				InterpolatedFragment interpolatedFragment =
-					InterpolationTools::InterpolateFragment(
-						fragments[i],
-						vert1,
-						vert2,
-						vert3,
-						screenSpaceV1,
-						screenSpaceV2,
-						screenSpaceV3,
-						vc1,
-						vc2,
-						vc3,
-						material
-					);
+			InterpolatedFragment interpolatedFragment =
+				InterpolationTools::InterpolateFragment(
+					fragments[i],
+					vert1,
+					vert2,
+					vert3,
+					screenSpaceV1,
+					screenSpaceV2,
+					screenSpaceV3,
+					vc1,
+					vc2,
+					vc3,
+					material
+				);
 
-				if (RasteringTools::PassesDepthCheck(
-						surface,
-						Vector3D(
-							fragments[i].Fragment.X(),
-							fragments[i].Fragment.Y(),
-							interpolatedFragment.Position.Z()
-						),
-						pipelineConfiguration.depthCheckMode
-					)
+			if (RasteringTools::PassesDepthCheck(
+				surface,
+				Vector3D(
+					fragments[i].Fragment.X(),
+					fragments[i].Fragment.Y(),
+					interpolatedFragment.Position.Z()
+				),
+				pipelineConfiguration.depthCheckMode
+			)
 				)
-				{
-					ShaderTools::PixelShader(
-						surface,
-						camera,
-						interpolatedFragment.Fragment,
-						interpolatedFragment.Position,
-						interpolatedFragment.Normal,
-						faceNormal,
-						interpolatedFragment.FragColor,
-						material,
-						lights,
-						pipelineConfiguration.depthCheckMode
-					);
-				}
+			{
+				ShaderTools::PixelShader(
+					surface,
+					camera,
+					interpolatedFragment.Fragment,
+					interpolatedFragment.Position,
+					interpolatedFragment.Normal,
+					faceNormal,
+					interpolatedFragment.FragColor,
+					material,
+					lights,
+					pipelineConfiguration.depthCheckMode
+				);
 			}
 		}
-
-		pipelineProfiler.AddTiming("Pixel Shader");
 	}
-
-	pipelineProfiler.PrintTimings();
 }
 
 void RenderPipeline3D::RunQuads(
