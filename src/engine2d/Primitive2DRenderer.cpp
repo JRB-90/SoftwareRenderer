@@ -392,9 +392,6 @@ void Primitive2DRenderer::RenderPolygonWireFrame(
 			RenderLine(surface, l3);
 		}
 		break;
-	case DrawType::Quads:
-		// TODO
-		break;
 	default:
 		break;
 	}

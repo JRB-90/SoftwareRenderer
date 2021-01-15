@@ -73,15 +73,6 @@ namespace softengine
 			SceneLighting& lights
 		);
 
-		void RunQuads(
-			RenderSurface& surface,
-			VBO3D& vbo,
-			Matrix4& model,
-			Camera& camera,
-			Material& material,
-			SceneLighting& lights
-		);
-
 	private:
 		PipelineConfiguration pipelineConfiguration;
 	};

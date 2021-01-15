@@ -83,16 +83,6 @@ void RenderPipeline3D::Run(
 			lights
 		);
 		break;
-	case DrawType::Quads:
-		RunQuads(
-			surface,
-			vbo,
-			model,
-			camera,
-			material,
-			lights
-		);
-		break;
 	default:
 		return;
 	}
@@ -398,15 +388,4 @@ void RenderPipeline3D::RunTriangle(
 			}
 		}
 	}
-}
-
-void RenderPipeline3D::RunQuads(
-	RenderSurface& surface, 
-	VBO3D& vbo,
-	Matrix4& model, 
-	Camera& camera,
-	Material& material,
-	SceneLighting& lights)
-{
-	// TODO
 }

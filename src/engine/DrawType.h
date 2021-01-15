@@ -6,7 +6,6 @@ namespace softengine
 	{
 		Points,
 		Lines,
-		Triangles,
-		Quads
+		Triangles
 	};
 }
